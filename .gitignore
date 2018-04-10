@@ -1,0 +1,4 @@
+*.vcxproj.user
+.vs/
+build/
+temp/
