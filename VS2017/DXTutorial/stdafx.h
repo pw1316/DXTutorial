@@ -19,3 +19,4 @@
 
 
 // TODO: reference additional headers your program requires here
+#define FAILRETURN(hr) if((hr) != S_OK) {return (hr);}

@@ -55,7 +55,7 @@ HRESULT System::Initialize()
     m_input = new Input;
     m_graphics = new Graphics;
     m_input->Initialize();
-    hr = m_graphics->Initialize();
+    hr = m_graphics->Initialize(m_hwnd, 1024, 768);
     return hr;
 }
 
@@ -152,6 +152,8 @@ HRESULT System::InitializeWindow()
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
     RegisterClassExW(&wcex);
 
+    RECT rect{ 0, 0, 1024, 768 };
+    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, true);
     m_hwnd = CreateWindowW
     (
         m_className,
@@ -159,8 +161,8 @@ HRESULT System::InitializeWindow()
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         0,
-        CW_USEDEFAULT,
-        0,
+        rect.right - rect.left,
+        rect.bottom - rect.top,
         nullptr,
         nullptr,
         m_hInst,

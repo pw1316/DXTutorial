@@ -7,8 +7,6 @@
 
 #define MAX_LOADSTRING 100
 
-#define FAILRETURN(hr) if((hr) != S_OK) {return (hr);}
-
 class System
 {
 public:
