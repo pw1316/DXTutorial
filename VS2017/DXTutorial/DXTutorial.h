@@ -22,8 +22,8 @@ public:
 
 private:
     System() {}
-    System(const System& rhs) = delete;
-    System(System&& rhs) = delete;
+    System(const System &rhs) = delete;
+    System(System &&rhs) = delete;
     ~System() {}
     HRESULT Update();
     HRESULT InitializeWindow();
@@ -37,6 +37,7 @@ private:
 
     Input* m_input = nullptr;
     Graphics* m_graphics = nullptr;
+    bool inited = false;
 };
 
 static LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

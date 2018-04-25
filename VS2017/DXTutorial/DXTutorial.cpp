@@ -4,8 +4,7 @@
 #include "stdafx.h"
 #include "DXTutorial.h"
 
-// Forward declarations of functions included in this code module:
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
 System* System::m_instance = nullptr;
 HINSTANCE System::m_hInst = nullptr;
@@ -28,10 +27,7 @@ System* System::GetInstance()
 {
     if (m_instance == nullptr)
     {
-        if (m_hInst == nullptr)
-        {
-            throw "HINSTANCE not set yet!";
-        }
+        assert(m_hInst != nullptr);
         m_instance = new System;
     }
     return m_instance;
@@ -39,9 +35,10 @@ System* System::GetInstance()
 
 void System::ReleaseInstance()
 {
+    /* Call Shutdown first */
+    assert(!(m_instance->inited));
     if (m_instance != nullptr)
     {
-        m_instance->Shutdown();
         delete m_instance;
         m_instance = nullptr;
     }
@@ -49,6 +46,7 @@ void System::ReleaseInstance()
 
 HRESULT System::Initialize()
 {
+    assert(!inited);
     HRESULT hr = S_OK;
     hr = InitializeWindow();
     FAILRETURN(hr);
@@ -56,11 +54,14 @@ HRESULT System::Initialize()
     m_graphics = new Graphics;
     m_input->Initialize();
     hr = m_graphics->Initialize(m_hwnd, 1024, 768);
+    FAILRETURN(hr);
+    inited = true;
     return hr;
 }
 
 HRESULT System::Shutdown()
 {
+    assert(inited);
     HRESULT hr = S_OK;
     if (m_input)
     {
@@ -76,11 +77,14 @@ HRESULT System::Shutdown()
     }
     FAILRETURN(hr);
     hr = ShutdownWindow();
+    FAILRETURN(hr);
+    inited = false;
     return hr;
 }
 
 void System::MainLoop()
 {
+    assert(inited);
     HRESULT hr = S_OK;
     MSG msg;
     ZeroMemory(&msg, sizeof(MSG));
@@ -150,10 +154,19 @@ HRESULT System::InitializeWindow()
     wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_DXTUTORIAL);
     wcex.lpszClassName = m_className;
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-    RegisterClassExW(&wcex);
+    auto registerResult = RegisterClassExW(&wcex);
+    if (registerResult == 0)
+    {
+        return E_FAIL;
+    }
 
     RECT rect{ 0, 0, 1024, 768 };
-    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, true);
+    auto adjustResult = AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, true);
+    if (!adjustResult)
+    {
+        UnregisterClassW(m_className, m_hInst);
+        return E_FAIL;
+    }
     m_hwnd = CreateWindowW
     (
         m_className,
@@ -169,10 +182,14 @@ HRESULT System::InitializeWindow()
         nullptr
     );
     hr = m_hwnd ? S_OK : E_FAIL;
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        UnregisterClassW(m_className, m_hInst);
+        return hr;
+    }
     ShowWindow(m_hwnd, SW_SHOWNORMAL);
     UpdateWindow(m_hwnd);
-    return hr;
+    return S_OK;
 }
 
 HRESULT System::ShutdownWindow()
@@ -185,10 +202,12 @@ HRESULT System::ShutdownWindow()
     return hr;
 }
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+int APIENTRY wWinMain(
+    _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR    lpCmdLine,
-    _In_ int       nCmdShow)
+    _In_ LPWSTR lpCmdLine,
+    _In_ int nCmdShow
+)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
