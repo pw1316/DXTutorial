@@ -1,90 +1,110 @@
-// DXTutorial.cpp : Defines the entry point for the application.
-//
-
 #include "stdafx.h"
 #include "DXTutorial.h"
 
 INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 
-System* System::m_instance = nullptr;
 HINSTANCE System::m_hInst = nullptr;
+System *System::m_instance = nullptr;
 
 HINSTANCE System::GetHInstance()
 {
+    assert(m_hInst != nullptr);
     return m_hInst;
 }
 
-/* Once set, never change */
-void System::SetHInstance(HINSTANCE hInst)
-{
-    if (m_hInst == nullptr)
-    {
-        m_hInst = hInst;
-    }
-}
-
-System* System::GetInstance()
+/* Call this before every thing!!! */
+System *System::CreateInstance(HINSTANCE hInst)
 {
     if (m_instance == nullptr)
     {
-        assert(m_hInst != nullptr);
+        m_hInst = hInst;
         m_instance = new System;
     }
+    return m_instance;
+}
+
+System *System::GetInstance()
+{
+    assert(m_instance != nullptr);
     return m_instance;
 }
 
 void System::ReleaseInstance()
 {
     /* Call Shutdown first */
-    assert(!(m_instance->inited));
+    assert(!(m_instance->m_isInited));
     if (m_instance != nullptr)
     {
         delete m_instance;
         m_instance = nullptr;
+        m_hInst = nullptr;
     }
 }
 
 HRESULT System::Initialize()
 {
-    assert(!inited);
+    assert(!m_isInited);
     HRESULT hr = S_OK;
+
+    /* Window */
     hr = InitializeWindow();
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        ShutdownWindow();
+        return E_FAIL;
+    }
+
+    /* Input */
     m_input = new Input;
-    m_graphics = new Graphics;
     m_input->Initialize();
+
+    /* Graphics */
+    m_graphics = new Graphics;
     hr = m_graphics->Initialize(m_hwnd, 1024, 768);
-    FAILRETURN(hr);
-    inited = true;
-    return hr;
+    if (FAILED(hr))
+    {
+        assert(m_graphics != nullptr);
+        m_graphics->Shutdown();
+        delete m_graphics;
+        m_graphics = nullptr;
+        assert(m_input != nullptr);
+        delete m_input;
+        m_input = nullptr;
+        ShutdownWindow();
+        return E_FAIL;
+    }
+    m_isInited = true;
+    return S_OK;
 }
 
-HRESULT System::Shutdown()
+void System::Shutdown()
 {
-    assert(inited);
-    HRESULT hr = S_OK;
+    assert(m_isInited);
+
+    /* Graphics */
+    if (m_graphics)
+    {
+        m_graphics->Shutdown();
+        delete m_graphics;
+        m_graphics = nullptr;
+    }
+
+    /* Input */
     if (m_input)
     {
         delete m_input;
         m_input = nullptr;
     }
 
-    if (m_graphics)
-    {
-        hr = m_graphics->Shutdown();
-        delete m_graphics;
-        m_graphics = nullptr;
-    }
-    FAILRETURN(hr);
-    hr = ShutdownWindow();
-    FAILRETURN(hr);
-    inited = false;
-    return hr;
+    /* Window */
+    ShutdownWindow();
+
+    m_isInited = false;
 }
 
 void System::MainLoop()
 {
-    assert(inited);
+    assert(m_isInited);
     HRESULT hr = S_OK;
     MSG msg;
     ZeroMemory(&msg, sizeof(MSG));
@@ -139,9 +159,13 @@ HRESULT System::Update()
 HRESULT System::InitializeWindow()
 {
     HRESULT hr = S_OK;
+
+    /* Load String */
     LoadStringW(m_hInst, IDS_APP_TITLE, m_appName, MAX_LOADSTRING);
     LoadStringW(m_hInst, IDC_DXTUTORIAL, m_className, MAX_LOADSTRING);
-    WNDCLASSEXW wcex;
+
+    /* Window Class */
+    WNDCLASSEXW wcex{};
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc = WinProc;
@@ -154,15 +178,15 @@ HRESULT System::InitializeWindow()
     wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_DXTUTORIAL);
     wcex.lpszClassName = m_className;
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-    auto registerResult = RegisterClassExW(&wcex);
-    if (registerResult == 0)
+    hr = (RegisterClassEx(&wcex) == 0) ? E_FAIL : S_OK;
+    if (FAILED(hr))
     {
         return E_FAIL;
     }
 
-    RECT rect{ 0, 0, 1024, 768 };
-    auto adjustResult = AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, true);
-    if (!adjustResult)
+    RECT paintRect{ 0, 0, 1024, 768 };
+    hr = AdjustWindowRect(&paintRect, WS_OVERLAPPEDWINDOW, true) ? S_OK : E_FAIL;
+    if (FAILED(hr))
     {
         UnregisterClassW(m_className, m_hInst);
         return E_FAIL;
@@ -174,8 +198,8 @@ HRESULT System::InitializeWindow()
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         0,
-        rect.right - rect.left,
-        rect.bottom - rect.top,
+        paintRect.right - paintRect.left,
+        paintRect.bottom - paintRect.top,
         nullptr,
         nullptr,
         m_hInst,
@@ -185,21 +209,19 @@ HRESULT System::InitializeWindow()
     if (FAILED(hr))
     {
         UnregisterClassW(m_className, m_hInst);
-        return hr;
+        return E_FAIL;
     }
     ShowWindow(m_hwnd, SW_SHOWNORMAL);
     UpdateWindow(m_hwnd);
     return S_OK;
 }
 
-HRESULT System::ShutdownWindow()
+void System::ShutdownWindow()
 {
-    HRESULT hr = S_OK;
     ShowCursor(true);
     DestroyWindow(m_hwnd);
     m_hwnd = nullptr;
     UnregisterClassW(m_className, m_hInst);
-    return hr;
 }
 
 int APIENTRY wWinMain(
@@ -213,13 +235,14 @@ int APIENTRY wWinMain(
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     HRESULT hr = S_OK;
-    System::SetHInstance(hInstance);
-    System *sys = System::GetInstance();
+    System *sys = System::CreateInstance(hInstance);
     hr = sys->Initialize();
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        return -1;
+    }
     sys->MainLoop();
-    hr = sys->Shutdown();
-    FAILRETURN(hr);
+    sys->Shutdown();
     System::ReleaseInstance();
     return 0;
 }
@@ -227,7 +250,7 @@ int APIENTRY wWinMain(
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HINSTANCE hInst = System::GetHInstance();
-    System* sys = System::GetInstance();
+    System *sys = System::GetInstance();
     switch (message)
     {
     case WM_COMMAND:
@@ -256,7 +279,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);

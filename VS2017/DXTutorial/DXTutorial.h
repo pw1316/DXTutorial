@@ -11,33 +11,33 @@ class System
 {
 public:
     static HINSTANCE GetHInstance();
-    static void SetHInstance(HINSTANCE hInst);
+    static System* CreateInstance(HINSTANCE hInst);
     static System* GetInstance();
     static void ReleaseInstance();
 
     HRESULT Initialize();
-    HRESULT Shutdown();
+    void Shutdown();
     void MainLoop();
     LRESULT CALLBACK HandleMSG(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 private:
-    System() {}
+    System() = default;
     System(const System &rhs) = delete;
     System(System &&rhs) = delete;
     ~System() {}
     HRESULT Update();
     HRESULT InitializeWindow();
-    HRESULT ShutdownWindow();
+    void ShutdownWindow();
 
-    static System* m_instance;
     static HINSTANCE m_hInst;
+    static System* m_instance;
     HWND m_hwnd = nullptr;
     WCHAR m_appName[MAX_LOADSTRING];
     WCHAR m_className[MAX_LOADSTRING];
 
+    bool m_isInited = false;
     Input* m_input = nullptr;
     Graphics* m_graphics = nullptr;
-    bool inited = false;
 };
 
 static LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

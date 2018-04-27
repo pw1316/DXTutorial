@@ -18,9 +18,10 @@
 #include <memory.h>
 #include <tchar.h>
 
+#include <type_traits>
 
 // TODO: reference additional headers your program requires here
-#define FAILRETURN(hr) if((hr) != S_OK) {return (hr);}
+#define FAILRETURN() if(FAILED(hr)) {return E_FAIL;}
 
 template<class COM>
 inline void SafeRelease(COM **ppCOM)

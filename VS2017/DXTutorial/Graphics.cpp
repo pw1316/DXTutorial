@@ -10,17 +10,17 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     /* Create DX factory */
     IDXGIFactory *factory;
     hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
-    FAILRETURN(hr);
+    FAILRETURN();
     /* Create DX adapter from factory, Release factory */
     IDXGIAdapter *adapter;
     hr = factory->EnumAdapters(0, &adapter);
     SafeRelease(&factory);
-    FAILRETURN(hr);
+    FAILRETURN();
     /* Create DX output from adapter, Release adapter */
     IDXGIOutput *adapterOutput;
     hr = adapter->EnumOutputs(0, &adapterOutput);
     SafeRelease(&adapter);
-    FAILRETURN(hr);
+    FAILRETURN();
     /* Create DX mode from output, Release output */
     std::vector<DXGI_MODE_DESC> modeList;
     UINT numModes;
@@ -29,12 +29,12 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     if (FAILED(hr))
     {
         SafeRelease(&adapterOutput);
-        return hr;
+        return E_FAIL;
     }
     modeList.resize(numModes);
     hr = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, &modeList[0]);
     SafeRelease(&adapterOutput);
-    FAILRETURN(hr);
+    FAILRETURN();
     /* Get Refresh Rate */
     UINT numerator, denominator;
     for (auto &mode : modeList)
@@ -78,14 +78,26 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
         nullptr,
         &m_deviceContext
     );
-    FAILRETURN(hr);
+    FAILRETURN();
     /* Create RTV on SwapChain */
     ID3D11Texture2D* backBuffer;
     hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
     hr = m_device->CreateRenderTargetView(backBuffer, nullptr, &m_RTView);
     SafeRelease(&backBuffer);
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
 
     /* Depth Buffer */
     D3D11_TEXTURE2D_DESC depthBufferDesc;
@@ -102,7 +114,14 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     depthBufferDesc.CPUAccessFlags = 0;
     depthBufferDesc.MiscFlags = 0;
     hr = m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_DSBuffer);
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        SafeRelease(&m_RTView);
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
 
     /* Depth Stencil State */
     D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -124,7 +143,15 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
     hr = m_device->CreateDepthStencilState(&depthStencilDesc, &m_DSState);
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        SafeRelease(&m_DSBuffer);
+        SafeRelease(&m_RTView);
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
     m_deviceContext->OMSetDepthStencilState(m_DSState, 1);
 
     /* Depth Stencil View */
@@ -134,7 +161,16 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
     depthStencilViewDesc.Texture2D.MipSlice = 0;
     hr = m_device->CreateDepthStencilView(m_DSBuffer, &depthStencilViewDesc, &m_DSView);
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        SafeRelease(&m_DSState);
+        SafeRelease(&m_DSBuffer);
+        SafeRelease(&m_RTView);
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
 
     /* Bind RTV and DSV */
     m_deviceContext->OMSetRenderTargets(1, &m_RTView, m_DSView);
@@ -153,7 +189,17 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     resterizeState.MultisampleEnable = false;
     resterizeState.AntialiasedLineEnable = false;
     hr = m_device->CreateRasterizerState(&resterizeState, &m_RState);
-    FAILRETURN(hr);
+    if (FAILED(hr))
+    {
+        SafeRelease(&m_DSView);
+        SafeRelease(&m_DSState);
+        SafeRelease(&m_DSBuffer);
+        SafeRelease(&m_RTView);
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
     m_deviceContext->RSSetState(m_RState);
 
     /* Viewport */
@@ -173,11 +219,72 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     D3DXMatrixPerspectiveFovLH(&m_MatrixProj, fov, aspect, 0.1f, 1000.0f);
     D3DXMatrixIdentity(&m_MatrixWorld);
     D3DXMatrixOrthoLH(&m_MatrixOrtho, (float)w, (float)h, 0.1f, 1000.0f);
+
+    m_camera = new Camera;
+    m_camera->SetPos(0.0f, 0.0f, -10.0f);
+
+    m_mesh = new Mesh;
+    hr = m_mesh->Initialize(m_device);
+    if (FAILED(hr))
+    {
+        delete m_mesh;
+        m_mesh = nullptr;
+        delete m_camera;
+        m_camera = nullptr;
+        SafeRelease(&m_RState);
+        SafeRelease(&m_DSView);
+        SafeRelease(&m_DSState);
+        SafeRelease(&m_DSBuffer);
+        SafeRelease(&m_RTView);
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
+
+    m_shader = new Shader;
+    m_shader->Initialize(m_device, hwnd);
+    if (FAILED(hr))
+    {
+        delete m_shader;
+        m_shader = nullptr;
+        m_mesh->Shutdown();
+        delete m_mesh;
+        m_mesh = nullptr;
+        delete m_camera;
+        m_camera = nullptr;
+        SafeRelease(&m_RState);
+        SafeRelease(&m_DSView);
+        SafeRelease(&m_DSState);
+        SafeRelease(&m_DSBuffer);
+        SafeRelease(&m_RTView);
+        SafeRelease(&m_deviceContext);
+        SafeRelease(&m_device);
+        SafeRelease(&m_swapChain);
+        return E_FAIL;
+    }
     return S_OK;
 }
 
-HRESULT Graphics::Shutdown()
+void Graphics::Shutdown()
 {
+    if (m_shader)
+    {
+        m_shader->Shutdown();
+        delete m_shader;
+        m_shader = nullptr;
+    }
+    if (m_mesh)
+    {
+        m_mesh->Shutdown();
+        delete m_mesh;
+        m_mesh = nullptr;
+    }
+    if (m_camera)
+    {
+        delete m_camera;
+        m_camera = nullptr;
+    }
     SafeRelease(&m_RState);
     SafeRelease(&m_DSView);
     SafeRelease(&m_DSState);
@@ -186,14 +293,22 @@ HRESULT Graphics::Shutdown()
     SafeRelease(&m_deviceContext);
     SafeRelease(&m_device);
     SafeRelease(&m_swapChain);
-    return S_OK;
 }
 
 HRESULT Graphics::OnRender()
 {
+    HRESULT hr = S_OK;
+    D3DXMATRIX world{}, view{}, proj{};
     BeginScene(0.7f, 0.2f, 0.1f, 0.0f);
-    EndScene();
-    return S_OK;
+    GetWorldMatrix(world);
+    m_camera->GetViewMatrix(view);
+    GetProjectionMatrix(proj);
+    m_camera->Render();
+    m_mesh->Render(m_deviceContext);
+    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj);
+    FAILRETURN();
+    hr = EndScene();
+    return hr;
 }
 
 ID3D11Device *Graphics::GetDevice()
@@ -221,16 +336,16 @@ void Graphics::GetOrthoMatrix(D3DXMATRIX &O)
     O = m_MatrixOrtho;
 }
 
-HRESULT Graphics::BeginScene(float r, float g, float b, float a)
+void Graphics::BeginScene(float r, float g, float b, float a)
 {
     float color[] = { r, g, b, a };
     m_deviceContext->ClearRenderTargetView(m_RTView, color);
     m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-    return S_OK;
 }
 
 HRESULT Graphics::EndScene()
 {
-    m_swapChain->Present(1, 0);
-    return S_OK;
+    HRESULT hr = S_OK;
+    hr = m_swapChain->Present(1, 0);
+    return hr;
 }

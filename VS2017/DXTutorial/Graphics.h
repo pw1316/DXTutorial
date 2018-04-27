@@ -9,6 +9,10 @@
 #include <D3D11.h>
 #include <D3DX10math.h>
 
+#include "Mesh.h"
+#include "Shader.h"
+#include "Camera.h"
+
 class Graphics
 {
 public:
@@ -18,7 +22,7 @@ public:
     ~Graphics() {}
 
     HRESULT Initialize(HWND hwnd, LONG w, LONG h);
-    HRESULT Shutdown();
+    void Shutdown();
     HRESULT OnRender();
 
     ID3D11Device *GetDevice();
@@ -28,7 +32,7 @@ public:
     void GetWorldMatrix(D3DXMATRIX&);
     void GetOrthoMatrix(D3DXMATRIX&);
 private:
-    HRESULT BeginScene(float r, float g, float b, float a);
+    void BeginScene(float r, float g, float b, float a);
     HRESULT EndScene();
 
     IDXGISwapChain *m_swapChain = nullptr;
@@ -39,7 +43,11 @@ private:
     ID3D11DepthStencilState *m_DSState = nullptr;
     ID3D11DepthStencilView *m_DSView = nullptr;
     ID3D11RasterizerState *m_RState = nullptr;
-    D3DXMATRIX m_MatrixProj;
-    D3DXMATRIX m_MatrixWorld;
-    D3DXMATRIX m_MatrixOrtho;
+    D3DXMATRIX m_MatrixProj{};
+    D3DXMATRIX m_MatrixWorld{};
+    D3DXMATRIX m_MatrixOrtho{};
+
+    Camera *m_camera = nullptr;
+    Mesh *m_mesh = nullptr;
+    Shader *m_shader = nullptr;
 };

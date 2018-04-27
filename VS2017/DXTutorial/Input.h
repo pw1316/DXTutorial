@@ -3,19 +3,20 @@
 
 class Input
 {
+private:
+    static const UINT NUM_KEYS = 256U;
 public:
-    Input() {}
-    Input(const Input& rhs) {}
+    Input() = default;
+    Input(const Input& rhs) = default;
     Input(Input&& rhs) {}
     ~Input() {}
 
     void Initialize();
 
-    void KeyDown(unsigned int);
-    void KeyUp(unsigned int);
+    void KeyDown(std::remove_const<decltype(NUM_KEYS)>::type);
+    void KeyUp(std::remove_const<decltype(NUM_KEYS)>::type);
 
-    bool IsKeyDown(unsigned int);
-
+    BOOL IsKeyDown(std::remove_const<decltype(NUM_KEYS)>::type);
 private:
-    bool m_keys[256];
+    BOOL m_keys[NUM_KEYS];
 };
