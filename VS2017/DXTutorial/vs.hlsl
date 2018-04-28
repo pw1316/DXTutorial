@@ -8,13 +8,13 @@ cbuffer MatrixBuffer
 struct VertexIn
 {
     float4 pos: POSITION;
-    float4 color: COLOR;
+    float2 uv: TEXCOORD0;
 };
 
 struct VertexOut
 {
     float4 pos: SV_POSITION;
-    float4 color: COLOR;
+    float2 uv: TEXCOORD0;
 };
 
 VertexOut VS(VertexIn vin)
@@ -24,6 +24,6 @@ VertexOut VS(VertexIn vin)
     vout.pos = mul(vin.pos, MatrixWorld);
     vout.pos = mul(vout.pos, MatrixView);
     vout.pos = mul(vout.pos, MatrixProj);
-    vout.color = vin.color;
+    vout.uv = vin.uv;
     return vout;
 }

@@ -3,11 +3,21 @@
 
 HRESULT Mesh::Initialize(ID3D11Device *device)
 {
-    return InitializeBuffer(device);
+    HRESULT hr = S_OK;
+    hr = InitializeBuffer(device);
+    FAILRETURN();
+    hr = InitializeTexture(device);
+    if (FAILED(hr))
+    {
+        ShutdownBuffer();
+        return E_FAIL;
+    }
+    return S_OK;
 }
 
 void Mesh::Shutdown()
 {
+    ShutdownTexture();
     ShutdownBuffer();
 }
 
@@ -21,7 +31,13 @@ int Mesh::GetIndexCount()
     return m_IBN;
 }
 
-HRESULT Mesh::InitializeBuffer(ID3D11Device * device)
+ID3D11ShaderResourceView *Mesh::GetTexture()
+{
+    assert(m_texture != nullptr);
+    return m_texture->GetTexture();
+}
+
+HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
 {
     HRESULT hrv = S_OK, hri = S_OK;
     DXVertex *vertices = nullptr;
@@ -36,11 +52,11 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device * device)
     vertices = new DXVertex[m_VBN];
     indices = new ULONG[m_IBN];
     vertices[0].pos = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);//BL
-    vertices[0].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+    vertices[0].uv = D3DXVECTOR2(0.0f, 1.0f);
     vertices[1].pos = D3DXVECTOR3(0.0f, 1.0f, 0.0f);//T
-    vertices[1].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+    vertices[1].uv = D3DXVECTOR2(0.5f, 0.0f);
     vertices[2].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);//BR
-    vertices[2].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+    vertices[2].uv = D3DXVECTOR2(1.0f, 1.0f);
     indices[0] = 0;//BL
     indices[1] = 1;//T
     indices[2] = 2;//BR
@@ -81,12 +97,31 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device * device)
     return S_OK;
 }
 
+HRESULT Mesh::InitializeTexture(ID3D11Device *device)
+{
+    if (m_texture == nullptr)
+    {
+        m_texture = new Texture;
+    }
+    return m_texture->Initialize(device, L"texture.dds");;
+}
+
 void Mesh::ShutdownBuffer()
 {
     SafeRelease(&m_VB);
     SafeRelease(&m_IB);
     m_VBN = 0;
     m_IBN = 0;
+}
+
+void Mesh::ShutdownTexture()
+{
+    if (m_texture != nullptr)
+    {
+        m_texture->Shutdown();
+        delete m_texture;
+        m_texture = nullptr;
+    }
 }
 
 void Mesh::RenderBuffer(ID3D11DeviceContext *context)

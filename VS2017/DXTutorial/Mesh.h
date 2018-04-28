@@ -4,13 +4,15 @@
 #include <D3D11.h>
 #include <D3DX10math.h>
 
+#include "Texture.h"
+
 class Mesh
 {
 private:
     struct DXVertex
     {
         D3DXVECTOR3 pos;
-        D3DXVECTOR4 color;
+        D3DXVECTOR2 uv;
     };
 public:
     Mesh() = default;
@@ -22,13 +24,17 @@ public:
     void Shutdown();
     void Render(ID3D11DeviceContext *context);
     int GetIndexCount();
+    ID3D11ShaderResourceView *GetTexture();
 private:
     HRESULT InitializeBuffer(ID3D11Device *device);
+    HRESULT InitializeTexture(ID3D11Device *device);
     void ShutdownBuffer();
+    void ShutdownTexture();
     void RenderBuffer(ID3D11DeviceContext *context);
 
     ID3D11Buffer *m_VB = nullptr;
     ID3D11Buffer *m_IB = nullptr;
     UINT m_VBN = 0;
     UINT m_IBN = 0;
+    Texture *m_texture = nullptr;
 };

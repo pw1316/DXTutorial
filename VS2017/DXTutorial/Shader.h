@@ -22,7 +22,7 @@ public:
 
     HRESULT Initialize(ID3D11Device *device, HWND hwnd);
     void Shutdown();
-    HRESULT Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj);
+    HRESULT Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, ID3D11ShaderResourceView *texture);
 private:
     HRESULT InitializeShader(ID3D11Device *device, HWND hwnd);
     void ShutdownShader();
@@ -32,4 +32,5 @@ private:
     ID3D11PixelShader *m_PS = nullptr;
     ID3D11InputLayout *m_layout = nullptr;
     ID3D11Buffer *m_matrix = nullptr;
+    ID3D11SamplerState *m_samplerState = nullptr;
 };

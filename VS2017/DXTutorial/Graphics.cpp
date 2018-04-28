@@ -305,7 +305,7 @@ HRESULT Graphics::OnRender()
     GetProjectionMatrix(proj);
     m_camera->Render();
     m_mesh->Render(m_deviceContext);
-    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj);
+    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj, m_mesh->GetTexture());
     FAILRETURN();
     hr = EndScene();
     return hr;
