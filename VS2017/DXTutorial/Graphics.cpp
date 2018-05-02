@@ -263,11 +263,20 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
         SafeRelease(&m_swapChain);
         return E_FAIL;
     }
+
+    m_light = new Light;
+    m_light->m_diffuse = D3DXVECTOR4(1.0f, 0.0f, 1.0f, 1.0f);
+    m_light->m_dir = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
     return S_OK;
 }
 
 void Graphics::Shutdown()
 {
+    if (m_light)
+    {
+        delete m_light;
+        m_light = nullptr;
+    }
     if (m_shader)
     {
         m_shader->Shutdown();
@@ -295,17 +304,18 @@ void Graphics::Shutdown()
     SafeRelease(&m_swapChain);
 }
 
-HRESULT Graphics::OnRender()
+HRESULT Graphics::OnRender(float f)
 {
     HRESULT hr = S_OK;
     D3DXMATRIX world{}, view{}, proj{};
     BeginScene(0.7f, 0.2f, 0.1f, 0.0f);
+    m_camera->Render();
     GetWorldMatrix(world);
     m_camera->GetViewMatrix(view);
     GetProjectionMatrix(proj);
-    m_camera->Render();
+    D3DXMatrixRotationY(&world, f);
     m_mesh->Render(m_deviceContext);
-    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj, m_mesh->GetTexture());
+    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj, m_mesh->GetTexture(), m_light->m_diffuse, m_light->m_dir);
     FAILRETURN();
     hr = EndScene();
     return hr;

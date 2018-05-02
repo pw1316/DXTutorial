@@ -12,6 +12,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Light.h"
 
 class Graphics
 {
@@ -23,7 +24,7 @@ public:
 
     HRESULT Initialize(HWND hwnd, LONG w, LONG h);
     void Shutdown();
-    HRESULT OnRender();
+    HRESULT OnRender(float f);
 
     ID3D11Device *GetDevice();
     ID3D11DeviceContext *GetDeviceContext();
@@ -50,4 +51,5 @@ private:
     Camera *m_camera = nullptr;
     Mesh *m_mesh = nullptr;
     Shader *m_shader = nullptr;
+    Light *m_light = nullptr;
 };

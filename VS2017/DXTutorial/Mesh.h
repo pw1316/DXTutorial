@@ -13,6 +13,7 @@ private:
     {
         D3DXVECTOR3 pos;
         D3DXVECTOR2 uv;
+        D3DXVECTOR3 normal;
     };
 public:
     Mesh() = default;

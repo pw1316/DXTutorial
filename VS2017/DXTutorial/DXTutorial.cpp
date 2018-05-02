@@ -147,12 +147,18 @@ LRESULT System::HandleMSG(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 HRESULT System::Update()
 {
+    static float rotation = 0.0f;
     HRESULT hr = S_OK;
     if (m_input->IsKeyDown(VK_ESCAPE))
     {
         return E_FAIL;
     }
-    hr = m_graphics->OnRender();
+    rotation += (float)D3DX_PI * 0.01f;
+    if (rotation > 360.0f)
+    {
+        rotation -= 360.0f;
+    }
+    hr = m_graphics->OnRender(rotation);
     return hr;
 }
 

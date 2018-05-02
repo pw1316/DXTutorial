@@ -11,11 +11,12 @@ void Shader::Shutdown()
     ShutdownShader();
 }
 
-HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, ID3D11ShaderResourceView *texture)
+HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, ID3D11ShaderResourceView *texture, D3DXVECTOR4 diffuse, D3DXVECTOR3 dir)
 {
     HRESULT hr = S_OK;
     D3D11_MAPPED_SUBRESOURCE mapped{};
     DXMatrix *data = nullptr;
+    DXLight *dataL = nullptr;
     UINT nBuffer = 0;
 
     D3DXMatrixTranspose(&world, &world);
@@ -34,6 +35,20 @@ HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX 
     nBuffer = 0;
     context->VSSetConstantBuffers(nBuffer, 1, &m_matrix);
     context->PSSetShaderResources(0, 1, &texture);
+
+    hr = context->Map(m_light, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    if (FAILED(hr))
+    {
+        return E_FAIL;
+    }
+    dataL = (DXLight*)mapped.pData;
+    dataL->diffuse = diffuse;
+    dataL->dir = dir;
+    dataL->padding = 0.0f;
+    context->Unmap(m_light, 0);
+    nBuffer = 0;
+    context->PSSetConstantBuffers(nBuffer, 1, &m_light);
+
     return RenderShader(context, indexCount, world, view, proj);
 }
 
@@ -42,10 +57,11 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
     HRESULT hrVS = S_OK, hrPS = S_OK;
     ID3D10Blob *VSBuffer = nullptr;
     ID3D10Blob *PSBuffer = nullptr;
-    D3D11_INPUT_ELEMENT_DESC layout[2] = {};
+    D3D11_INPUT_ELEMENT_DESC layout[3] = {};
     UINT nLayout = 0;
     D3D11_BUFFER_DESC matrixDesc{};
     D3D11_SAMPLER_DESC sampleDesc{};
+    D3D11_BUFFER_DESC lightDesc{};
 
     hrVS = D3DX11CompileFromFile(L"VS.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &VSBuffer, nullptr, nullptr);
     hrPS = D3DX11CompileFromFile(L"PS.hlsl", nullptr, nullptr, "PS", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &PSBuffer, nullptr, nullptr);
@@ -80,6 +96,13 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
     layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
     layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
     layout[1].InstanceDataStepRate = 0;
+    layout[2].SemanticName = "NORMAL";
+    layout[2].SemanticIndex = 0;
+    layout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+    layout[2].InputSlot = 0;
+    layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+    layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+    layout[2].InstanceDataStepRate = 0;
     nLayout = sizeof(layout) / sizeof(layout[0]);
     hrVS = device->CreateInputLayout(layout, nLayout, VSBuffer->GetBufferPointer(), VSBuffer->GetBufferSize(), &m_layout);
     SafeRelease(&VSBuffer);
@@ -128,11 +151,29 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
         SafeRelease(&m_VS);
         return E_FAIL;
     }
+
+    lightDesc.ByteWidth = sizeof(DXLight);
+    lightDesc.Usage = D3D11_USAGE_DYNAMIC;
+    lightDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    lightDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    lightDesc.MiscFlags = 0;
+    lightDesc.StructureByteStride = 0;
+    hrVS = device->CreateBuffer(&lightDesc, nullptr, &m_light);
+    if (FAILED(hrVS))
+    {
+        SafeRelease(&m_samplerState);
+        SafeRelease(&m_matrix);
+        SafeRelease(&m_layout);
+        SafeRelease(&m_PS);
+        SafeRelease(&m_VS);
+        return E_FAIL;
+    }
     return S_OK;
 }
 
 void Shader::ShutdownShader()
 {
+    SafeRelease(&m_light);
     SafeRelease(&m_samplerState);
     SafeRelease(&m_matrix);
     SafeRelease(&m_layout);

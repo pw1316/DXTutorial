@@ -53,10 +53,13 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
     indices = new ULONG[m_IBN];
     vertices[0].pos = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);//BL
     vertices[0].uv = D3DXVECTOR2(0.0f, 1.0f);
+    vertices[0].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
     vertices[1].pos = D3DXVECTOR3(0.0f, 1.0f, 0.0f);//T
     vertices[1].uv = D3DXVECTOR2(0.5f, 0.0f);
+    vertices[1].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
     vertices[2].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);//BR
     vertices[2].uv = D3DXVECTOR2(1.0f, 1.0f);
+    vertices[2].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
     indices[0] = 0;//BL
     indices[1] = 1;//T
     indices[2] = 2;//BR
