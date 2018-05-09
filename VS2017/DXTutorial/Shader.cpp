@@ -42,6 +42,7 @@ HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX 
         return E_FAIL;
     }
     dataL = (DXLight*)mapped.pData;
+    dataL->ambient = D3DXVECTOR4(0.1f, 0.1f, 0.1f, 1.0f);
     dataL->diffuse = diffuse;
     dataL->dir = dir;
     dataL->padding = 0.0f;

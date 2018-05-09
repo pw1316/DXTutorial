@@ -3,6 +3,7 @@ SamplerState SampleType;
 
 cbuffer LightBuffer
 {
+    float4 ambient;
     float4 diffuse;
     float3 dir;
     float padding;
@@ -18,6 +19,6 @@ struct PixelIn
 float4 PS(PixelIn pin) : SV_TARGET
 {
     float4 color = shaderTexture.Sample(SampleType, pin.uv);
-    color = color * saturate(diffuse * saturate(dot(pin.normal, -dir)));
+    color = color * saturate(ambient + diffuse * saturate(dot(pin.normal, -dir)));
     return color;
 }

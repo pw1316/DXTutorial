@@ -153,7 +153,7 @@ HRESULT System::Update()
     {
         return E_FAIL;
     }
-    rotation += (float)D3DX_PI * 0.01f;
+    rotation += (float)D3DX_PI * 0.005f;
     if (rotation > 360.0f)
     {
         rotation -= 360.0f;
