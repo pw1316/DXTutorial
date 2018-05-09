@@ -214,14 +214,14 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     m_deviceContext->RSSetViewports(1, &viewport);
 
     float fov, aspect;
-    fov = (float)D3DX_PI / 4.0f;
+    fov = (float)D3DX_PI / 3.0f;
     aspect = (float)w / (float)h;
     D3DXMatrixPerspectiveFovLH(&m_MatrixProj, fov, aspect, 0.1f, 1000.0f);
     D3DXMatrixIdentity(&m_MatrixWorld);
     D3DXMatrixOrthoLH(&m_MatrixOrtho, (float)w, (float)h, 0.1f, 1000.0f);
 
     m_camera = new Camera;
-    m_camera->SetPos(0.0f, 0.0f, -10.0f);
+    m_camera->SetPos(0.0f, 5.0f, -15.0f);
 
     m_mesh = new Mesh;
     hr = m_mesh->Initialize(m_device);

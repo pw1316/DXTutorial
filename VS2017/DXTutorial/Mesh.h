@@ -4,6 +4,7 @@
 #include <D3D11.h>
 #include <D3DX10math.h>
 
+#include "3rdparty/include/tiny_obj_loader.h"
 #include "Texture.h"
 
 class Mesh
@@ -14,6 +15,12 @@ private:
         D3DXVECTOR3 pos;
         D3DXVECTOR2 uv;
         D3DXVECTOR3 normal;
+    };
+    struct TinyObj
+    {
+        tinyobj::attrib_t attr;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
     };
 public:
     Mesh() = default;
@@ -28,8 +35,10 @@ public:
     ID3D11ShaderResourceView *GetTexture();
 private:
     HRESULT InitializeBuffer(ID3D11Device *device);
+    HRESULT InitializeModel(ID3D11Device *device);
     HRESULT InitializeTexture(ID3D11Device *device);
     void ShutdownBuffer();
+    void ShutdownModel();
     void ShutdownTexture();
     void RenderBuffer(ID3D11DeviceContext *context);
 
@@ -37,5 +46,6 @@ private:
     ID3D11Buffer *m_IB = nullptr;
     UINT m_VBN = 0;
     UINT m_IBN = 0;
+    TinyObj *m_model = nullptr;
     Texture *m_texture = nullptr;
 };

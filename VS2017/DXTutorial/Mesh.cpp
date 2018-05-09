@@ -4,12 +4,19 @@
 HRESULT Mesh::Initialize(ID3D11Device *device)
 {
     HRESULT hr = S_OK;
-    hr = InitializeBuffer(device);
+    hr = InitializeModel(device);
     FAILRETURN();
+    hr = InitializeBuffer(device);
+    if (FAILED(hr))
+    {
+        ShutdownModel();
+        return E_FAIL;
+    }
     hr = InitializeTexture(device);
     if (FAILED(hr))
     {
         ShutdownBuffer();
+        ShutdownModel();
         return E_FAIL;
     }
     return S_OK;
@@ -19,6 +26,7 @@ void Mesh::Shutdown()
 {
     ShutdownTexture();
     ShutdownBuffer();
+    ShutdownModel();
 }
 
 void Mesh::Render(ID3D11DeviceContext *context)
@@ -46,23 +54,32 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
     D3D11_SUBRESOURCE_DATA VData{}, IData{};
 
     /* Triangle */
-    m_VBN = 3U;
-    m_IBN = 3U;
+    m_VBN = m_model->shapes[0].mesh.indices.size();
+    m_IBN = m_model->shapes[0].mesh.indices.size();
 
     vertices = new DXVertex[m_VBN];
     indices = new ULONG[m_IBN];
-    vertices[0].pos = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);//BL
-    vertices[0].uv = D3DXVECTOR2(0.0f, 1.0f);
-    vertices[0].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-    vertices[1].pos = D3DXVECTOR3(0.0f, 1.0f, 0.0f);//T
-    vertices[1].uv = D3DXVECTOR2(0.5f, 0.0f);
-    vertices[1].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-    vertices[2].pos = D3DXVECTOR3(1.0f, -1.0f, 0.0f);//BR
-    vertices[2].uv = D3DXVECTOR2(1.0f, 1.0f);
-    vertices[2].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
-    indices[0] = 0;//BL
-    indices[1] = 1;//T
-    indices[2] = 2;//BR
+    for (UINT i = 0; i < m_VBN / 3; ++i)
+    {
+        for (UINT j = 0; j < 3; ++j)
+        {
+            auto vi = m_model->shapes[0].mesh.indices[3 * i + 2 - j].vertex_index;
+            auto ti = m_model->shapes[0].mesh.indices[3 * i + 2 - j].texcoord_index;
+            auto ni = m_model->shapes[0].mesh.indices[3 * i + 2 - j].normal_index;
+            auto x = m_model->attr.vertices[3 * vi + 0];
+            auto y = m_model->attr.vertices[3 * vi + 1];
+            auto z = m_model->attr.vertices[3 * vi + 2];
+            vertices[3 * i + j].pos = D3DXVECTOR3(x, y, -z);
+            x = m_model->attr.texcoords[2 * ti + 0];
+            y = m_model->attr.texcoords[2 * ti + 1];
+            vertices[3 * i + j].uv = D3DXVECTOR2(x, y);
+            x = m_model->attr.normals[3 * ni + 0];
+            y = m_model->attr.normals[3 * ni + 1];
+            z = m_model->attr.normals[3 * ni + 2];
+            vertices[3 * i + j].normal = D3DXVECTOR3(x, y, -z);
+            indices[3 * i + j] = 3 * i + j;
+        }
+    }
 
     VBDesc.ByteWidth = sizeof(DXVertex) * m_VBN;
     VBDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -100,6 +117,20 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
     return S_OK;
 }
 
+HRESULT Mesh::InitializeModel(ID3D11Device * device)
+{
+    if (m_model == nullptr)
+    {
+        m_model = new TinyObj;
+    }
+    bool res = tinyobj::LoadObj(&m_model->attr, &m_model->shapes, &m_model->materials, nullptr, "scene01.obj", nullptr, true);
+    if (!res)
+    {
+        return E_FAIL;
+    }
+    return S_OK;
+}
+
 HRESULT Mesh::InitializeTexture(ID3D11Device *device)
 {
     if (m_texture == nullptr)
@@ -115,6 +146,15 @@ void Mesh::ShutdownBuffer()
     SafeRelease(&m_IB);
     m_VBN = 0;
     m_IBN = 0;
+}
+
+void Mesh::ShutdownModel()
+{
+    if (m_model != nullptr)
+    {
+        delete m_model;
+        m_model = nullptr;
+    }
 }
 
 void Mesh::ShutdownTexture()

@@ -4,8 +4,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <IncludePath>$(DXSDK_DIR)include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
-    <_PropertySheetDisplayName>DirectX.Win32</_PropertySheetDisplayName>
+    <LibraryPath>$(DXSDK_DIR)Lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup />
   <ItemGroup />
