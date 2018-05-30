@@ -12,5 +12,6 @@ public:
     ~Light() = default;
 
     D3DXVECTOR4 m_diffuse{};
+    D3DXVECTOR4 m_specular{};
     D3DXVECTOR3 m_dir{};
 };

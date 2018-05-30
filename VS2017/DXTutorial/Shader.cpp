@@ -11,11 +11,12 @@ void Shader::Shutdown()
     ShutdownShader();
 }
 
-HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, ID3D11ShaderResourceView *texture, D3DXVECTOR4 diffuse, D3DXVECTOR3 dir)
+HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, ID3D11ShaderResourceView *texture, D3DXVECTOR4 diffuse, D3DXVECTOR4 specular, D3DXVECTOR3 dir)
 {
     HRESULT hr = S_OK;
     D3D11_MAPPED_SUBRESOURCE mapped{};
-    DXMatrix *data = nullptr;
+    DXMatrix *dataM = nullptr;
+    DXCamera *dataC = nullptr;
     DXLight *dataL = nullptr;
     UINT nBuffer = 0;
 
@@ -27,13 +28,25 @@ HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX 
     {
         return E_FAIL;
     }
-    data = (DXMatrix *)mapped.pData;
-    data->world = world;
-    data->view = view;
-    data->proj = proj;
+    dataM = (DXMatrix *)mapped.pData;
+    dataM->world = world;
+    dataM->view = view;
+    dataM->proj = proj;
     context->Unmap(m_matrix, 0);
     nBuffer = 0;
     context->VSSetConstantBuffers(nBuffer, 1, &m_matrix);
+
+    hr = context->Map(m_camera, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+    if (FAILED(hr))
+    {
+        return E_FAIL;
+    }
+    dataC = (DXCamera *)mapped.pData;
+    dataC->pos = camPos;
+    context->Unmap(m_camera, 0);
+    nBuffer = 1;
+    context->VSSetConstantBuffers(nBuffer, 1, &m_camera);
+    
     context->PSSetShaderResources(0, 1, &texture);
 
     hr = context->Map(m_light, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
@@ -42,10 +55,11 @@ HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX 
         return E_FAIL;
     }
     dataL = (DXLight*)mapped.pData;
-    dataL->ambient = D3DXVECTOR4(0.1f, 0.1f, 0.1f, 1.0f);
+    dataL->ambient = D3DXVECTOR4(0.05f, 0.05f, 0.05f, 1.0f);
     dataL->diffuse = diffuse;
+    dataL->specular = specular;
     dataL->dir = dir;
-    dataL->padding = 0.0f;
+    dataL->ns = 10.0f;
     context->Unmap(m_light, 0);
     nBuffer = 0;
     context->PSSetConstantBuffers(nBuffer, 1, &m_light);
@@ -61,6 +75,7 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
     D3D11_INPUT_ELEMENT_DESC layout[3] = {};
     UINT nLayout = 0;
     D3D11_BUFFER_DESC matrixDesc{};
+    D3D11_BUFFER_DESC cameraDesc{};
     D3D11_SAMPLER_DESC sampleDesc{};
     D3D11_BUFFER_DESC lightDesc{};
 
@@ -130,6 +145,22 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
         return E_FAIL;
     }
 
+    cameraDesc.ByteWidth = sizeof(DXCamera);
+    cameraDesc.Usage = D3D11_USAGE_DYNAMIC;
+    cameraDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    cameraDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    cameraDesc.MiscFlags = 0;
+    cameraDesc.StructureByteStride = 0;
+    hrVS = device->CreateBuffer(&cameraDesc, nullptr, &m_camera);
+    if (FAILED(hrVS))
+    {
+        SafeRelease(&m_matrix);
+        SafeRelease(&m_layout);
+        SafeRelease(&m_PS);
+        SafeRelease(&m_VS);
+        return E_FAIL;
+    }
+
     sampleDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
     sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -146,6 +177,7 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
     hrVS = device->CreateSamplerState(&sampleDesc, &m_samplerState);
     if (FAILED(hrVS))
     {
+        SafeRelease(&m_camera);
         SafeRelease(&m_matrix);
         SafeRelease(&m_layout);
         SafeRelease(&m_PS);
@@ -163,6 +195,7 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
     if (FAILED(hrVS))
     {
         SafeRelease(&m_samplerState);
+        SafeRelease(&m_camera);
         SafeRelease(&m_matrix);
         SafeRelease(&m_layout);
         SafeRelease(&m_PS);
@@ -176,6 +209,7 @@ void Shader::ShutdownShader()
 {
     SafeRelease(&m_light);
     SafeRelease(&m_samplerState);
+    SafeRelease(&m_camera);
     SafeRelease(&m_matrix);
     SafeRelease(&m_layout);
     SafeRelease(&m_PS);

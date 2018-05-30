@@ -154,9 +154,9 @@ HRESULT System::Update()
         return E_FAIL;
     }
     rotation += (float)D3DX_PI * 0.005f;
-    if (rotation > 360.0f)
+    if (rotation > (float)D3DX_PI * 2)
     {
-        rotation -= 360.0f;
+        rotation -= (float)D3DX_PI * 2;
     }
     hr = m_graphics->OnRender(rotation);
     return hr;

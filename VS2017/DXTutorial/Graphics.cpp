@@ -265,7 +265,8 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     }
 
     m_light = new Light;
-    m_light->m_diffuse = D3DXVECTOR4(1.0f, 0.0f, 1.0f, 1.0f);
+    m_light->m_diffuse = D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1.0f);
+    m_light->m_specular = D3DXVECTOR4(0.65f, 0.65f, 0.65f, 1.0f);
     m_light->m_dir = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
     return S_OK;
 }
@@ -315,7 +316,7 @@ HRESULT Graphics::OnRender(float f)
     GetProjectionMatrix(proj);
     D3DXMatrixRotationY(&world, f);
     m_mesh->Render(m_deviceContext);
-    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj, m_mesh->GetTexture(), m_light->m_diffuse, m_light->m_dir);
+    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj, m_camera->GetPos(), m_mesh->GetTexture(), m_light->m_diffuse, m_light->m_specular, m_light->m_dir);
     FAILRETURN();
     hr = EndScene();
     return hr;

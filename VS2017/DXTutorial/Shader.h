@@ -15,12 +15,19 @@ private:
         D3DXMATRIX proj;
     };
 
+    struct DXCamera
+    {
+        D3DXVECTOR3 pos;
+        float padding;
+    };
+
     struct DXLight
     {
         D3DXVECTOR4 ambient;
         D3DXVECTOR4 diffuse;
+        D3DXVECTOR4 specular;
         D3DXVECTOR3 dir;
-        float padding;// 16x bytes
+        float ns;
     };
 public:
     Shader() = default;
@@ -30,7 +37,7 @@ public:
 
     HRESULT Initialize(ID3D11Device *device, HWND hwnd);
     void Shutdown();
-    HRESULT Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, ID3D11ShaderResourceView *texture, D3DXVECTOR4 diffuse, D3DXVECTOR3 dir);
+    HRESULT Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, ID3D11ShaderResourceView *texture, D3DXVECTOR4 diffuse, D3DXVECTOR4 specular, D3DXVECTOR3 dir);
 private:
     HRESULT InitializeShader(ID3D11Device *device, HWND hwnd);
     void ShutdownShader();
@@ -40,6 +47,7 @@ private:
     ID3D11PixelShader *m_PS = nullptr;
     ID3D11InputLayout *m_layout = nullptr;
     ID3D11Buffer *m_matrix = nullptr;
+    ID3D11Buffer *m_camera = nullptr;
     ID3D11SamplerState *m_samplerState = nullptr;
     ID3D11Buffer *m_light = nullptr;
 };
