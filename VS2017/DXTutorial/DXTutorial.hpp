@@ -3,8 +3,8 @@
 #include <Resource.h>
 
 #include "Graphics.h"
-#include <MessageHandler.hpp>
-#include <InputManager.h>
+#include <Core/MessageHandler.hpp>
+#include <Manager/InputManager.hpp>
 
 namespace PW
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
-#include <View.hpp>
+#include <Core/View.hpp>
+#include <Core/MessageHandler.hpp>
 
 namespace PW
 {

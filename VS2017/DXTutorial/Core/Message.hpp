@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __PW_CORE_MESSAGE__
+#define __PW_CORE_MESSAGE__
 #include <stdafx.h>
 #include <string>
 
@@ -28,3 +29,5 @@ namespace PW
         };
     }
 }
+
+#endif

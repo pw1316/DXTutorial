@@ -64,7 +64,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>4005</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Core\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -83,7 +83,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <DisableSpecificWarnings>4005</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Core\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -101,8 +101,8 @@
     <ClInclude Include="Core\View.hpp" />
     <ClInclude Include="DXTutorial.hpp" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Manager\InputManager.hpp" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshReader.h" />
     <ClInclude Include="Resource.h" />

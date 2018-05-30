@@ -1,11 +1,12 @@
-#pragma once
+#ifndef __PW_CORE_MESSAGE_HANDLER__
+#define __PW_CORE_MESSAGE_HANDLER__
 #include <stdafx.h>
 #include <map>
 #include <set>
 
-#include <View.hpp>
-#include <Message.hpp>
-#include <ICommand.hpp>
+#include <Core/Message.hpp>
+#include <Core/ICommand.hpp>
+#include <Core/View.hpp>
 
 namespace PW
 {
@@ -117,3 +118,4 @@ namespace PW
         };
     }
 }
+#endif

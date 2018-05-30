@@ -1,10 +1,10 @@
-#pragma once
+#ifndef __PW_CORE_VIEW__
+#define __PW_CORE_VIEW__
 #include <stdafx.h>
 #include <set>
 #include <string>
 
-#include <Message.hpp>
-#include <MessageHandler.hpp>
+#include <Core/Message.hpp>
 
 namespace PW
 {
@@ -26,11 +26,13 @@ namespace PW
             View &operator=(const View &rhs) = delete;
             View &operator=(View &&rhs) = delete;
 
-            virtual void Initialize(){ MessageHandler::GetInstance()->RegisterViewCommand(this, messages); }
-            virtual void Shutdown() { MessageHandler::GetInstance()->RemoveViewCommand(this, messages); }
+            virtual void Initialize() = 0;
+            virtual void Shutdown() = 0;
             virtual void OnMessage(const Message &msg) = 0;
         protected:
             std::set<std::string> messages;
         };
     }
 }
+
+#endif

@@ -1,7 +1,8 @@
-#pragma once
+#ifndef __PW_CORE_ICOMMAND__
+#define __PW_CORE_ICOMMAND__
 #include <stdafx.h>
 
-#include <Message.hpp>
+#include <Core/Message.hpp>
 
 namespace PW
 {
@@ -16,3 +17,5 @@ namespace PW
         };
     }
 }
+
+#endif

@@ -18,6 +18,9 @@
       <Extensions>
       </Extensions>
     </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{a46fec6d-e238-494f-a814-42e762680067}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -65,8 +68,8 @@
     <ClInclude Include="DXTutorial.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Manager\InputManager.hpp">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
