@@ -19,9 +19,17 @@ namespace PW
         public:
             View() = default;
             virtual ~View() = default;
+
+            /* No copy, no move */
+            View(const View& rhs) = delete;
+            View(View&& rhs) = delete;
+            View &operator=(const View &rhs) = delete;
+            View &operator=(View &&rhs) = delete;
+
             virtual void Initialize(){ MessageHandler::GetInstance()->RegisterViewCommand(this, messages); }
             virtual void Shutdown() { MessageHandler::GetInstance()->RemoveViewCommand(this, messages); }
-            virtual void OnMessage(Message msg) = 0;
+            virtual void OnMessage(const Message &msg) = 0;
+        protected:
             std::set<std::string> messages;
         };
     }

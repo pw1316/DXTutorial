@@ -3,6 +3,7 @@
 #include <map>
 #include <set>
 
+#include <View.hpp>
 #include <Message.hpp>
 #include <ICommand.hpp>
 
@@ -50,7 +51,7 @@ namespace PW
                 }
             }
 
-            void RegisterViewCommand(void *view, const std::set<std::string> &list)
+            void RegisterViewCommand(View *view, const std::set<std::string> &list)
             {
                 auto iter = m_viewCommandMap.find(view);
                 if (iter != m_viewCommandMap.end())
@@ -62,7 +63,7 @@ namespace PW
                     m_viewCommandMap[view] = list;
                 }
             }
-            void RemoveViewCommand(void *view, const std::set<std::string> &list)
+            void RemoveViewCommand(View *view, const std::set<std::string> &list)
             {
                 auto iter = m_viewCommandMap.find(view);
                 if (iter != m_viewCommandMap.end())
@@ -97,7 +98,7 @@ namespace PW
                     {
                         if (view.second.find(message.GetName()) != view.second.end())
                         {
-                            //*(view.first).OnMessage(message)// View的对象必须具有OnMessage(message)成员函数
+                            (*(view.first)).OnMessage(message);// View的对象必须具有OnMessage(message)成员函数
                         }
                     }
                 }
@@ -112,7 +113,7 @@ namespace PW
             MessageHandler() = default;
 
             std::map<std::string, ICommand*> m_commandMap;// 命令的对象必须有效，命令移除列表时要负责删除，命令的对象的创建者不负责
-            std::map<void*, std::set<std::string>> m_viewCommandMap;// View的对象可以不有效，View的对象移除时不负责删除，由该View的管理者删除。
+            std::map<View*, std::set<std::string>> m_viewCommandMap;// View的对象可以不有效，View的对象移除时不负责删除，由该View的管理者删除。
         };
     }
 }

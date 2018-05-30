@@ -2,9 +2,9 @@
 #include <stdafx.h>
 #include <Resource.h>
 
-#include "Input.h"
 #include "Graphics.h"
 #include <MessageHandler.hpp>
+#include <InputManager.h>
 
 namespace PW
 {
@@ -88,12 +88,12 @@ namespace PW
                 {
                 case WM_KEYDOWN:
                 {
-                    m_input->KeyDown((unsigned int)wParam);
+                    SendMessageCommand("SYS_KEY_DOWN", (UINT)wParam);
                     break;
                 }
                 case WM_KEYUP:
                 {
-                    m_input->KeyUp((unsigned int)wParam);
+                    SendMessageCommand("SYS_KEY_UP", (UINT)wParam);
                     break;
                 }
                 default:
@@ -175,7 +175,7 @@ namespace PW
                 }
 
                 /* Input */
-                m_input = new Input;
+                m_input = new Manager::InputManager;
                 m_input->Initialize();
 
                 /* Graphics */
@@ -311,7 +311,7 @@ namespace PW
 
             BOOL m_isInited = false;
             PW::Core::MessageHandler *m_messageHandler = nullptr;
-            Input* m_input = nullptr;
+            Manager::InputManager *m_input = nullptr;
             Graphics* m_graphics = nullptr;
         };
     }

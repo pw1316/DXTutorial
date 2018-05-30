@@ -101,7 +101,7 @@
     <ClInclude Include="Core\View.hpp" />
     <ClInclude Include="DXTutorial.hpp" />
     <ClInclude Include="Graphics.h" />
-    <ClInclude Include="Input.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshReader.h" />
@@ -116,7 +116,6 @@
     <ClCompile Include="Core\MessageHandler.cpp" />
     <ClCompile Include="DXTutorial.cpp" />
     <ClCompile Include="Graphics.cpp" />
-    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshReader.cpp" />
     <ClCompile Include="Shader.cpp" />
