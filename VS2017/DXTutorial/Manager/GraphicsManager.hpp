@@ -27,32 +27,32 @@ namespace PW
             GraphicsManager() = default;
             virtual ~GraphicsManager() = default;
 
+            /* Override */
             virtual HRESULT Awake() override { return S_OK; }
             virtual void Destroy() override {}
             virtual void OnMessage(const Core::Message &msg) override {}
 
-            HRESULT InitializeWindow(HWND hwnd, LONG w, LONG h);
+            HRESULT Initialize(HWND hwnd, LONG w, LONG h);
             void Shutdown();
             HRESULT OnRender(float f);
-
-            ID3D11Device *GetDevice();
-            ID3D11DeviceContext *GetDeviceContext();
-
-            void GetProjectionMatrix(D3DXMATRIX&);
-            void GetWorldMatrix(D3DXMATRIX&);
-            void GetOrthoMatrix(D3DXMATRIX&);
         private:
-            void BeginScene(float r, float g, float b, float a);
+            void BeginScene();
             HRESULT EndScene();
 
+            /* D3D Basic */
             IDXGISwapChain *m_swapChain = nullptr;
             ID3D11Device *m_device = nullptr;
             ID3D11DeviceContext *m_deviceContext = nullptr;
+
+            /* Output Merger */
             ID3D11RenderTargetView *m_RTView = nullptr;
             ID3D11Texture2D *m_DSBuffer = nullptr;
             ID3D11DepthStencilState *m_DSState = nullptr;
             ID3D11DepthStencilView *m_DSView = nullptr;
+
+            /* Rasterizer */
             ID3D11RasterizerState *m_RState = nullptr;
+
             D3DXMATRIX m_MatrixProj{};
             D3DXMATRIX m_MatrixWorld{};
             D3DXMATRIX m_MatrixOrtho{};

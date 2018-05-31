@@ -3,7 +3,7 @@
 
 #include <vector>
 
-HRESULT PW::Manager::GraphicsManager::InitializeWindow(HWND hwnd, LONG w, LONG h)
+HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, LONG w, LONG h)
 {
     HRESULT hr;
 
@@ -79,6 +79,7 @@ HRESULT PW::Manager::GraphicsManager::InitializeWindow(HWND hwnd, LONG w, LONG h
         &m_deviceContext
     );
     FAILRETURN();
+
     /* Create RTV on SwapChain */
     ID3D11Texture2D* backBuffer;
     hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
@@ -308,12 +309,10 @@ void PW::Manager::GraphicsManager::Shutdown()
 HRESULT PW::Manager::GraphicsManager::OnRender(float f)
 {
     HRESULT hr = S_OK;
-    D3DXMATRIX world{}, view{}, proj{};
-    BeginScene(0.7f, 0.2f, 0.1f, 0.0f);
+    D3DXMATRIX world = m_MatrixWorld, view{}, proj = m_MatrixProj;
+    BeginScene();
     m_camera->Render();
-    GetWorldMatrix(world);
     m_camera->GetViewMatrix(view);
-    GetProjectionMatrix(proj);
     D3DXMatrixRotationY(&world, f);
     m_mesh->Render(m_deviceContext);
     hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj, m_camera->GetPos(), m_mesh->GetTexture(), m_light->m_diffuse, m_light->m_specular, m_light->m_dir);
@@ -322,34 +321,9 @@ HRESULT PW::Manager::GraphicsManager::OnRender(float f)
     return hr;
 }
 
-ID3D11Device *PW::Manager::GraphicsManager::GetDevice()
+void PW::Manager::GraphicsManager::BeginScene()
 {
-    return m_device;
-}
-
-ID3D11DeviceContext *PW::Manager::GraphicsManager::GetDeviceContext()
-{
-    return m_deviceContext;
-}
-
-void PW::Manager::GraphicsManager::GetProjectionMatrix(D3DXMATRIX &P)
-{
-    P = m_MatrixProj;
-}
-
-void PW::Manager::GraphicsManager::GetWorldMatrix(D3DXMATRIX &M)
-{
-    M = m_MatrixWorld;
-}
-
-void PW::Manager::GraphicsManager::GetOrthoMatrix(D3DXMATRIX &O)
-{
-    O = m_MatrixOrtho;
-}
-
-void PW::Manager::GraphicsManager::BeginScene(float r, float g, float b, float a)
-{
-    float color[] = { r, g, b, a };
+    float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
     m_deviceContext->ClearRenderTargetView(m_RTView, color);
     m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }

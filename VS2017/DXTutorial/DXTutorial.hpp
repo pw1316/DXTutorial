@@ -181,7 +181,7 @@ namespace PW
                 /* Graphics */
                 m_graphics = new PW::Manager::GraphicsManager;
                 m_graphics->Awake();
-                hr = m_graphics->InitializeWindow(m_hwnd, 1024, 768);
+                hr = m_graphics->Initialize(m_hwnd, 1024, 768);
                 if (FAILED(hr))
                 {
                     assert(m_graphics != nullptr);
