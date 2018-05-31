@@ -100,8 +100,8 @@
     <ClInclude Include="Core\Message.hpp" />
     <ClInclude Include="Core\MessageHandler.hpp" />
     <ClInclude Include="DXTutorial.hpp" />
-    <ClInclude Include="Graphics.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Manager\GraphicsManager.hpp" />
     <ClInclude Include="Manager\InputManager.hpp" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshReader.h" />
@@ -115,7 +115,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Core\MessageHandler.cpp" />
     <ClCompile Include="DXTutorial.cpp" />
-    <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="Manager\GraphicsManager.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshReader.cpp" />
     <ClCompile Include="Shader.cpp" />

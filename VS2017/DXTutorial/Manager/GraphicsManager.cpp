@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "Graphics.h"
+#include "GraphicsManager.hpp"
 
 #include <vector>
 
-HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
+HRESULT PW::Manager::GraphicsManager::InitializeWindow(HWND hwnd, LONG w, LONG h)
 {
     HRESULT hr;
 
@@ -271,7 +271,7 @@ HRESULT Graphics::Initialize(HWND hwnd, LONG w, LONG h)
     return S_OK;
 }
 
-void Graphics::Shutdown()
+void PW::Manager::GraphicsManager::Shutdown()
 {
     if (m_light)
     {
@@ -305,7 +305,7 @@ void Graphics::Shutdown()
     SafeRelease(&m_swapChain);
 }
 
-HRESULT Graphics::OnRender(float f)
+HRESULT PW::Manager::GraphicsManager::OnRender(float f)
 {
     HRESULT hr = S_OK;
     D3DXMATRIX world{}, view{}, proj{};
@@ -322,39 +322,39 @@ HRESULT Graphics::OnRender(float f)
     return hr;
 }
 
-ID3D11Device *Graphics::GetDevice()
+ID3D11Device *PW::Manager::GraphicsManager::GetDevice()
 {
     return m_device;
 }
 
-ID3D11DeviceContext *Graphics::GetDeviceContext()
+ID3D11DeviceContext *PW::Manager::GraphicsManager::GetDeviceContext()
 {
     return m_deviceContext;
 }
 
-void Graphics::GetProjectionMatrix(D3DXMATRIX &P)
+void PW::Manager::GraphicsManager::GetProjectionMatrix(D3DXMATRIX &P)
 {
     P = m_MatrixProj;
 }
 
-void Graphics::GetWorldMatrix(D3DXMATRIX &M)
+void PW::Manager::GraphicsManager::GetWorldMatrix(D3DXMATRIX &M)
 {
     M = m_MatrixWorld;
 }
 
-void Graphics::GetOrthoMatrix(D3DXMATRIX &O)
+void PW::Manager::GraphicsManager::GetOrthoMatrix(D3DXMATRIX &O)
 {
     O = m_MatrixOrtho;
 }
 
-void Graphics::BeginScene(float r, float g, float b, float a)
+void PW::Manager::GraphicsManager::BeginScene(float r, float g, float b, float a)
 {
     float color[] = { r, g, b, a };
     m_deviceContext->ClearRenderTargetView(m_RTView, color);
     m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 }
 
-HRESULT Graphics::EndScene()
+HRESULT PW::Manager::GraphicsManager::EndScene()
 {
     HRESULT hr = S_OK;
     hr = m_swapChain->Present(1, 0);

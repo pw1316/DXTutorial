@@ -26,8 +26,8 @@ namespace PW
             IView &operator=(const IView &rhs) = delete;
             IView &operator=(IView &&rhs) = delete;
 
-            virtual void Initialize() = 0;
-            virtual void Shutdown() = 0;
+            virtual HRESULT Awake() = 0;
+            virtual void Destroy() = 0;
             virtual void OnMessage(const Message &msg) = 0;
         protected:
             std::set<std::string> messages;

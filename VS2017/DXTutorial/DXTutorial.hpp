@@ -2,9 +2,9 @@
 #include <stdafx.h>
 #include <Resource.h>
 
-#include "Graphics.h"
 #include <Core/MessageHandler.hpp>
 #include <Manager/InputManager.hpp>
+#include <Manager/GraphicsManager.hpp>
 
 namespace PW
 {
@@ -176,11 +176,12 @@ namespace PW
 
                 /* Input */
                 m_input = new Manager::InputManager;
-                m_input->Initialize();
+                m_input->Awake();
 
                 /* Graphics */
-                m_graphics = new Graphics;
-                hr = m_graphics->Initialize(m_hwnd, 1024, 768);
+                m_graphics = new PW::Manager::GraphicsManager;
+                m_graphics->Awake();
+                hr = m_graphics->InitializeWindow(m_hwnd, 1024, 768);
                 if (FAILED(hr))
                 {
                     assert(m_graphics != nullptr);
@@ -319,7 +320,7 @@ namespace PW
             BOOL m_isInited = false;
             PW::Core::MessageHandler *m_messageHandler = nullptr;
             Manager::InputManager *m_input = nullptr;
-            Graphics* m_graphics = nullptr;
+            PW::Manager::GraphicsManager* m_graphics = nullptr;
         };
     }
 }

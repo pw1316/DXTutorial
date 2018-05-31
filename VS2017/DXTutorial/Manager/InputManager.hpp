@@ -17,12 +17,13 @@ namespace PW
             ~InputManager() {}
 
             /* Override */
-            virtual void Initialize() override
+            virtual HRESULT Awake() override
             {
                 messages = { "SYS_KEY_DOWN", "SYS_KEY_UP" };
                 Core::MessageHandler::GetInstance()->RegisterViewCommand(this, messages);
+                return S_OK;
             }
-            virtual void Shutdown() override
+            virtual void Destroy() override
             {
                 Core::MessageHandler::GetInstance()->RemoveViewCommand(this, messages);
             }
