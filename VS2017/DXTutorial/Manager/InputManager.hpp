@@ -1,13 +1,13 @@
 #pragma once
 #include "stdafx.h"
-#include <Core/View.hpp>
+#include <Core/Interface/IView.hpp>
 #include <Core/MessageHandler.hpp>
 
 namespace PW
 {
     namespace Manager
     {
-        class InputManager : public Core::View
+        class InputManager : public Core::IView
         {
         private:
             static const UINT NUM_KEYS = 256U;

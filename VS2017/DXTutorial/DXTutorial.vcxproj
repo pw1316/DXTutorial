@@ -95,10 +95,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Core\ICommand.hpp" />
+    <ClInclude Include="Core\Interface\ICommand.hpp" />
+    <ClInclude Include="Core\Interface\IView.hpp" />
     <ClInclude Include="Core\Message.hpp" />
     <ClInclude Include="Core\MessageHandler.hpp" />
-    <ClInclude Include="Core\View.hpp" />
     <ClInclude Include="DXTutorial.hpp" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Light.h" />

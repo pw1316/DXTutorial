@@ -224,16 +224,23 @@ namespace PW
             {
                 static float rotation = 0.0f;
                 HRESULT hr = S_OK;
+                /* Physics */
+                /// TODO
+                /* Input */
                 if (m_input->IsKeyDown(VK_ESCAPE))
                 {
                     return E_FAIL;
                 }
+                /* Logic */
                 rotation += (float)D3DX_PI * 0.005f;
                 if (rotation > (float)D3DX_PI * 2)
                 {
                     rotation -= (float)D3DX_PI * 2;
                 }
+                /* Graphics */
                 hr = m_graphics->OnRender(rotation);
+                /* GUI */
+                ///TODO
                 return hr;
             }
             HRESULT InitializeWindow()

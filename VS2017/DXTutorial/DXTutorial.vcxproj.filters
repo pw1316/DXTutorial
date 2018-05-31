@@ -21,6 +21,9 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{a46fec6d-e238-494f-a814-42e762680067}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Interface">
+      <UniqueIdentifier>{70bdf96b-a044-44ee-a437-ddfbd4588bc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -59,17 +62,17 @@
     <ClInclude Include="Core\MessageHandler.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\ICommand.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\View.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DXTutorial.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Manager\InputManager.hpp">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Interface\ICommand.hpp">
+      <Filter>Core\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Interface\IView.hpp">
+      <Filter>Core\Interface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

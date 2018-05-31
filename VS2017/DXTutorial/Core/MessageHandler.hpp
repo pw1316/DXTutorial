@@ -5,8 +5,8 @@
 #include <set>
 
 #include <Core/Message.hpp>
-#include <Core/ICommand.hpp>
-#include <Core/View.hpp>
+#include <Core/Interface/ICommand.hpp>
+#include <Core/Interface/IView.hpp>
 
 namespace PW
 {
@@ -52,7 +52,7 @@ namespace PW
                 }
             }
 
-            void RegisterViewCommand(View *view, const std::set<std::string> &list)
+            void RegisterViewCommand(IView *view, const std::set<std::string> &list)
             {
                 auto iter = m_viewCommandMap.find(view);
                 if (iter != m_viewCommandMap.end())
@@ -64,7 +64,7 @@ namespace PW
                     m_viewCommandMap[view] = list;
                 }
             }
-            void RemoveViewCommand(View *view, const std::set<std::string> &list)
+            void RemoveViewCommand(IView *view, const std::set<std::string> &list)
             {
                 auto iter = m_viewCommandMap.find(view);
                 if (iter != m_viewCommandMap.end())
@@ -114,7 +114,7 @@ namespace PW
             MessageHandler() = default;
 
             std::map<std::string, ICommand*> m_commandMap;// 命令的对象必须有效，命令移除列表时要负责删除，命令的对象的创建者不负责
-            std::map<View*, std::set<std::string>> m_viewCommandMap;// View的对象可以不有效，View的对象移除时不负责删除，由该View的管理者删除。
+            std::map<IView*, std::set<std::string>> m_viewCommandMap;// View的对象可以不有效，View的对象移除时不负责删除，由该View的管理者删除。
         };
     }
 }

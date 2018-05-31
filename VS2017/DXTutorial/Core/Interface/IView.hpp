@@ -10,21 +10,21 @@ namespace PW
 {
     namespace Core
     {
-        class View
+        class IView
         {
             //public Facade facade
             //{
             //    get{ return Facade.instance; }
             //}
         public:
-            View() = default;
-            virtual ~View() = default;
+            IView() = default;
+            virtual ~IView() = default;
 
             /* No copy, no move */
-            View(const View& rhs) = delete;
-            View(View&& rhs) = delete;
-            View &operator=(const View &rhs) = delete;
-            View &operator=(View &&rhs) = delete;
+            IView(const IView& rhs) = delete;
+            IView(IView&& rhs) = delete;
+            IView &operator=(const IView &rhs) = delete;
+            IView &operator=(IView &&rhs) = delete;
 
             virtual void Initialize() = 0;
             virtual void Shutdown() = 0;
