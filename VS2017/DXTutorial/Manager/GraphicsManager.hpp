@@ -46,6 +46,10 @@ namespace PW
             HRESULT InitializeOM(HWND hwnd, UINT w, UINT h);
             void ShutdownOM();
 
+            /* Output Merger */
+            HRESULT InitializeRasterizer(HWND hwnd, UINT w, UINT h);
+            void ShutdownRasterizer();
+
             void BeginScene()
             {
                 float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };

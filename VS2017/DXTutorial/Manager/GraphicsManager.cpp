@@ -18,38 +18,14 @@ HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
         return E_FAIL;
     }
 
-    /* Rasterize State */
-    D3D11_RASTERIZER_DESC resterizeState;
-    ZeroMemory(&resterizeState, sizeof(resterizeState));
-    resterizeState.FillMode = D3D11_FILL_SOLID;
-    resterizeState.CullMode = D3D11_CULL_BACK;
-    resterizeState.FrontCounterClockwise = false;
-    resterizeState.DepthBias = 0;
-    resterizeState.DepthBiasClamp = 0.0f;
-    resterizeState.SlopeScaledDepthBias = 0.0f;
-    resterizeState.DepthClipEnable = true;
-    resterizeState.ScissorEnable = false;
-    resterizeState.MultisampleEnable = false;
-    resterizeState.AntialiasedLineEnable = false;
-    hr = m_device->CreateRasterizerState(&resterizeState, &m_RState);
+    /* Create RasterizerState */
+    hr = InitializeRasterizer(hwnd, w, h);
     if (FAILED(hr))
     {
         ShutdownOM();
         ShutdownDevice();
         return E_FAIL;
     }
-    m_deviceContext->RSSetState(m_RState);
-
-    /* Viewport */
-    D3D11_VIEWPORT viewport;
-    ZeroMemory(&viewport, sizeof(viewport));
-    viewport.TopLeftX = 0.0f;
-    viewport.TopLeftY = 0.0f;
-    viewport.Width = (float)w;
-    viewport.Height = (float)h;
-    viewport.MinDepth = 0.0f;
-    viewport.MaxDepth = 1.0f;
-    m_deviceContext->RSSetViewports(1, &viewport);
 
     float fov, aspect;
     fov = (float)D3DX_PI / 3.0f;
@@ -69,7 +45,7 @@ HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
         m_mesh = nullptr;
         delete m_camera;
         m_camera = nullptr;
-        SafeRelease(&m_RState);
+        ShutdownRasterizer();
         ShutdownOM();
         ShutdownDevice();
         return E_FAIL;
@@ -86,7 +62,7 @@ HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
         m_mesh = nullptr;
         delete m_camera;
         m_camera = nullptr;
-        SafeRelease(&m_RState);
+        ShutdownRasterizer();
         ShutdownOM();
         ShutdownDevice();
         return E_FAIL;
@@ -122,7 +98,7 @@ void PW::Manager::GraphicsManager::Shutdown()
         delete m_camera;
         m_camera = nullptr;
     }
-    SafeRelease(&m_RState);
+    ShutdownRasterizer();
     ShutdownOM();
     ShutdownDevice();
 }
@@ -315,4 +291,43 @@ void PW::Manager::GraphicsManager::ShutdownOM()
     SafeRelease(&m_DSState);
     SafeRelease(&m_DSView);
     SafeRelease(&m_RTView);
+}
+
+HRESULT PW::Manager::GraphicsManager::InitializeRasterizer(HWND hwnd, UINT w, UINT h)
+{
+    HRESULT hr = S_OK;
+
+    /* State */
+    D3D11_RASTERIZER_DESC resterizeState;
+    ZeroMemory(&resterizeState, sizeof(resterizeState));
+    resterizeState.FillMode = D3D11_FILL_SOLID;
+    resterizeState.CullMode = D3D11_CULL_BACK;
+    resterizeState.FrontCounterClockwise = false;
+    resterizeState.DepthBias = 0;
+    resterizeState.DepthBiasClamp = 0.0f;
+    resterizeState.SlopeScaledDepthBias = 0.0f;
+    resterizeState.DepthClipEnable = true;
+    resterizeState.ScissorEnable = false;
+    resterizeState.MultisampleEnable = false;
+    resterizeState.AntialiasedLineEnable = false;
+    hr = m_device->CreateRasterizerState(&resterizeState, &m_RState);
+    FAILRETURN();
+    m_deviceContext->RSSetState(m_RState);
+
+    /* ViewPort */
+    D3D11_VIEWPORT viewport;
+    ZeroMemory(&viewport, sizeof(viewport));
+    viewport.TopLeftX = 0.0f;
+    viewport.TopLeftY = 0.0f;
+    viewport.Width = (float)w;
+    viewport.Height = (float)h;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+    m_deviceContext->RSSetViewports(1, &viewport);
+
+    return S_OK;
+}
+void PW::Manager::GraphicsManager::ShutdownRasterizer()
+{
+    SafeRelease(&m_RState);
 }
