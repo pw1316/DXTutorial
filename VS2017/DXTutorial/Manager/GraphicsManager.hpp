@@ -32,12 +32,30 @@ namespace PW
             virtual void Destroy() override {}
             virtual void OnMessage(const Core::Message &msg) override {}
 
-            HRESULT Initialize(HWND hwnd, LONG w, LONG h);
+            HRESULT Initialize(HWND hwnd, UINT w, UINT h);
             void Shutdown();
             HRESULT OnRender(float f);
         private:
-            void BeginScene();
-            HRESULT EndScene();
+            HRESULT GetRefreshRate(UINT w, UINT h, UINT &num, UINT &den);
+
+            /* D3D Basic */
+            HRESULT InitializeDevice(HWND hwnd, UINT w, UINT h);
+            void ShutdownDevice();
+
+            /* Output Merger */
+            HRESULT InitializeOM(HWND hwnd, UINT w, UINT h);
+            void ShutdownOM();
+
+            void BeginScene()
+            {
+                float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+                m_deviceContext->ClearRenderTargetView(m_RTView, color);
+                m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+            }
+            HRESULT EndScene()
+            {
+                return m_swapChain->Present(1, 0);
+            }
 
             /* D3D Basic */
             IDXGISwapChain *m_swapChain = nullptr;
@@ -46,9 +64,8 @@ namespace PW
 
             /* Output Merger */
             ID3D11RenderTargetView *m_RTView = nullptr;
-            ID3D11Texture2D *m_DSBuffer = nullptr;
-            ID3D11DepthStencilState *m_DSState = nullptr;
             ID3D11DepthStencilView *m_DSView = nullptr;
+            ID3D11DepthStencilState *m_DSState = nullptr;
 
             /* Rasterizer */
             ID3D11RasterizerState *m_RState = nullptr;
