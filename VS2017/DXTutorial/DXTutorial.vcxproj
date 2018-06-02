@@ -100,11 +100,10 @@
     <ClInclude Include="Core\Message.hpp" />
     <ClInclude Include="Core\MessageHandler.hpp" />
     <ClInclude Include="DXTutorial.hpp" />
+    <ClInclude Include="Entity\Mesh.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Manager\GraphicsManager.hpp" />
     <ClInclude Include="Manager\InputManager.hpp" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="MeshReader.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stdafx.h" />
@@ -115,9 +114,8 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Core\MessageHandler.cpp" />
     <ClCompile Include="DXTutorial.cpp" />
+    <ClCompile Include="Entity\Mesh.cpp" />
     <ClCompile Include="Manager\GraphicsManager.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="MeshReader.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -131,20 +129,6 @@
   <ItemGroup>
     <Image Include="DXTutorial.ico" />
     <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS</EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS</EntryPointName>
-    </FxCompile>
-    <FxCompile Include="vs.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS</EntryPointName>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
-    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

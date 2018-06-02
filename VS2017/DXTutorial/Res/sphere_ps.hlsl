@@ -21,6 +21,6 @@ struct PixelIn
 float4 PS(PixelIn pin) : SV_TARGET
 {
     float4 color = shaderTexture.Sample(SampleType, pin.uv);
-    color = color * saturate(Ka + Kd * saturate(dot(pin.normal, -lightDir)) + Ks * saturate(pow(dot(normalize(pin.view - lightDir), pin.normal), Ns)));
+    color = color * saturate(Ka + Kd * saturate(dot(pin.normal, -lightDir)) + Ks * pow(saturate(dot(normalize(pin.view - lightDir), pin.normal)), Ns));
     return color;
 }

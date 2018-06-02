@@ -79,8 +79,8 @@ HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
     D3D11_SAMPLER_DESC sampleDesc{};
     D3D11_BUFFER_DESC lightDesc{};
 
-    hrVS = D3DX11CompileFromFile(L"VS.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &VSBuffer, nullptr, nullptr);
-    hrPS = D3DX11CompileFromFile(L"PS.hlsl", nullptr, nullptr, "PS", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &PSBuffer, nullptr, nullptr);
+    hrVS = D3DX11CompileFromFile(L"Res/sphere_vs.hlsl", nullptr, nullptr, "VS", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &VSBuffer, nullptr, nullptr);
+    hrPS = D3DX11CompileFromFile(L"Res/sphere_ps.hlsl", nullptr, nullptr, "PS", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, nullptr, &PSBuffer, nullptr, nullptr);
     if (FAILED(hrVS) || FAILED(hrPS))
     {
         SafeRelease(&VSBuffer);

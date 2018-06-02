@@ -72,7 +72,7 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
             vertices[3 * i + j].pos = D3DXVECTOR3(x, y, -z);
             x = m_model->attr.texcoords[2 * ti + 0];
             y = m_model->attr.texcoords[2 * ti + 1];
-            vertices[3 * i + j].uv = D3DXVECTOR2(x, y);
+            vertices[3 * i + j].uv = D3DXVECTOR2(x, 1.0 - y);
             x = m_model->attr.normals[3 * ni + 0];
             y = m_model->attr.normals[3 * ni + 1];
             z = m_model->attr.normals[3 * ni + 2];
@@ -123,7 +123,12 @@ HRESULT Mesh::InitializeModel(ID3D11Device * device)
     {
         m_model = new TinyObj;
     }
-    bool res = tinyobj::LoadObj(&m_model->attr, &m_model->shapes, &m_model->materials, nullptr, "scene01.obj", nullptr, true);
+    std::string charname;
+    for (auto &each : m_name + L".obj")
+    {
+        charname.push_back(each & 0x00FF);
+    }
+    bool res = tinyobj::LoadObj(&m_model->attr, &m_model->shapes, &m_model->materials, nullptr, charname.c_str(), nullptr, true);
     if (!res)
     {
         return E_FAIL;
@@ -137,7 +142,7 @@ HRESULT Mesh::InitializeTexture(ID3D11Device *device)
     {
         m_texture = new Texture;
     }
-    return m_texture->Initialize(device, L"texture.dds");;
+    return m_texture->Initialize(device, (m_name + L".dds").c_str());;
 }
 
 void Mesh::ShutdownBuffer()

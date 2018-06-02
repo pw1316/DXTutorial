@@ -35,9 +35,9 @@ HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
     D3DXMatrixOrthoLH(&m_MatrixOrtho, (float)w, (float)h, 0.1f, 1000.0f);
 
     m_camera = new Camera;
-    m_camera->SetPos(0.0f, 5.0f, -15.0f);
+    m_camera->SetPos(0.0f, 2.0f, -10.0f);
 
-    m_mesh = new Mesh;
+    m_mesh = new Mesh(L"Res/sphere");
     hr = m_mesh->Initialize(m_device);
     if (FAILED(hr))
     {

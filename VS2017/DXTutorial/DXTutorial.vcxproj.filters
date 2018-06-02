@@ -24,6 +24,9 @@
     <Filter Include="Core\Interface">
       <UniqueIdentifier>{70bdf96b-a044-44ee-a437-ddfbd4588bc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Entity">
+      <UniqueIdentifier>{0cd9b723-0134-45bc-8f5b-ad686e2ff0c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -33,9 +36,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
@@ -48,9 +48,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Message.hpp">
@@ -74,15 +71,15 @@
     <ClInclude Include="Manager\GraphicsManager.hpp">
       <Filter>Manager</Filter>
     </ClInclude>
+    <ClInclude Include="Entity\Mesh.h">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DXTutorial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
@@ -94,14 +91,14 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MeshReader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Core\MessageHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Manager\GraphicsManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\Mesh.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,9 +113,5 @@
     <Image Include="DXTutorial.ico">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="vs.hlsl" />
-    <FxCompile Include="ps.hlsl" />
   </ItemGroup>
 </Project>

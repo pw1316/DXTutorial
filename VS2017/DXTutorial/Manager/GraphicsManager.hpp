@@ -11,8 +11,7 @@
 #include <D3DX10math.h>
 
 #include <Core/Interface/IView.hpp>
-
-#include "Mesh.h"
+#include <Entity/Mesh.h>
 #include "Shader.h"
 #include "Camera.h"
 #include "Light.h"

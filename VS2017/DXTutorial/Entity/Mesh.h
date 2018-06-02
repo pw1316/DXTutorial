@@ -7,6 +7,8 @@
 #include "3rdparty/include/tiny_obj_loader.h"
 #include "Texture.h"
 
+#include <string>
+
 class Mesh
 {
 private:
@@ -23,7 +25,8 @@ private:
         std::vector<tinyobj::material_t> materials;
     };
 public:
-    Mesh() = default;
+    Mesh() = delete;
+    Mesh(const std::wstring name) :m_name(name) {}
     Mesh(const Mesh &rhs) = default;
     Mesh(Mesh &&rhs) = default;
     ~Mesh() = default;
@@ -42,6 +45,7 @@ private:
     void ShutdownTexture();
     void RenderBuffer(ID3D11DeviceContext *context);
 
+    const std::wstring m_name;
     ID3D11Buffer *m_VB = nullptr;
     ID3D11Buffer *m_IB = nullptr;
     UINT m_VBN = 0;
