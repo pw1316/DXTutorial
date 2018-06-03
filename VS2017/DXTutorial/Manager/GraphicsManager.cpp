@@ -52,8 +52,6 @@ HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
     }
 
     m_light = new Light;
-    m_light->m_diffuse = D3DXVECTOR4(0.3f, 0.3f, 0.3f, 1.0f);
-    m_light->m_specular = D3DXVECTOR4(0.65f, 0.65f, 0.65f, 1.0f);
     m_light->m_dir = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
     return S_OK;
 }
@@ -87,7 +85,7 @@ HRESULT PW::Manager::GraphicsManager::OnRender(float f)
     m_camera->Render();
     m_camera->GetViewMatrix(view);
     D3DXMatrixRotationY(&world, f);
-    m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_diffuse, m_light->m_specular, m_light->m_dir);
+    m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_dir);
     FAILRETURN();
     hr = EndScene();
     return hr;

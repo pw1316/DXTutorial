@@ -42,7 +42,7 @@ namespace PW
 
             HRESULT Initialize(ID3D11Device *device);
             void Shutdown();
-            void Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, D3DXVECTOR4 diffuse, D3DXVECTOR4 specular, D3DXVECTOR3 dir);
+            void Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, D3DXVECTOR3 dir);
         private:
             /* Mesh, Material, Texture */
             HRESULT LoadMesh(ID3D11Device *device);

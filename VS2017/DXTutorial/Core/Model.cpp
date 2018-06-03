@@ -38,7 +38,7 @@ void PW::Core::Model::Shutdown()
     }
     UnLoadMesh();
 }
-void PW::Core::Model::Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, D3DXVECTOR4 diffuse, D3DXVECTOR4 specular, D3DXVECTOR3 dir)
+void PW::Core::Model::Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, D3DXVECTOR3 dir)
 {
     UINT stride = sizeof(VertexType);
     UINT offset = 0;
@@ -46,6 +46,8 @@ void PW::Core::Model::Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3D
     context->IASetIndexBuffer(m_IB, DXGI_FORMAT_R32_UINT, 0);
     context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+    D3DXVECTOR4 diffuse = m_model->materials[0].diffuse; diffuse.w = 1.0f;
+    D3DXVECTOR4 specular = m_model->materials[0].specular; specular.w = 1.0f;
     m_shader->Render(context, m_IBN, world, view, proj, camPos, m_texture, diffuse, specular, dir);
 }
 
@@ -60,7 +62,7 @@ HRESULT PW::Core::Model::LoadMesh(ID3D11Device *device)
         {
             charname.push_back(each & 0x00FF);
         }
-        bool res = tinyobj::LoadObj(&m_model->attr, &m_model->shapes, &m_model->materials, nullptr, charname.c_str(), nullptr, true);
+        bool res = tinyobj::LoadObj(&m_model->attr, &m_model->shapes, &m_model->materials, nullptr, charname.c_str(), "Res/", true);
         if (!res)
         {
             return E_FAIL;

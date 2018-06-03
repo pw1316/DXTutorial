@@ -27,6 +27,9 @@
     <Filter Include="Entity">
       <UniqueIdentifier>{0cd9b723-0134-45bc-8f5b-ad686e2ff0c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Res">
+      <UniqueIdentifier>{7b21fdbd-504d-436f-baa0-7b6537520ae2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -110,5 +113,26 @@
     <Image Include="DXTutorial.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Res\sphere.dds">
+      <Filter>Res</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Res\sphere.mtl">
+      <Filter>Res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="Res\sphere.obj">
+      <Filter>Res</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Res\sphere_ps.hlsl">
+      <Filter>Res</Filter>
+    </FxCompile>
+    <FxCompile Include="Res\sphere_vs.hlsl">
+      <Filter>Res</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
