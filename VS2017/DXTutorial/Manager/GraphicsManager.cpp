@@ -87,6 +87,7 @@ HRESULT PW::Manager::GraphicsManager::OnRender(float f)
     D3DXMatrixRotationY(&world, f);
     m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_dir);
     FAILRETURN();
+    // TODO Add GUI render
     hr = EndScene();
     return hr;
 }

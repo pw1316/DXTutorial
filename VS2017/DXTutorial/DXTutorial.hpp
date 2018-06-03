@@ -223,10 +223,10 @@ namespace PW
             }
             HRESULT Update()
             {
-                static float rotation = 0.0f;
+                static float rotation = 0.0f;// TODO move rotation to model
                 HRESULT hr = S_OK;
                 /* Physics */
-                /// TODO
+                // TODO physics
                 /* Input */
                 if (m_input->IsKeyDown(VK_ESCAPE))
                 {
@@ -241,7 +241,7 @@ namespace PW
                 /* Graphics */
                 hr = m_graphics->OnRender(rotation);
                 /* GUI */
-                ///TODO
+                // TODO gui
                 return hr;
             }
             HRESULT InitializeWindow()
