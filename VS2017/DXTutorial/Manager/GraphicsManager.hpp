@@ -74,7 +74,7 @@ namespace PW
             ID3D11RasterizerState *m_RState = nullptr;
 
             D3DXMATRIX m_MatrixProj{};
-            D3DXMATRIX m_MatrixWorld{};
+            D3DXMATRIX m_MatrixWorld{};/// TODO move this to model
             D3DXMATRIX m_MatrixOrtho{};
 
             Camera *m_camera = nullptr;
