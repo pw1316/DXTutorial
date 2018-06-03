@@ -37,29 +37,12 @@ HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
     m_camera = new Camera;
     m_camera->SetPos(0.0f, 2.0f, -10.0f);
 
-    m_mesh = new Mesh(L"Res/sphere");
-    hr = m_mesh->Initialize(m_device);
+    m_model = new Core::Model(L"Res/sphere");
+    hr = m_model->Initialize(m_device);
     if (FAILED(hr))
     {
-        delete m_mesh;
-        m_mesh = nullptr;
-        delete m_camera;
-        m_camera = nullptr;
-        ShutdownRasterizer();
-        ShutdownOM();
-        ShutdownDevice();
-        return E_FAIL;
-    }
-
-    m_shader = new Shader;
-    m_shader->Initialize(m_device, hwnd);
-    if (FAILED(hr))
-    {
-        delete m_shader;
-        m_shader = nullptr;
-        m_mesh->Shutdown();
-        delete m_mesh;
-        m_mesh = nullptr;
+        delete m_model;
+        m_model = nullptr;
         delete m_camera;
         m_camera = nullptr;
         ShutdownRasterizer();
@@ -81,17 +64,11 @@ void PW::Manager::GraphicsManager::Shutdown()
         delete m_light;
         m_light = nullptr;
     }
-    if (m_shader)
+    if (m_model)
     {
-        m_shader->Shutdown();
-        delete m_shader;
-        m_shader = nullptr;
-    }
-    if (m_mesh)
-    {
-        m_mesh->Shutdown();
-        delete m_mesh;
-        m_mesh = nullptr;
+        m_model->Shutdown();
+        delete m_model;
+        m_model = nullptr;
     }
     if (m_camera)
     {
@@ -110,8 +87,7 @@ HRESULT PW::Manager::GraphicsManager::OnRender(float f)
     m_camera->Render();
     m_camera->GetViewMatrix(view);
     D3DXMatrixRotationY(&world, f);
-    m_mesh->Render(m_deviceContext);
-    hr = m_shader->Render(m_deviceContext, m_mesh->GetIndexCount(), world, view, proj, m_camera->GetPos(), m_mesh->GetTexture(), m_light->m_diffuse, m_light->m_specular, m_light->m_dir);
+    m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_diffuse, m_light->m_specular, m_light->m_dir);
     FAILRETURN();
     hr = EndScene();
     return hr;

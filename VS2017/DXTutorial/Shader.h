@@ -35,11 +35,11 @@ public:
     Shader(Shader &&rhs) = default;
     ~Shader() = default;
 
-    HRESULT Initialize(ID3D11Device *device, HWND hwnd);
+    HRESULT Initialize(ID3D11Device *device);
     void Shutdown();
     HRESULT Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, ID3D11ShaderResourceView *texture, D3DXVECTOR4 diffuse, D3DXVECTOR4 specular, D3DXVECTOR3 dir);
 private:
-    HRESULT InitializeShader(ID3D11Device *device, HWND hwnd);
+    HRESULT InitializeShader(ID3D11Device *device);
     void ShutdownShader();
     HRESULT RenderShader(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj);
 

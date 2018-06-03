@@ -1,54 +1,98 @@
 #include "stdafx.h"
-#include "Mesh.h"
+#include "Model.hpp"
 
-HRESULT Mesh::Initialize(ID3D11Device *device)
+#include <D3DX11tex.h>
+
+HRESULT PW::Core::Model::Initialize(ID3D11Device *device)
 {
     HRESULT hr = S_OK;
-    hr = InitializeModel(device);
+    hr = LoadMesh(device);
     FAILRETURN();
+
     hr = InitializeBuffer(device);
     if (FAILED(hr))
     {
-        ShutdownModel();
+        UnLoadMesh();
         return E_FAIL;
     }
-    hr = InitializeTexture(device);
+
+    m_shader = new Shader;
+    hr = m_shader->Initialize(device);
     if (FAILED(hr))
     {
+        delete m_shader;
+        m_shader = nullptr;
         ShutdownBuffer();
-        ShutdownModel();
+        UnLoadMesh();
         return E_FAIL;
     }
     return S_OK;
 }
-
-void Mesh::Shutdown()
+void PW::Core::Model::Shutdown()
 {
-    ShutdownTexture();
-    ShutdownBuffer();
-    ShutdownModel();
+    if (m_shader)
+    {
+        m_shader->Shutdown();
+        delete m_shader;
+        m_shader = nullptr;
+    }
+    UnLoadMesh();
+}
+void PW::Core::Model::Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR3 camPos, D3DXVECTOR4 diffuse, D3DXVECTOR4 specular, D3DXVECTOR3 dir)
+{
+    UINT stride = sizeof(VertexType);
+    UINT offset = 0;
+    context->IASetVertexBuffers(0, 1, &m_VB, &stride, &offset);
+    context->IASetIndexBuffer(m_IB, DXGI_FORMAT_R32_UINT, 0);
+    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    m_shader->Render(context, m_IBN, world, view, proj, camPos, m_texture, diffuse, specular, dir);
 }
 
-void Mesh::Render(ID3D11DeviceContext *context)
+HRESULT PW::Core::Model::LoadMesh(ID3D11Device *device)
 {
-    RenderBuffer(context);
+    HRESULT hr = S_OK;
+    if (m_model == nullptr)
+    {
+        m_model = new TinyObj;
+        std::string charname;
+        for (auto &each : m_name + L".obj")
+        {
+            charname.push_back(each & 0x00FF);
+        }
+        bool res = tinyobj::LoadObj(&m_model->attr, &m_model->shapes, &m_model->materials, nullptr, charname.c_str(), nullptr, true);
+        if (!res)
+        {
+            return E_FAIL;
+        }
+    }
+    SafeRelease(&m_texture);
+    hr = D3DX11CreateShaderResourceViewFromFile(device, (m_name + L".dds").c_str(), nullptr, nullptr, &m_texture, nullptr);
+    if (FAILED(hr))
+    {
+        if (m_model != nullptr)
+        {
+            delete m_model;
+            m_model = nullptr;
+        }
+        return E_FAIL;
+    }
+    return S_OK;
+}
+void PW::Core::Model::UnLoadMesh()
+{
+    SafeRelease(&m_texture);
+    if (m_model != nullptr)
+    {
+        delete m_model;
+        m_model = nullptr;
+    }
 }
 
-int Mesh::GetIndexCount()
-{
-    return m_IBN;
-}
-
-ID3D11ShaderResourceView *Mesh::GetTexture()
-{
-    assert(m_texture != nullptr);
-    return m_texture->GetTexture();
-}
-
-HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
+HRESULT PW::Core::Model::InitializeBuffer(ID3D11Device *device)
 {
     HRESULT hrv = S_OK, hri = S_OK;
-    DXVertex *vertices = nullptr;
+    VertexType *vertices = nullptr;
     ULONG *indices = nullptr;
     D3D11_BUFFER_DESC VBDesc{}, IBDesc{};
     D3D11_SUBRESOURCE_DATA VData{}, IData{};
@@ -57,7 +101,7 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
     m_VBN = m_model->shapes[0].mesh.indices.size();
     m_IBN = m_model->shapes[0].mesh.indices.size();
 
-    vertices = new DXVertex[m_VBN];
+    vertices = new VertexType[m_VBN];
     indices = new ULONG[m_IBN];
     for (UINT i = 0; i < m_VBN / 3; ++i)
     {
@@ -72,7 +116,7 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
             vertices[3 * i + j].pos = D3DXVECTOR3(x, y, -z);
             x = m_model->attr.texcoords[2 * ti + 0];
             y = m_model->attr.texcoords[2 * ti + 1];
-            vertices[3 * i + j].uv = D3DXVECTOR2(x, 1.0 - y);
+            vertices[3 * i + j].uv = D3DXVECTOR2(x, 1.0f - y);
             x = m_model->attr.normals[3 * ni + 0];
             y = m_model->attr.normals[3 * ni + 1];
             z = m_model->attr.normals[3 * ni + 2];
@@ -81,7 +125,7 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
         }
     }
 
-    VBDesc.ByteWidth = sizeof(DXVertex) * m_VBN;
+    VBDesc.ByteWidth = sizeof(VertexType) * m_VBN;
     VBDesc.Usage = D3D11_USAGE_DEFAULT;
     VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     VBDesc.CPUAccessFlags = 0;
@@ -116,67 +160,10 @@ HRESULT Mesh::InitializeBuffer(ID3D11Device *device)
     }
     return S_OK;
 }
-
-HRESULT Mesh::InitializeModel(ID3D11Device * device)
-{
-    if (m_model == nullptr)
-    {
-        m_model = new TinyObj;
-    }
-    std::string charname;
-    for (auto &each : m_name + L".obj")
-    {
-        charname.push_back(each & 0x00FF);
-    }
-    bool res = tinyobj::LoadObj(&m_model->attr, &m_model->shapes, &m_model->materials, nullptr, charname.c_str(), nullptr, true);
-    if (!res)
-    {
-        return E_FAIL;
-    }
-    return S_OK;
-}
-
-HRESULT Mesh::InitializeTexture(ID3D11Device *device)
-{
-    if (m_texture == nullptr)
-    {
-        m_texture = new Texture;
-    }
-    return m_texture->Initialize(device, (m_name + L".dds").c_str());;
-}
-
-void Mesh::ShutdownBuffer()
+void PW::Core::Model::ShutdownBuffer()
 {
     SafeRelease(&m_VB);
     SafeRelease(&m_IB);
     m_VBN = 0;
     m_IBN = 0;
-}
-
-void Mesh::ShutdownModel()
-{
-    if (m_model != nullptr)
-    {
-        delete m_model;
-        m_model = nullptr;
-    }
-}
-
-void Mesh::ShutdownTexture()
-{
-    if (m_texture != nullptr)
-    {
-        m_texture->Shutdown();
-        delete m_texture;
-        m_texture = nullptr;
-    }
-}
-
-void Mesh::RenderBuffer(ID3D11DeviceContext *context)
-{
-    UINT stride = sizeof(DXVertex);
-    UINT offset = 0;
-    context->IASetVertexBuffers(0, 1, &m_VB, &stride, &offset);
-    context->IASetIndexBuffer(m_IB, DXGI_FORMAT_R32_UINT, 0);
-    context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

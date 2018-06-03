@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "Shader.h"
 
-HRESULT Shader::Initialize(ID3D11Device *device, HWND hwnd)
+HRESULT Shader::Initialize(ID3D11Device *device)
 {
-    return InitializeShader(device, hwnd);
+    return InitializeShader(device);
 }
 
 void Shader::Shutdown()
@@ -67,7 +67,7 @@ HRESULT Shader::Render(ID3D11DeviceContext *context, int indexCount, D3DXMATRIX 
     return RenderShader(context, indexCount, world, view, proj);
 }
 
-HRESULT Shader::InitializeShader(ID3D11Device *device, HWND hwnd)
+HRESULT Shader::InitializeShader(ID3D11Device *device)
 {
     HRESULT hrVS = S_OK, hrPS = S_OK;
     ID3D10Blob *VSBuffer = nullptr;

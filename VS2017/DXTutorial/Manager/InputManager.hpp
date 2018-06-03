@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __PW_MANAGER_INPUT_MANAGER__
+#define __PW_MANAGER_INPUT_MANAGER__
 #include "stdafx.h"
 #include <Core/Interface/IView.hpp>
 #include <Core/MessageHandler.hpp>
@@ -60,3 +61,5 @@ namespace PW
         };
     }
 }
+
+#endif

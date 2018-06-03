@@ -11,7 +11,7 @@
 #include <D3DX10math.h>
 
 #include <Core/Interface/IView.hpp>
-#include <Entity/Mesh.h>
+#include <Core/Model.hpp>
 #include "Shader.h"
 #include "Camera.h"
 #include "Light.h"
@@ -78,8 +78,7 @@ namespace PW
             D3DXMATRIX m_MatrixOrtho{};
 
             Camera *m_camera = nullptr;
-            Mesh *m_mesh = nullptr;
-            Shader *m_shader = nullptr;
+            Core::Model *m_model = nullptr;
             Light *m_light = nullptr;
         };
     }
