@@ -33,7 +33,7 @@ namespace PW
 
             void Initialize(HWND hwnd, UINT w, UINT h);
             void Shutdown();
-            void OnRender(float f);
+            void OnRender();
         private:
             void GetRefreshRate(UINT w, UINT h, UINT &num, UINT &den);
 
@@ -77,7 +77,6 @@ namespace PW
             ID3D11RasterizerState *m_RState = nullptr;
 
             D3DXMATRIX m_MatrixProj{};
-            D3DXMATRIX m_MatrixWorld{};// TODO move this to model
             D3DXMATRIX m_MatrixOrtho{};
 
             Camera *m_camera = nullptr;

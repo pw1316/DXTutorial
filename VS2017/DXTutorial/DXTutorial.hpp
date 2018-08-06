@@ -199,7 +199,6 @@ namespace PW
             }
             HRESULT Update()
             {
-                static float rotation = 0.0f;// TODO move rotation to model
                 HRESULT hr = S_OK;
                 /* Physics */
                 // TODO physics
@@ -209,13 +208,8 @@ namespace PW
                     return E_FAIL;
                 }
                 /* Logic */
-                rotation += (float)D3DX_PI * 0.005f;
-                if (rotation > (float)D3DX_PI * 2)
-                {
-                    rotation -= (float)D3DX_PI * 2;
-                }
                 /* Graphics */
-                m_graphics->OnRender(rotation);
+                m_graphics->OnRender();
                 /* GUI */
                 // TODO gui
                 return hr;

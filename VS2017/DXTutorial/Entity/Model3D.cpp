@@ -14,8 +14,13 @@ void PW::Entity::Model3D::Shutdown()
     ShutdownShader();
     ShutdownBuffer();
 }
-void PW::Entity::Model3D::Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR4 camPos, D3DXVECTOR3 dir)
+void PW::Entity::Model3D::Render(ID3D11DeviceContext *context, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR4 camPos, D3DXVECTOR3 dir)
 {
+    rotation += (float)D3DX_PI * 0.005f;
+    if (rotation > (float)D3DX_PI * 2)
+    {
+        rotation -= (float)D3DX_PI * 2;
+    }
     HRESULT hr = S_OK;
 
     D3D11_MAPPED_SUBRESOURCE mapped{};
@@ -24,7 +29,8 @@ void PW::Entity::Model3D::Render(ID3D11DeviceContext *context, D3DXMATRIX world,
     {
         auto rawdata = (CBTransformType *)mapped.pData;
         D3DXMATRIX temp;
-        D3DXMatrixTranspose(&temp, &world);
+        D3DXMatrixRotationY(&temp, rotation);
+        D3DXMatrixTranspose(&temp, &temp);
         rawdata->world = temp;
         D3DXMatrixTranspose(&temp, &view);
         rawdata->view = temp;

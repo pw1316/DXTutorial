@@ -61,7 +61,7 @@ namespace PW
 
             void Initialize(ID3D11Device *device);
             void Shutdown();
-            void Render(ID3D11DeviceContext *context, D3DXMATRIX world, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR4 camPos, D3DXVECTOR3 dir);
+            void Render(ID3D11DeviceContext *context, D3DXMATRIX view, D3DXMATRIX proj, D3DXVECTOR4 camPos, D3DXVECTOR3 dir);
         private:
             /* Resources */
             void InitializeBuffer(ID3D11Device *device);
@@ -72,6 +72,7 @@ namespace PW
             void ShutdownShader();
 
             std::string m_name;
+            float rotation = 0.0f;
 
             /* Resources */
             UINT m_VN = 0;

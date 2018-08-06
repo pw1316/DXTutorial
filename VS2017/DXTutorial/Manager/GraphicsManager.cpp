@@ -19,7 +19,6 @@ void PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
     fov = (float)D3DX_PI / 3.0f;
     aspect = (float)w / (float)h;
     D3DXMatrixPerspectiveFovLH(&m_MatrixProj, fov, aspect, 0.1f, 1000.0f);
-    D3DXMatrixIdentity(&m_MatrixWorld);
     D3DXMatrixOrthoLH(&m_MatrixOrtho, (float)w, (float)h, 0.1f, 1000.0f);
 
     m_camera = new Camera;
@@ -62,17 +61,16 @@ void PW::Manager::GraphicsManager::Shutdown()
     ShutdownOM();
     ShutdownDevice();
 }
-void PW::Manager::GraphicsManager::OnRender(float f)
+void PW::Manager::GraphicsManager::OnRender()
 {
-    D3DXMATRIX world = m_MatrixWorld, view, proj = m_MatrixProj, ortho = m_MatrixOrtho;
+    D3DXMATRIX view, proj = m_MatrixProj, ortho = m_MatrixOrtho;
     float blendFactor[4] = { 0,0,0,0 };
     BeginScene();
     m_camera->Render();
     m_camera->GetViewMatrix(view);
-    D3DXMatrixRotationY(&world, f);
     m_deviceContext->OMSetDepthStencilState(m_DSStateWithZ, 1);
     m_deviceContext->OMSetBlendState(m_BlendStateWithoutAlpha, blendFactor, 0xFFFFFFFF);
-    m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_dir);
+    m_model->Render(m_deviceContext, view, proj, m_camera->GetPos(), m_light->m_dir);
     m_deviceContext->OMSetDepthStencilState(m_DSStateWithoutZ, 1);
     m_deviceContext->OMSetBlendState(m_BlendStateWithAlpha, blendFactor, 0xFFFFFFFF);
     m_gui->Render(m_device, m_deviceContext, "testaaaaaa", { 512, 384 }, ortho);
