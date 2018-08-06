@@ -76,7 +76,7 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device *device)
     /* =====VB & IB===== */
     VBType *vertices = nullptr;
     ULONG *indices = nullptr;
-    m_VN = obj.shapes[0].mesh.indices.size();
+    m_VN = static_cast<UINT>(obj.shapes[0].mesh.indices.size());
     vertices = new VBType[m_VN];
     indices = new ULONG[m_VN];
     for (std::remove_const<decltype(m_VN)>::type triId = 0; triId < m_VN / 3; ++triId)
@@ -176,6 +176,7 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device *device)
     hr = D3DX11CreateShaderResourceViewFromFile(device, (m_name + ".dds").c_str(), nullptr, nullptr, &m_SRVTexture0, nullptr);
     FAILTHROW;
 
+    /* =====SamplerState===== */
     sampleDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
     sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
     sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -249,6 +250,7 @@ void PW::Entity::Model3D::InitializeShader(ID3D11Device *device)
     FAILTHROW;
     hr = device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &m_PS);
     FAILTHROW;
+    SafeRelease(&blob);
 }
 void PW::Entity::Model3D::ShutdownShader()
 {

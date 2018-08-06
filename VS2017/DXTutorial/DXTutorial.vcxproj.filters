@@ -74,6 +74,9 @@
     <ClInclude Include="Entity\Model3D.hpp">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="Entity\Font.hpp">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -92,6 +95,9 @@
       <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="Entity\Model3D.cpp">
+      <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity\Font.cpp">
       <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
@@ -126,6 +132,12 @@
       <Filter>Res</Filter>
     </FxCompile>
     <FxCompile Include="Res\sphere_vs.hlsl">
+      <Filter>Res</Filter>
+    </FxCompile>
+    <FxCompile Include="Res\font_vs.hlsl">
+      <Filter>Res</Filter>
+    </FxCompile>
+    <FxCompile Include="Res\font_ps.hlsl">
       <Filter>Res</Filter>
     </FxCompile>
   </ItemGroup>

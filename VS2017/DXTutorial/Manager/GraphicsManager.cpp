@@ -28,6 +28,9 @@ void PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
     m_model = new Entity::Model3D("Res/sphere");
     m_model->Initialize(m_device);
 
+    m_gui = new Entity::Font;
+    m_gui->Initialize(m_device);
+
     m_light = new Light;
     m_light->m_dir = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
 }
@@ -37,6 +40,12 @@ void PW::Manager::GraphicsManager::Shutdown()
     {
         delete m_light;
         m_light = nullptr;
+    }
+    if (m_gui)
+    {
+        m_gui->Shutdown();
+        delete m_gui;
+        m_gui = nullptr;
     }
     if (m_model)
     {
@@ -55,13 +64,15 @@ void PW::Manager::GraphicsManager::Shutdown()
 }
 void PW::Manager::GraphicsManager::OnRender(float f)
 {
-    D3DXMATRIX world = m_MatrixWorld, view{}, proj = m_MatrixProj;
+    D3DXMATRIX world = m_MatrixWorld, view, proj = m_MatrixProj, ortho = m_MatrixOrtho;
     BeginScene();
     m_camera->Render();
     m_camera->GetViewMatrix(view);
     D3DXMatrixRotationY(&world, f);
+    m_deviceContext->OMSetDepthStencilState(m_DSStateWithZ, 1);
     m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_dir);
-    // TODO Add GUI render
+    m_deviceContext->OMSetDepthStencilState(m_DSStateWithoutZ, 1);
+    m_gui->Render(m_device, m_deviceContext, "testaaaaaa", { 0, 0 }, ortho);
     EndScene();
 }
 
@@ -208,13 +219,34 @@ void PW::Manager::GraphicsManager::InitializeOM(HWND hwnd, UINT w, UINT h)
     depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
     depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-    hr = m_device->CreateDepthStencilState(&depthStencilDesc, &m_DSState);
+    hr = m_device->CreateDepthStencilState(&depthStencilDesc, &m_DSStateWithZ);
     FAILTHROW;
-    m_deviceContext->OMSetDepthStencilState(m_DSState, 1);
+
+    ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+    depthStencilDesc.DepthEnable = false;
+    depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+    depthStencilDesc.StencilEnable = true;
+    depthStencilDesc.StencilReadMask = 0xFF;
+    depthStencilDesc.StencilWriteMask = 0xFF;
+    /* Frontal face */
+    depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+    depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    /* Back face */
+    depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+    depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    hr = m_device->CreateDepthStencilState(&depthStencilDesc, &m_DSStateWithoutZ);
+    FAILTHROW;
+    m_deviceContext->OMSetDepthStencilState(m_DSStateWithZ, 1);
 }
 void PW::Manager::GraphicsManager::ShutdownOM()
 {
-    SafeRelease(&m_DSState);
+    SafeRelease(&m_DSStateWithoutZ);
+    SafeRelease(&m_DSStateWithZ);
     SafeRelease(&m_DSView);
     SafeRelease(&m_RTView);
 }

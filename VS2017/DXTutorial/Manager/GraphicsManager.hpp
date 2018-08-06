@@ -12,6 +12,7 @@
 
 #include <Core/Interface/IView.hpp>
 #include <Entity/Model3D.hpp>
+#include <Entity/Font.hpp>
 #include "Camera.h"
 #include "Light.h"
 
@@ -67,7 +68,8 @@ namespace PW
             /* Output Merger */
             ID3D11RenderTargetView *m_RTView = nullptr;
             ID3D11DepthStencilView *m_DSView = nullptr;
-            ID3D11DepthStencilState *m_DSState = nullptr;
+            ID3D11DepthStencilState *m_DSStateWithZ = nullptr;
+            ID3D11DepthStencilState *m_DSStateWithoutZ = nullptr;
 
             /* Rasterizer */
             ID3D11RasterizerState *m_RState = nullptr;
@@ -78,6 +80,7 @@ namespace PW
 
             Camera *m_camera = nullptr;
             Entity::Model3D *m_model = nullptr;
+            Entity::Font *m_gui = nullptr;
             Light *m_light = nullptr;
         };
     }
