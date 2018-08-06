@@ -70,6 +70,8 @@ namespace PW
             ID3D11DepthStencilView *m_DSView = nullptr;
             ID3D11DepthStencilState *m_DSStateWithZ = nullptr;
             ID3D11DepthStencilState *m_DSStateWithoutZ = nullptr;
+            ID3D11BlendState *m_BlendStateWithAlpha = nullptr;
+            ID3D11BlendState *m_BlendStateWithoutAlpha = nullptr;
 
             /* Rasterizer */
             ID3D11RasterizerState *m_RState = nullptr;

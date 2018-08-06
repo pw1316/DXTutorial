@@ -65,14 +65,17 @@ void PW::Manager::GraphicsManager::Shutdown()
 void PW::Manager::GraphicsManager::OnRender(float f)
 {
     D3DXMATRIX world = m_MatrixWorld, view, proj = m_MatrixProj, ortho = m_MatrixOrtho;
+    float blendFactor[4] = { 0,0,0,0 };
     BeginScene();
     m_camera->Render();
     m_camera->GetViewMatrix(view);
     D3DXMatrixRotationY(&world, f);
     m_deviceContext->OMSetDepthStencilState(m_DSStateWithZ, 1);
+    m_deviceContext->OMSetBlendState(m_BlendStateWithoutAlpha, blendFactor, 0xFFFFFFFF);
     m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_dir);
     m_deviceContext->OMSetDepthStencilState(m_DSStateWithoutZ, 1);
-    m_gui->Render(m_device, m_deviceContext, "testaaaaaa", { 0, 0 }, ortho);
+    m_deviceContext->OMSetBlendState(m_BlendStateWithAlpha, blendFactor, 0xFFFFFFFF);
+    m_gui->Render(m_device, m_deviceContext, "testaaaaaa", { 512, 384 }, ortho);
     EndScene();
 }
 
@@ -242,9 +245,30 @@ void PW::Manager::GraphicsManager::InitializeOM(HWND hwnd, UINT w, UINT h)
     hr = m_device->CreateDepthStencilState(&depthStencilDesc, &m_DSStateWithoutZ);
     FAILTHROW;
     m_deviceContext->OMSetDepthStencilState(m_DSStateWithZ, 1);
+
+    /* Blend State */
+    D3D11_BLEND_DESC blendDesc;
+    ZeroMemory(&blendDesc, sizeof(blendDesc));
+    blendDesc.AlphaToCoverageEnable = false;
+    blendDesc.IndependentBlendEnable = false;
+    blendDesc.RenderTarget[0].BlendEnable = true;
+    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
+    hr = m_device->CreateBlendState(&blendDesc, &m_BlendStateWithAlpha);
+    FAILTHROW;
+    blendDesc.RenderTarget[0].BlendEnable = false;
+    hr = m_device->CreateBlendState(&blendDesc, &m_BlendStateWithoutAlpha);
+    FAILTHROW;
 }
 void PW::Manager::GraphicsManager::ShutdownOM()
 {
+    SafeRelease(&m_BlendStateWithoutAlpha);
+    SafeRelease(&m_BlendStateWithAlpha);
     SafeRelease(&m_DSStateWithoutZ);
     SafeRelease(&m_DSStateWithZ);
     SafeRelease(&m_DSView);
