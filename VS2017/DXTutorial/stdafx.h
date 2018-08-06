@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <type_traits>
 
-#define FAILRETURN() if(FAILED(hr)) {return E_FAIL;}
+#define FAILTHROW if(FAILED(hr)) { throw 1; }
 
 template<class COM>
 inline void SafeRelease(COM **ppCOM)

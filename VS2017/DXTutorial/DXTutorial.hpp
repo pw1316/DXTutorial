@@ -30,16 +30,8 @@ namespace PW
                 }
                 if (g_instance == nullptr)
                 {
-                    HRESULT hr = S_OK;
                     g_instance = new System;
-                    hr = g_instance->Awake();
-                    if (FAILED(hr))
-                    {
-                        g_instance->Destroy();
-                        delete g_instance;
-                        g_instance = nullptr;
-                        g_hInst = nullptr;
-                    }
+                    g_instance->Awake();
                 }
                 return g_instance;
             }
@@ -160,42 +152,26 @@ namespace PW
             System &operator=(const System &rhs) = delete;
             System &operator=(System &&rhs) = delete;
 
-            HRESULT Awake()
+            void Awake()
             {
                 assert(!m_isInited);
                 HRESULT hr = S_OK;
 
                 m_messageHandler = MessageHandler::GetInstance();
                 /* Window */
-                hr = InitializeWindow();
-                if (FAILED(hr))
-                {
-                    ShutdownWindow();
-                    return E_FAIL;
-                }
+                InitializeWindow();
 
                 /* Input */
                 m_input = new Manager::InputManager;
-                m_input->Awake();
+                hr = m_input->Awake();
+                FAILTHROW;
 
                 /* Graphics */
                 m_graphics = new PW::Manager::GraphicsManager;
-                m_graphics->Awake();
-                hr = m_graphics->Initialize(m_hwnd, 1024, 768);
-                if (FAILED(hr))
-                {
-                    assert(m_graphics != nullptr);
-                    m_graphics->Shutdown();
-                    delete m_graphics;
-                    m_graphics = nullptr;
-                    assert(m_input != nullptr);
-                    delete m_input;
-                    m_input = nullptr;
-                    ShutdownWindow();
-                    return E_FAIL;
-                }
+                hr = m_graphics->Awake();
+                FAILTHROW;
+                m_graphics->Initialize(m_hwnd, 1024, 768);
                 m_isInited = true;
-                return S_OK;
             }
             void Destroy()
             {
@@ -239,21 +215,21 @@ namespace PW
                     rotation -= (float)D3DX_PI * 2;
                 }
                 /* Graphics */
-                hr = m_graphics->OnRender(rotation);
+                m_graphics->OnRender(rotation);
                 /* GUI */
                 // TODO gui
                 return hr;
             }
-            HRESULT InitializeWindow()
+            void InitializeWindow()
             {
                 HRESULT hr = S_OK;
 
                 /* Load String */
-                LoadStringW(g_hInst, IDS_APP_TITLE, m_appName, MAX_LOADSTRING);
-                LoadStringW(g_hInst, IDC_DXTUTORIAL, m_className, MAX_LOADSTRING);
+                LoadString(g_hInst, IDS_APP_TITLE, m_appName, MAX_LOADSTRING);
+                LoadString(g_hInst, IDC_DXTUTORIAL, m_className, MAX_LOADSTRING);
 
                 /* Window Class */
-                WNDCLASSEXW wcex{};
+                WNDCLASSEX wcex{};
                 wcex.cbSize = sizeof(WNDCLASSEX);
                 wcex.style = CS_HREDRAW | CS_VREDRAW;
                 wcex.lpfnWndProc = WinProc;
@@ -263,23 +239,16 @@ namespace PW
                 wcex.hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_DXTUTORIAL));
                 wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
                 wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-                wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_DXTUTORIAL);
+                wcex.lpszMenuName = MAKEINTRESOURCE(IDC_DXTUTORIAL);
                 wcex.lpszClassName = m_className;
                 wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
                 hr = (RegisterClassEx(&wcex) == 0) ? E_FAIL : S_OK;
-                if (FAILED(hr))
-                {
-                    return E_FAIL;
-                }
+                FAILTHROW;
 
                 RECT paintRect{ 0, 0, 1024, 768 };
                 hr = AdjustWindowRect(&paintRect, WS_OVERLAPPEDWINDOW, true) ? S_OK : E_FAIL;
-                if (FAILED(hr))
-                {
-                    UnregisterClassW(m_className, g_hInst);
-                    return E_FAIL;
-                }
-                m_hwnd = CreateWindowW
+                FAILTHROW;
+                m_hwnd = CreateWindow
                 (
                     m_className,
                     m_appName,
@@ -294,28 +263,23 @@ namespace PW
                     nullptr
                 );
                 hr = m_hwnd ? S_OK : E_FAIL;
-                if (FAILED(hr))
-                {
-                    UnregisterClassW(m_className, g_hInst);
-                    return E_FAIL;
-                }
+                FAILTHROW;
                 ShowWindow(m_hwnd, SW_SHOWNORMAL);
                 UpdateWindow(m_hwnd);
-                return S_OK;
             }
             void ShutdownWindow()
             {
                 ShowCursor(true);
                 DestroyWindow(m_hwnd);
                 m_hwnd = nullptr;
-                UnregisterClassW(m_className, g_hInst);
+                UnregisterClass(m_className, g_hInst);
             }
 
             static HINSTANCE g_hInst;
             static System* g_instance;
             HWND m_hwnd = nullptr;
-            WCHAR m_appName[MAX_LOADSTRING];
-            WCHAR m_className[MAX_LOADSTRING];
+            CHAR m_appName[MAX_LOADSTRING];
+            CHAR m_className[MAX_LOADSTRING];
 
             BOOL m_isInited = false;
             PW::Core::MessageHandler *m_messageHandler = nullptr;

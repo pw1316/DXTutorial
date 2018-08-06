@@ -13,7 +13,7 @@ public:
 
     void SetPos(FLOAT xx, FLOAT yy, FLOAT zz);
     void SetRot(FLOAT xx, FLOAT yy, FLOAT zz);
-    D3DXVECTOR3 GetPos() const;
+    D3DXVECTOR4 GetPos() const;
     D3DXVECTOR3 GetRot() const;
 
     void Render();

@@ -15,21 +15,21 @@
     <ProjectGuid>{E9328672-A211-41A3-ABE5-6BEEA7C41240}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>DXTutorial</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -99,24 +99,22 @@
     <ClInclude Include="Core\Interface\IView.hpp" />
     <ClInclude Include="Core\Message.hpp" />
     <ClInclude Include="Core\MessageHandler.hpp" />
-    <ClInclude Include="Core\Model.hpp" />
     <ClInclude Include="DXTutorial.hpp" />
     <ClInclude Include="Entity\Entity.hpp" />
+    <ClInclude Include="Entity\Model3D.hpp" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Manager\GraphicsManager.hpp" />
     <ClInclude Include="Manager\InputManager.hpp" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Core\MessageHandler.cpp" />
-    <ClCompile Include="Core\Model.cpp" />
     <ClCompile Include="DXTutorial.cpp" />
+    <ClCompile Include="Entity\Model3D.cpp" />
     <ClCompile Include="Manager\GraphicsManager.cpp" />
-    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

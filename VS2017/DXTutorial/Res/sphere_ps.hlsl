@@ -1,13 +1,18 @@
-Texture2D shaderTexture;
+Texture2D shaderTexture : register(t0);
 SamplerState SampleType;
 
-cbuffer LightBuffer
+cbuffer consts0 : register(b0)
 {
     float4 Ka;
     float4 Kd;
     float4 Ks;
-    float3 lightDir;
     float Ns;
+};
+
+cbuffer consts1 : register(b1)
+{
+    float4 CameraPos;
+    float3 LightDir;
 };
 
 struct PixelIn
@@ -21,6 +26,6 @@ struct PixelIn
 float4 PS(PixelIn pin) : SV_TARGET
 {
     float4 color = shaderTexture.Sample(SampleType, pin.uv);
-    color = color * saturate(Ka + Kd * saturate(dot(pin.normal, -lightDir)) + Ks * pow(saturate(dot(normalize(pin.view - lightDir), pin.normal)), Ns));
+    color = color * saturate(Ka + Kd * saturate(dot(pin.normal, -LightDir)) + Ks * pow(saturate(dot(normalize(pin.view - LightDir), pin.normal)), Ns));
     return color;
 }

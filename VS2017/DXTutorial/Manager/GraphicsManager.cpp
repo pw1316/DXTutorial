@@ -3,29 +3,17 @@
 
 #include <vector>
 
-HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
+void PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
 {
     HRESULT hr = S_OK;
     /* Create SwapChain, Device and Context */
-    hr = InitializeDevice(hwnd, w, h);
-    FAILRETURN();
+    InitializeDevice(hwnd, w, h);
 
     /* Create RenderTarget and DepthStencilState */
-    hr = InitializeOM(hwnd, w, h);
-    if (FAILED(hr))
-    {
-        ShutdownDevice();
-        return E_FAIL;
-    }
+    InitializeOM(hwnd, w, h);
 
     /* Create RasterizerState */
-    hr = InitializeRasterizer(hwnd, w, h);
-    if (FAILED(hr))
-    {
-        ShutdownOM();
-        ShutdownDevice();
-        return E_FAIL;
-    }
+    InitializeRasterizer(hwnd, w, h);
 
     float fov, aspect;
     fov = (float)D3DX_PI / 3.0f;
@@ -37,23 +25,11 @@ HRESULT PW::Manager::GraphicsManager::Initialize(HWND hwnd, UINT w, UINT h)
     m_camera = new Camera;
     m_camera->SetPos(0.0f, 2.0f, -10.0f);
 
-    m_model = new Core::Model(L"Res/sphere");
-    hr = m_model->Initialize(m_device);
-    if (FAILED(hr))
-    {
-        delete m_model;
-        m_model = nullptr;
-        delete m_camera;
-        m_camera = nullptr;
-        ShutdownRasterizer();
-        ShutdownOM();
-        ShutdownDevice();
-        return E_FAIL;
-    }
+    m_model = new Entity::Model3D("Res/sphere");
+    m_model->Initialize(m_device);
 
     m_light = new Light;
     m_light->m_dir = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-    return S_OK;
 }
 void PW::Manager::GraphicsManager::Shutdown()
 {
@@ -77,52 +53,44 @@ void PW::Manager::GraphicsManager::Shutdown()
     ShutdownOM();
     ShutdownDevice();
 }
-HRESULT PW::Manager::GraphicsManager::OnRender(float f)
+void PW::Manager::GraphicsManager::OnRender(float f)
 {
-    HRESULT hr = S_OK;
     D3DXMATRIX world = m_MatrixWorld, view{}, proj = m_MatrixProj;
     BeginScene();
     m_camera->Render();
     m_camera->GetViewMatrix(view);
     D3DXMatrixRotationY(&world, f);
     m_model->Render(m_deviceContext, world, view, proj, m_camera->GetPos(), m_light->m_dir);
-    FAILRETURN();
     // TODO Add GUI render
-    hr = EndScene();
-    return hr;
+    EndScene();
 }
 
-HRESULT PW::Manager::GraphicsManager::GetRefreshRate(UINT w, UINT h, UINT &num, UINT &den)
+void PW::Manager::GraphicsManager::GetRefreshRate(UINT w, UINT h, UINT &num, UINT &den)
 {
     HRESULT hr = S_OK;
     /* Create DX factory */
     IDXGIFactory *factory;
     hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
-    FAILRETURN();
+    FAILTHROW;
     /* Create DX adapter from factory, Release factory */
     IDXGIAdapter *adapter;
     hr = factory->EnumAdapters(0, &adapter);
     SafeRelease(&factory);
-    FAILRETURN();
+    FAILTHROW;
     /* Create DX output from adapter, Release adapter */
     IDXGIOutput *adapterOutput;
     hr = adapter->EnumOutputs(0, &adapterOutput);
     SafeRelease(&adapter);
-    FAILRETURN();
+    FAILTHROW;
     /* Create DX mode from output, Release output */
     std::vector<DXGI_MODE_DESC> modeList;
     UINT numModes;
     hr = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, nullptr);
-    /* UGLY!!! */
-    if (FAILED(hr))
-    {
-        SafeRelease(&adapterOutput);
-        return E_FAIL;
-    }
+    FAILTHROW;
     modeList.resize(numModes);
     hr = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, &modeList[0]);
     SafeRelease(&adapterOutput);
-    FAILRETURN();
+    FAILTHROW;
     /* Get Refresh Rate */
     for (auto &mode : modeList)
     {
@@ -133,15 +101,13 @@ HRESULT PW::Manager::GraphicsManager::GetRefreshRate(UINT w, UINT h, UINT &num, 
             break;
         }
     }
-    return S_OK;
 }
 
-HRESULT PW::Manager::GraphicsManager::InitializeDevice(HWND hwnd, UINT w, UINT h)
+void PW::Manager::GraphicsManager::InitializeDevice(HWND hwnd, UINT w, UINT h)
 {
     HRESULT hr = S_OK;
     UINT num = 0U, den = 0U;
-    hr = GetRefreshRate(w, h, num, den);
-    FAILRETURN();
+    GetRefreshRate(w, h, num, den);
     /* Swap Chain */
     DXGI_SWAP_CHAIN_DESC swapChainDesc;
     ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
@@ -165,7 +131,7 @@ HRESULT PW::Manager::GraphicsManager::InitializeDevice(HWND hwnd, UINT w, UINT h
         nullptr,
         D3D_DRIVER_TYPE_HARDWARE,
         nullptr,
-        0,
+        D3D11_CREATE_DEVICE_DEBUG,
         &featureLevel, 1,
         D3D11_SDK_VERSION,
         &swapChainDesc, &m_swapChain,
@@ -173,8 +139,7 @@ HRESULT PW::Manager::GraphicsManager::InitializeDevice(HWND hwnd, UINT w, UINT h
         nullptr,
         &m_deviceContext
     );
-    FAILRETURN();
-    return S_OK;
+    FAILTHROW;
 }
 void PW::Manager::GraphicsManager::ShutdownDevice()
 {
@@ -183,17 +148,17 @@ void PW::Manager::GraphicsManager::ShutdownDevice()
     SafeRelease(&m_swapChain);
 }
 
-HRESULT PW::Manager::GraphicsManager::InitializeOM(HWND hwnd, UINT w, UINT h)
+void PW::Manager::GraphicsManager::InitializeOM(HWND hwnd, UINT w, UINT h)
 {
     HRESULT hr = S_OK;
 
     /* Create RTV */
     ID3D11Texture2D* backBuffer;
     hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
-    FAILRETURN();
+    FAILTHROW;
     hr = m_device->CreateRenderTargetView(backBuffer, nullptr, &m_RTView);
     SafeRelease(&backBuffer);
-    FAILRETURN();
+    FAILTHROW;
 
     /* Create DSV */
     ID3D11Texture2D *dsBuffer = nullptr;
@@ -211,11 +176,7 @@ HRESULT PW::Manager::GraphicsManager::InitializeOM(HWND hwnd, UINT w, UINT h)
     depthBufferDesc.CPUAccessFlags = 0;
     depthBufferDesc.MiscFlags = 0;
     hr = m_device->CreateTexture2D(&depthBufferDesc, NULL, &dsBuffer);
-    if (FAILED(hr))
-    {
-        SafeRelease(&m_RTView);
-        return E_FAIL;
-    }
+    FAILTHROW;
     D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
     ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
     depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -223,11 +184,7 @@ HRESULT PW::Manager::GraphicsManager::InitializeOM(HWND hwnd, UINT w, UINT h)
     depthStencilViewDesc.Texture2D.MipSlice = 0;
     hr = m_device->CreateDepthStencilView(dsBuffer, &depthStencilViewDesc, &m_DSView);
     SafeRelease(&dsBuffer);
-    if (FAILED(hr))
-    {
-        SafeRelease(&m_RTView);
-        return E_FAIL;
-    }
+    FAILTHROW;
 
     /* RenderTarget */
     m_deviceContext->OMSetRenderTargets(1, &m_RTView, m_DSView);
@@ -252,14 +209,8 @@ HRESULT PW::Manager::GraphicsManager::InitializeOM(HWND hwnd, UINT w, UINT h)
     depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
     depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
     hr = m_device->CreateDepthStencilState(&depthStencilDesc, &m_DSState);
-    if (FAILED(hr))
-    {
-        SafeRelease(&m_DSView);
-        SafeRelease(&m_RTView);
-        return E_FAIL;
-    }
+    FAILTHROW;
     m_deviceContext->OMSetDepthStencilState(m_DSState, 1);
-    return S_OK;
 }
 void PW::Manager::GraphicsManager::ShutdownOM()
 {
@@ -268,7 +219,7 @@ void PW::Manager::GraphicsManager::ShutdownOM()
     SafeRelease(&m_RTView);
 }
 
-HRESULT PW::Manager::GraphicsManager::InitializeRasterizer(HWND hwnd, UINT w, UINT h)
+void PW::Manager::GraphicsManager::InitializeRasterizer(HWND hwnd, UINT w, UINT h)
 {
     HRESULT hr = S_OK;
 
@@ -286,7 +237,7 @@ HRESULT PW::Manager::GraphicsManager::InitializeRasterizer(HWND hwnd, UINT w, UI
     resterizeState.MultisampleEnable = false;
     resterizeState.AntialiasedLineEnable = false;
     hr = m_device->CreateRasterizerState(&resterizeState, &m_RState);
-    FAILRETURN();
+    FAILTHROW;
     m_deviceContext->RSSetState(m_RState);
 
     /* ViewPort */
@@ -299,8 +250,6 @@ HRESULT PW::Manager::GraphicsManager::InitializeRasterizer(HWND hwnd, UINT w, UI
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
     m_deviceContext->RSSetViewports(1, &viewport);
-
-    return S_OK;
 }
 void PW::Manager::GraphicsManager::ShutdownRasterizer()
 {

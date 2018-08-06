@@ -41,9 +41,6 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -74,8 +71,8 @@
     <ClInclude Include="Entity\Entity.hpp">
       <Filter>Entity</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Model.hpp">
-      <Filter>Core</Filter>
+    <ClInclude Include="Entity\Model3D.hpp">
+      <Filter>Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +80,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DXTutorial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
@@ -97,8 +91,8 @@
     <ClCompile Include="Manager\GraphicsManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Model.cpp">
-      <Filter>Core</Filter>
+    <ClCompile Include="Entity\Model3D.cpp">
+      <Filter>Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

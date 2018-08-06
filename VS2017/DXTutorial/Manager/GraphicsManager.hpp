@@ -11,8 +11,7 @@
 #include <D3DX10math.h>
 
 #include <Core/Interface/IView.hpp>
-#include <Core/Model.hpp>
-#include "Shader.h"
+#include <Entity/Model3D.hpp>
 #include "Camera.h"
 #include "Light.h"
 
@@ -31,22 +30,22 @@ namespace PW
             virtual void Destroy() override {}
             virtual void OnMessage(const Core::Message &msg) override {}
 
-            HRESULT Initialize(HWND hwnd, UINT w, UINT h);
+            void Initialize(HWND hwnd, UINT w, UINT h);
             void Shutdown();
-            HRESULT OnRender(float f);
+            void OnRender(float f);
         private:
-            HRESULT GetRefreshRate(UINT w, UINT h, UINT &num, UINT &den);
+            void GetRefreshRate(UINT w, UINT h, UINT &num, UINT &den);
 
             /* D3D Basic */
-            HRESULT InitializeDevice(HWND hwnd, UINT w, UINT h);
+            void InitializeDevice(HWND hwnd, UINT w, UINT h);
             void ShutdownDevice();
 
             /* Output Merger */
-            HRESULT InitializeOM(HWND hwnd, UINT w, UINT h);
+            void InitializeOM(HWND hwnd, UINT w, UINT h);
             void ShutdownOM();
 
             /* Output Merger */
-            HRESULT InitializeRasterizer(HWND hwnd, UINT w, UINT h);
+            void InitializeRasterizer(HWND hwnd, UINT w, UINT h);
             void ShutdownRasterizer();
 
             void BeginScene()
@@ -55,9 +54,9 @@ namespace PW
                 m_deviceContext->ClearRenderTargetView(m_RTView, color);
                 m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
             }
-            HRESULT EndScene()
+            void EndScene()
             {
-                return m_swapChain->Present(1, 0);
+                m_swapChain->Present(1, 0);
             }
 
             /* D3D Basic */
@@ -78,7 +77,7 @@ namespace PW
             D3DXMATRIX m_MatrixOrtho{};
 
             Camera *m_camera = nullptr;
-            Core::Model *m_model = nullptr;
+            Entity::Model3D *m_model = nullptr;
             Light *m_light = nullptr;
         };
     }

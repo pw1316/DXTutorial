@@ -4,17 +4,16 @@
 HINSTANCE PW::Core::System::g_hInst = nullptr;
 PW::Core::System *PW::Core::System::g_instance = nullptr;
 
-int APIENTRY wWinMain(
+int APIENTRY WinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR lpCmdLine,
+    _In_ LPSTR lpCmdLine,
     _In_ int nCmdShow
 )
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    HRESULT hr = S_OK;
     PW::Core::System *sys = PW::Core::System::GetInstance(hInstance);
     if (sys == nullptr)
     {

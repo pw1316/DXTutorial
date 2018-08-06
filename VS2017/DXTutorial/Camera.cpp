@@ -17,9 +17,9 @@ void Camera::SetRot(FLOAT xx, FLOAT yy, FLOAT zz)
     m_dirty = true;
 }
 
-D3DXVECTOR3 Camera::GetPos() const
+D3DXVECTOR4 Camera::GetPos() const
 {
-    return D3DXVECTOR3(m_x, m_y, m_z);
+    return D3DXVECTOR4(m_x, m_y, m_z, 1.0f);
 }
 
 D3DXVECTOR3 Camera::GetRot() const
