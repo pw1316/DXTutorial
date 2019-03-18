@@ -1,5 +1,5 @@
-#ifndef __CORE_APPLICATION_H__
-#define __CORE_APPLICATION_H__
+#ifndef __CORE_APPLICATION__
+#define __CORE_APPLICATION__
 #include <stdafx.h>
 
 #include <Resource.h>

@@ -1,6 +1,7 @@
-#ifndef __PW_CORE_VIEW__
-#define __PW_CORE_VIEW__
+#ifndef __CORE_VIEW__
+#define __CORE_VIEW__
 #include <stdafx.h>
+
 #include <set>
 #include <string>
 

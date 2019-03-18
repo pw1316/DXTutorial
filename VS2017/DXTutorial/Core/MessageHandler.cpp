@@ -2,4 +2,9 @@
 
 #include "MessageHandler.hpp"
 
-Naiive::Core::MessageHandler* Naiive::Core::MessageHandler::g_instance = nullptr;
+namespace Naiive::Core {
+MessageHandlerClass& Naiive::Core::MessageHandler() {
+  static MessageHandlerClass obj;
+  return obj;
+}
+}  // namespace Naiive::Core

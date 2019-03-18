@@ -10,22 +10,10 @@
 #include <Core/Message.hpp>
 
 namespace Naiive::Core {
-class MessageHandler {
+class MessageHandlerClass {
+  friend MessageHandlerClass& MessageHandler();
+
  public:
-  static MessageHandler* GetInstance() {
-    if (g_instance == nullptr) {
-      g_instance = new MessageHandler;
-    }
-    return g_instance;
-  }
-
-  static void ReleaseInstance() {
-    if (g_instance != nullptr) {
-      delete g_instance;
-      g_instance = nullptr;
-    }
-  }
-
   void RegisterCommand(const std::string& name, ICommand* cmd) {
     auto iter = m_commandMap.find(name);
     if (iter != m_commandMap.end()) {
@@ -85,8 +73,7 @@ class MessageHandler {
   }
 
  private:
-  static MessageHandler* g_instance;
-  MessageHandler() = default;
+  MessageHandlerClass() = default;
 
   std::map<std::string, ICommand*>
       m_commandMap;  // ICommand's deletion handled HERE, NOT refer to its
@@ -94,5 +81,7 @@ class MessageHandler {
   std::map<IView*, std::set<std::string>>
       m_viewCommandMap;  // IView's deletion is handled by its CREATOR, NOT HERE
 };
+
+MessageHandlerClass& MessageHandler();
 }  // namespace Naiive::Core
 #endif

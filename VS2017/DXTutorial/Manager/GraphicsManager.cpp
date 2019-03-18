@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include <stdafx.h>
 #include "GraphicsManager.hpp"
 
 #include <vector>

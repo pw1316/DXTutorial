@@ -6,85 +6,80 @@
 #pragma comment(lib, "d3dx10.lib")
 #include "stdafx.h"
 
-#include <DXGI.h>
 #include <D3D11.h>
 #include <D3DX10math.h>
+#include <DXGI.h>
 
 #include <Core/Interface/IView.hpp>
-#include <Entity/Model3D.hpp>
 #include <Entity/Font.hpp>
+#include <Entity/Model3D.hpp>
 #include "Camera.h"
 #include "Light.h"
 
-namespace PW
-{
-    namespace Manager
-    {
-        class GraphicsManager : public Core::IView
-        {
-        public:
-            GraphicsManager() = default;
-            virtual ~GraphicsManager() = default;
+namespace PW {
+namespace Manager {
+class GraphicsManager : public Naiive::Core::IView {
+ public:
+  GraphicsManager() = default;
+  virtual ~GraphicsManager() = default;
 
-            /* Override */
-            virtual HRESULT Awake() override { return S_OK; }
-            virtual void Destroy() override {}
-            virtual void OnMessage(const Core::Message &msg) override {}
+  /* Override */
+  virtual HRESULT Awake() override { return S_OK; }
+  virtual void Destroy() override {}
+  virtual void OnMessage(const Naiive::Core::Message& msg) override {}
 
-            void Initialize(HWND hwnd, UINT w, UINT h);
-            void Shutdown();
-            void OnRender();
-        private:
-            void GetRefreshRate(UINT w, UINT h, UINT &num, UINT &den);
+  void Initialize(HWND hwnd, UINT w, UINT h);
+  void Shutdown();
+  void OnRender();
 
-            /* D3D Basic */
-            void InitializeDevice(HWND hwnd, UINT w, UINT h);
-            void ShutdownDevice();
+ private:
+  void GetRefreshRate(UINT w, UINT h, UINT& num, UINT& den);
 
-            /* Output Merger */
-            void InitializeOM(HWND hwnd, UINT w, UINT h);
-            void ShutdownOM();
+  /* D3D Basic */
+  void InitializeDevice(HWND hwnd, UINT w, UINT h);
+  void ShutdownDevice();
 
-            /* Output Merger */
-            void InitializeRasterizer(HWND hwnd, UINT w, UINT h);
-            void ShutdownRasterizer();
+  /* Output Merger */
+  void InitializeOM(HWND hwnd, UINT w, UINT h);
+  void ShutdownOM();
 
-            void BeginScene()
-            {
-                float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-                m_deviceContext->ClearRenderTargetView(m_RTView, color);
-                m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-            }
-            void EndScene()
-            {
-                m_swapChain->Present(1, 0);
-            }
+  /* Output Merger */
+  void InitializeRasterizer(HWND hwnd, UINT w, UINT h);
+  void ShutdownRasterizer();
 
-            /* D3D Basic */
-            IDXGISwapChain *m_swapChain = nullptr;
-            ID3D11Device *m_device = nullptr;
-            ID3D11DeviceContext *m_deviceContext = nullptr;
+  void BeginScene() {
+    float color[] = {0.0f, 0.0f, 0.0f, 0.0f};
+    m_deviceContext->ClearRenderTargetView(m_RTView, color);
+    m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f,
+                                           0);
+  }
+  void EndScene() { m_swapChain->Present(1, 0); }
 
-            /* Output Merger */
-            ID3D11RenderTargetView *m_RTView = nullptr;
-            ID3D11DepthStencilView *m_DSView = nullptr;
-            ID3D11DepthStencilState *m_DSStateWithZ = nullptr;
-            ID3D11DepthStencilState *m_DSStateWithoutZ = nullptr;
-            ID3D11BlendState *m_BlendStateWithAlpha = nullptr;
-            ID3D11BlendState *m_BlendStateWithoutAlpha = nullptr;
+  /* D3D Basic */
+  IDXGISwapChain* m_swapChain = nullptr;
+  ID3D11Device* m_device = nullptr;
+  ID3D11DeviceContext* m_deviceContext = nullptr;
 
-            /* Rasterizer */
-            ID3D11RasterizerState *m_RState = nullptr;
+  /* Output Merger */
+  ID3D11RenderTargetView* m_RTView = nullptr;
+  ID3D11DepthStencilView* m_DSView = nullptr;
+  ID3D11DepthStencilState* m_DSStateWithZ = nullptr;
+  ID3D11DepthStencilState* m_DSStateWithoutZ = nullptr;
+  ID3D11BlendState* m_BlendStateWithAlpha = nullptr;
+  ID3D11BlendState* m_BlendStateWithoutAlpha = nullptr;
 
-            D3DXMATRIX m_MatrixProj{};
-            D3DXMATRIX m_MatrixOrtho{};
+  /* Rasterizer */
+  ID3D11RasterizerState* m_RState = nullptr;
 
-            Camera *m_camera = nullptr;
-            Entity::Model3D *m_model = nullptr;
-            Entity::Font *m_gui = nullptr;
-            Light *m_light = nullptr;
-        };
-    }
-}
+  D3DXMATRIX m_MatrixProj{};
+  D3DXMATRIX m_MatrixOrtho{};
+
+  Camera* m_camera = nullptr;
+  Entity::Model3D* m_model = nullptr;
+  Entity::Font* m_gui = nullptr;
+  Light* m_light = nullptr;
+};
+}  // namespace Manager
+}  // namespace PW
 
 #endif
