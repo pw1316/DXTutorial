@@ -77,12 +77,12 @@
     <ClInclude Include="Entity\Font.hpp">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="Core\System.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DXTutorial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
@@ -99,6 +99,12 @@
     </ClCompile>
     <ClCompile Include="Entity\Font.cpp">
       <Filter>Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\System.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,3 @@
+[submodule "VS2017/DXTutorial/3rdparty/tinyobjloader"]
+	path = VS2017/DXTutorial/3rdparty/tinyobjloader
+	url = https://github.com/syoyo/tinyobjloader.git
