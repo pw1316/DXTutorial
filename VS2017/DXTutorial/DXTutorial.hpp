@@ -220,7 +220,7 @@ namespace PW
 
                 /* Load String */
                 LoadString(g_hInst, IDS_APP_TITLE, m_appName, MAX_LOADSTRING);
-                LoadString(g_hInst, IDC_DXTUTORIAL, m_className, MAX_LOADSTRING);
+                LoadString(g_hInst, IDS_WINDOW_CLASS, m_className, MAX_LOADSTRING);
 
                 /* Window Class */
                 WNDCLASSEX wcex{};
@@ -230,12 +230,12 @@ namespace PW
                 wcex.cbClsExtra = 0;
                 wcex.cbWndExtra = 0;
                 wcex.hInstance = g_hInst;
-                wcex.hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_DXTUTORIAL));
+                wcex.hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_NAIIVE_ICON));
                 wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
                 wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-                wcex.lpszMenuName = MAKEINTRESOURCE(IDC_DXTUTORIAL);
+                wcex.lpszMenuName = MAKEINTRESOURCE(IDC_NAIIVE_MENU);
                 wcex.lpszClassName = m_className;
-                wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+                wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_NAIIVE_ICON_SMALL));
                 hr = (RegisterClassEx(&wcex) == 0) ? E_FAIL : S_OK;
                 FAILTHROW;
 

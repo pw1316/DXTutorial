@@ -99,6 +99,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Core\Application.hpp" />
+    <ClInclude Include="Core\IGraphics.hpp" />
     <ClInclude Include="Core\Interface\ICommand.hpp" />
     <ClInclude Include="Core\Interface\IView.hpp" />
     <ClInclude Include="Core\Message.hpp" />
@@ -117,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\MessageHandler.cpp" />
     <ClCompile Include="Core\System.cpp" />
     <ClCompile Include="Main.cpp" />

@@ -80,6 +80,12 @@
     <ClInclude Include="Core\System.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Application.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\IGraphics.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -104,6 +110,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\System.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Application.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
