@@ -72,7 +72,7 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device *device)
     HRESULT hr = S_OK;
 
     TinyObj obj;
-    hr = tinyobj::LoadObj(&obj.attr, &obj.shapes, &obj.materials, nullptr, (m_name + ".obj").c_str(), "Res/", true) ? S_OK : E_FAIL;
+    hr = tinyobj::LoadObj(&obj.attr, &obj.shapes, &obj.materials, nullptr, nullptr, (m_name + ".obj").c_str(), "Res/", true) ? S_OK : E_FAIL;
     FAILTHROW;
 
     D3D11_BUFFER_DESC bufferDesc;
