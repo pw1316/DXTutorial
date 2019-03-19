@@ -199,6 +199,8 @@ void PW::Entity::Font::InitializeBuffer(ID3D11Device* device) {
 }
 void PW::Entity::Font::ShutdownBuffer() {
   SafeRelease(&m_SamplerState);
+  SafeRelease(&m_SRVTexture);
+  SafeRelease(&m_CBColor);
   SafeRelease(&m_CBTransform);
   SafeRelease(&m_IB);
   SafeRelease(&m_VB);

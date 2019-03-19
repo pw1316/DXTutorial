@@ -17,6 +17,12 @@ class SystemClass {
     return 1.0f * (m_nowTime.QuadPart - m_startTime.QuadPart) / m_freq.QuadPart;
   }
 
+  void ReportLiveObjects() {
+    DebugInfo("=====A=====");
+    m_dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+    DebugInfo("=====B=====");
+  }
+
   template <class... _Args>
   void DebugInfo(_Args&&... args) {
     DebugLog("[INFO]", std::forward<_Args>(args)...);
