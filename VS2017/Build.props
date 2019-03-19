@@ -6,6 +6,7 @@
     <OutDir>$(ProjectDir)build\$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)temp\$(Configuration)\</IntDir>
     <LibraryPath>$(ProjectDir)3rdparty\lib\$(PlatformTarget);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

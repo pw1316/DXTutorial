@@ -189,7 +189,7 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   /* =====Texture=====*/
   auto texture_name = m_name + ".dds";
   WCHAR texture_name_l[128] = {0};
-  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(), texture_name.size(),
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(), (int)texture_name.size(),
                       texture_name_l, 128);
   DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
                                     &m_SRVTexture0);
