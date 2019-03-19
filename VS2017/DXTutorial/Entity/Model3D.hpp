@@ -6,8 +6,8 @@
 #include <vector>
 
 #include <3rdparty/include/tiny_obj_loader.h>
-#include <D3D11.h>
-#include <D3DX10math.h>
+#include <DirectXMath.h>
+#include <d3d11.h>
 
 #include <Core/Interface/IView.hpp>
 
@@ -16,26 +16,26 @@ namespace Entity {
 class Model3D : public Naiive::Core::IView {
  private:
   struct VBType {
-    D3DXVECTOR3 pos;
-    D3DXVECTOR2 uv;
-    D3DXVECTOR3 normal;
+    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT2 uv;
+    DirectX::XMFLOAT3 normal;
   };
   struct CBTransformType {
-    D3DXMATRIX world;
-    D3DXMATRIX view;
-    D3DXMATRIX proj;
+    DirectX::XMFLOAT4X4 world;
+    DirectX::XMFLOAT4X4 view;
+    DirectX::XMFLOAT4X4 proj;
   };
   struct CBCameraLightType {
-    D3DXVECTOR4 camPos;
-    D3DXVECTOR3 lightDir;
+    DirectX::XMFLOAT4 camPos;
+    DirectX::XMFLOAT3 lightDir;
     float padding;
   };
   struct CBMaterialType {
-    D3DXVECTOR4 ka;
-    D3DXVECTOR4 kd;
-    D3DXVECTOR4 ks;
+    DirectX::XMFLOAT4 ka;
+    DirectX::XMFLOAT4 kd;
+    DirectX::XMFLOAT4 ks;
     float ns;
-    D3DXVECTOR3 padding;
+    DirectX::XMFLOAT3 padding;
   };
   struct TinyObj {
     tinyobj::attrib_t attr;
@@ -49,14 +49,15 @@ class Model3D : public Naiive::Core::IView {
   ~Model3D() = default;
 
   /* Override */
-  virtual void Awake() override {};
+  virtual void Awake() override{};
   virtual void Destroy() override{};
   virtual void OnMessage(const Naiive::Core::Message& msg) override{};
 
   void Initialize(ID3D11Device* device);
   void Shutdown();
-  void Render(ID3D11DeviceContext* context, D3DXMATRIX view, D3DXMATRIX proj,
-              D3DXVECTOR4 camPos, D3DXVECTOR3 dir);
+  void Render(ID3D11DeviceContext* context, DirectX::XMFLOAT4X4 view,
+              DirectX::XMFLOAT4X4 proj, DirectX::XMFLOAT4 camPos,
+              DirectX::XMFLOAT3 dir);
 
  private:
   /* Resources */

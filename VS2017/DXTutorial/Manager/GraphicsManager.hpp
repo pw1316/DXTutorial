@@ -1,14 +1,10 @@
 #ifndef __MANAGER_GRAPHICS_MANAGER__
 #define __MANAGER_GRAPHICS_MANAGER__
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "d3dx11.lib")
-#pragma comment(lib, "d3dx10.lib")
 #include <stdafx.h>
 
-#include <D3D11.h>
-#include <D3DX10math.h>
-#include <DXGI.h>
+#include <DirectXMath.h>
+#include <d3d11.h>
+#include <dxgi.h>
 
 #include <Core/IGraphics.hpp>
 #include <Core/Interface/IView.hpp>
@@ -32,18 +28,27 @@ class GraphicsManagerClass : public Core::IView, public Core::IGraphics {
       m_rotz = zz;
       m_dirty = true;
     }
-    D3DXVECTOR4 GetPos() const { return D3DXVECTOR4(m_x, m_y, m_z, 1.0f); }
-    D3DXVECTOR3 GetRot() const { return D3DXVECTOR3(m_rotx, m_roty, m_rotz); }
-    void GetMatrix(D3DXMATRIX& m) {
+    DirectX::XMFLOAT4 GetPos() const {
+      return DirectX::XMFLOAT4(m_x, m_y, m_z, 1.0f);
+    }
+    DirectX::XMFLOAT3 GetRot() const {
+      return DirectX::XMFLOAT3(m_rotx, m_roty, m_rotz);
+    }
+    void GetMatrix(DirectX::XMFLOAT4X4& m) {
       if (m_dirty) {
-        D3DXVECTOR3 pos(m_x, m_y, m_z), up(0.0f, 1.0f, 0.0f),
-            lookAt(0.0f, 0.0f, 1.0f);
-        D3DXMATRIX rotMatrix{};
-        D3DXMatrixRotationYawPitchRoll(&rotMatrix, m_roty, m_rotx, m_rotz);
-        D3DXVec3TransformCoord(&lookAt, &lookAt, &rotMatrix);
-        D3DXVec3TransformCoord(&up, &up, &rotMatrix);
-        lookAt = pos + lookAt;
-        D3DXMatrixLookAtLH(&m_matrix, &pos, &lookAt, &up);
+        DirectX::XMFLOAT3 pos_raw(m_x, m_y, m_z);
+        DirectX::XMFLOAT3 up_raw(0.0f, 1.0f, 0.0f);
+        DirectX::XMFLOAT3 lookAt_raw(0.0f, 0.0f, 1.0f);
+        auto rotMatrix =
+            DirectX::XMMatrixRotationRollPitchYaw(m_rotx, m_roty, m_rotz);
+        auto pos = DirectX::XMLoadFloat3(&pos_raw);
+        auto lookAt = DirectX::XMVector3TransformCoord(
+            DirectX::XMLoadFloat3(&lookAt_raw), rotMatrix);
+        auto up = DirectX::XMVector3TransformCoord(
+            DirectX::XMLoadFloat3(&up_raw), rotMatrix);
+        lookAt = DirectX::XMVectorAdd(pos, lookAt);
+        DirectX::XMStoreFloat4x4(&m_matrix,
+                                 DirectX::XMMatrixLookAtLH(pos, lookAt, up));
         m_dirty = false;
       }
       m = m_matrix;
@@ -53,10 +58,10 @@ class GraphicsManagerClass : public Core::IView, public Core::IGraphics {
     BOOL m_dirty = true;
     FLOAT m_x = 0.0f, m_y = 0.0f, m_z = 0.0f;
     FLOAT m_rotx = 0.0f, m_roty = 0.0f, m_rotz = 0.0f;
-    D3DXMATRIX m_matrix{};
+    DirectX::XMFLOAT4X4 m_matrix{};
   };
   struct Light {
-    D3DXVECTOR3 m_dir{};
+    DirectX::XMFLOAT3 m_dir{};
   };
 
  public:
@@ -114,8 +119,8 @@ class GraphicsManagerClass : public Core::IView, public Core::IGraphics {
   /* Rasterizer */
   ID3D11RasterizerState* m_RState = nullptr;
 
-  D3DXMATRIX m_MatrixProj{};
-  D3DXMATRIX m_MatrixOrtho{};
+  DirectX::XMFLOAT4X4 m_MatrixProj{};
+  DirectX::XMFLOAT4X4 m_MatrixOrtho{};
 
   Camera m_camera;
   PW::Entity::Model3D* m_model = nullptr;

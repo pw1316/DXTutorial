@@ -38,12 +38,10 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\DirectX.props" />
     <Import Project="..\Build.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\DirectX.props" />
     <Import Project="..\Build.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -67,7 +65,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>tinyobjloaderd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dxgi.lib;dxguid.lib;d3d11.lib;d3dcompiler.lib;tinyobjloaderd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -105,10 +103,10 @@
     <ClInclude Include="Core\Message.hpp" />
     <ClInclude Include="Core\MessageHandler.hpp" />
     <ClInclude Include="Core\System.hpp" />
+    <ClInclude Include="DirectX\DDSTextureLoader.h" />
     <ClInclude Include="Entity\Entity.hpp" />
     <ClInclude Include="Entity\Font.hpp" />
     <ClInclude Include="Entity\Model3D.hpp" />
-    <ClInclude Include="Light.h" />
     <ClInclude Include="Manager\GraphicsManager.hpp" />
     <ClInclude Include="Manager\InputManager.hpp" />
     <ClInclude Include="Resource.h" />
@@ -119,6 +117,7 @@
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\MessageHandler.cpp" />
     <ClCompile Include="Core\System.cpp" />
+    <ClCompile Include="DirectX\DDSTextureLoader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Entity\Font.cpp" />
     <ClCompile Include="Entity\Model3D.cpp" />

@@ -2,6 +2,8 @@
 #define __CORE_SYSTEM__
 #include <stdafx.h>
 
+#include <dxgidebug.h>
+
 #include <sstream>
 #include <string>
 
@@ -33,6 +35,14 @@ class SystemClass {
     QueryPerformanceFrequency(&m_freq);
     QueryPerformanceCounter(&m_startTime);
     m_nowTime = m_startTime;
+    typedef HRESULT(WINAPI * funcdef)(const IID& riid, void** ppDebug);
+    m_dxgiDebugModule = LoadLibrary("Dxgidebug.dll");
+    ((funcdef)GetProcAddress(m_dxgiDebugModule, "DXGIGetDebugInterface"))(
+        IID_PPV_ARGS(&m_dxgiDebug));
+  }
+  ~SystemClass() {
+    SafeRelease(&m_dxgiDebug);
+    FreeLibrary(m_dxgiDebugModule);
   }
 
   template <class... _Args>
@@ -55,6 +65,8 @@ class SystemClass {
   LARGE_INTEGER m_nowTime;
 
   CHAR m_debugText[1024];
+  HMODULE m_dxgiDebugModule = nullptr;
+  IDXGIDebug* m_dxgiDebug = nullptr;
 };
 
 SystemClass& System();

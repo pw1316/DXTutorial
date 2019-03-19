@@ -4,13 +4,12 @@
 
 #include <string>
 
-#include <D3D11.h>
-#include <D3DX10math.h>
+#include <DirectXMath.h>
+#include <d3d11_4.h>
 
 #include <Core/Interface/IView.hpp>
 
-namespace PW {
-namespace Entity {
+namespace PW::Entity {
 class Font : public Naiive::Core::IView {
  private:
   struct FontType {
@@ -18,14 +17,14 @@ class Font : public Naiive::Core::IView {
     int size;
   };
   struct VBType {
-    D3DXVECTOR3 pos;
-    D3DXVECTOR2 uv;
+    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT2 uv;
   };
   struct CBTransformType {
-    D3DXMATRIX proj;
+    DirectX::XMFLOAT4X4 proj;
   };
   struct CBColorType {
-    D3DXVECTOR4 color;
+    DirectX::XMFLOAT4 color;
   };
 
  public:
@@ -40,7 +39,8 @@ class Font : public Naiive::Core::IView {
   void Initialize(ID3D11Device* device);
   void Shutdown();
   void Render(ID3D11Device* device, ID3D11DeviceContext* context,
-              const std::string& text, const D3DXVECTOR2& pos, D3DXMATRIX proj);
+              const std::string& text, const DirectX::XMFLOAT2& pos,
+              DirectX::XMFLOAT4X4 proj);
 
  private:
   /* Resources */
@@ -66,7 +66,6 @@ class Font : public Naiive::Core::IView {
   ID3D11PixelShader* m_PS = nullptr;
   ID3D11InputLayout* m_Layout = nullptr;
 };
-}  // namespace Entity
-}  // namespace PW
+}  // namespace PW::Entity
 
 #endif

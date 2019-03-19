@@ -30,6 +30,9 @@
     <Filter Include="Res">
       <UniqueIdentifier>{7b21fdbd-504d-436f-baa0-7b6537520ae2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DirectX">
+      <UniqueIdentifier>{ed01deaa-94c9-4b98-89ca-8401794a75c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -39,9 +42,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Message.hpp">
@@ -80,6 +80,9 @@
     <ClInclude Include="Core\IGraphics.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="DirectX\DDSTextureLoader.h">
+      <Filter>DirectX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -108,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="Manager\InputManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectX\DDSTextureLoader.cpp">
+      <Filter>DirectX</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

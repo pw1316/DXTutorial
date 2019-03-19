@@ -1,6 +1,10 @@
 #include <stdafx.h>
 
+#include <DirectXMath.h>
+
 #include "GraphicsManager.hpp"
+
+#include <Core/System.hpp>
 
 #include <vector>
 
@@ -17,10 +21,15 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   InitializeRasterizer(hWnd, width, height);
 
   float fov, aspect;
-  fov = (float)D3DX_PI / 3.0f;
+  fov = (float)DirectX::XM_PI / 3.0f;
   aspect = (float)width / (float)height;
-  D3DXMatrixPerspectiveFovLH(&m_MatrixProj, fov, aspect, 0.1f, 1000.0f);
-  D3DXMatrixOrthoLH(&m_MatrixOrtho, (float)width, (float)height, 0.1f, 1000.0f);
+  auto matrixProj =
+      DirectX::XMMatrixPerspectiveFovLH(fov, aspect, 0.1f, 1000.0f);
+  DirectX::XMStoreFloat4x4(&m_MatrixProj, matrixProj);
+
+  auto matrixOrtho = DirectX::XMMatrixOrthographicLH(
+      (float)width, (float)height, 0.1f, 1000.0f);
+  DirectX::XMStoreFloat4x4(&m_MatrixOrtho, matrixOrtho);
 
   m_camera.SetPos(0.0f, 2.0f, -10.0f);
 
@@ -30,7 +39,7 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   m_gui = new PW::Entity::Font;
   m_gui->Initialize(m_device);
 
-  m_light.m_dir = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+  m_light.m_dir = DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f);
 }
 void GraphicsManagerClass::Shutdown() {
   if (m_gui) {
@@ -48,7 +57,7 @@ void GraphicsManagerClass::Shutdown() {
   ShutdownDevice();
 }
 BOOL GraphicsManagerClass::OnUpdate() {
-  D3DXMATRIX view, proj = m_MatrixProj, ortho = m_MatrixOrtho;
+  DirectX::XMFLOAT4X4 view, proj = m_MatrixProj, ortho = m_MatrixOrtho;
   float blendFactor[4] = {0, 0, 0, 0};
   BeginScene();
   m_camera.GetMatrix(view);
