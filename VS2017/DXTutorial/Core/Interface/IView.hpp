@@ -23,7 +23,7 @@ class IView {
   IView& operator=(const IView& rhs) = delete;
   IView& operator=(IView&& rhs) = delete;
 
-  virtual HRESULT Awake() = 0;
+  virtual void Awake() = 0;
   virtual void Destroy() = 0;
   virtual void OnMessage(const Message& msg) = 0;
 

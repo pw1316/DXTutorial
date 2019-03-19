@@ -7,19 +7,17 @@
 #include <Core/System.hpp>
 
 namespace Naiive::Manager {
-class InputManager : public Core::IView {
+class InputManagerClass : public Core::IView {
+  friend InputManagerClass& InputManager();
+
  private:
-  static const UINT NUM_KEYS = 256U;
+  static constexpr UINT NUM_KEYS = 256U;
 
  public:
-  InputManager() = default;
-  ~InputManager() {}
-
   /* Override */
-  virtual HRESULT Awake() override {
+  virtual void Awake() override {
     messages = {"SYS_KEY_DOWN", "SYS_KEY_UP"};
     Core::MessageHandler().RegisterViewCommand(this, messages);
-    return S_OK;
   }
   virtual void Destroy() override {
     Core::MessageHandler().RemoveViewCommand(this, messages);
@@ -38,6 +36,8 @@ class InputManager : public Core::IView {
   }
 
  private:
+  InputManagerClass() = default;
+
   void KeyDown(std::remove_const<decltype(NUM_KEYS)>::type key) {
     assert(key < NUM_KEYS);
     Core::System().DebugInfo(key, " down");
@@ -50,6 +50,8 @@ class InputManager : public Core::IView {
   }
   BOOL m_keys[NUM_KEYS];
 };
+
+InputManagerClass& InputManager();
 }  // namespace Naiive::Manager
 
 #endif

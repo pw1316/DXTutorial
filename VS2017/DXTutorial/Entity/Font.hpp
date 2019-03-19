@@ -33,7 +33,7 @@ class Font : public Naiive::Core::IView {
   ~Font() = default;
 
   /* Override */
-  virtual HRESULT Awake() override { return S_OK; };
+  virtual void Awake() override{};
   virtual void Destroy() override{};
   virtual void OnMessage(const Naiive::Core::Message& msg) override{};
 

@@ -3,6 +3,7 @@
 #include "Application.hpp"
 
 #include <Core/IGraphics.hpp>
+#include <Manager/InputManager.hpp>
 
 void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
                                          IGraphics& graphics) {
@@ -35,6 +36,7 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
   LoadString(hInst, IDS_WINDOW_CLASS, m_WindowClass, MAX_LOADSTRING);
   InitializeWindowClass(hInst, nCmdShow);
   InitializeWindow(hInst, nCmdShow, graphics);
+  Manager::InputManager().Awake();
   graphics.Initialize(m_hWnd, m_w, m_h);
 
   MSG msg;
@@ -44,22 +46,49 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
+    /* Input */
+    if (Manager::InputManager().IsKeyDown(VK_ESCAPE)) {
+      break;
+    }
+    /* Graphics */
     if (!graphics.OnUpdate()) {
       break;
     }
   }
 
   graphics.Shutdown();
+  Manager::InputManager().Destroy();
   ShutdownWindow();
   ShutdownWindowClass();
+}
+
+LRESULT Naiive::Core::ApplicationClass::MessageHandler(HWND hWnd, UINT message,
+                                                       WPARAM wParam,
+                                                       LPARAM lParam) {
+  auto pgraphics =
+      reinterpret_cast<IGraphics*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+  switch (message) {
+    case WM_KEYDOWN: {
+      Core::MessageHandler().ExecuteCommand({"SYS_KEY_DOWN", (UINT)wParam});
+      break;
+    }
+    case WM_KEYUP: {
+      Core::MessageHandler().ExecuteCommand({"SYS_KEY_UP", (UINT)wParam});
+      break;
+    }
+    default: {
+      return pgraphics
+                 ? pgraphics->MessageHandler(hWnd, message, wParam, lParam)
+                 : DefWindowProc(hWnd, message, wParam, lParam);
+    }
+  }
+  return 0;
 }
 
 LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
                                                 WPARAM wParam, LPARAM lParam) {
   auto hInst =
       reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWnd, GWLP_HINSTANCE));
-  auto pgraphics =
-      reinterpret_cast<IGraphics*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
   switch (message) {
     case WM_CREATE: {
       LPCREATESTRUCT pCreateStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
@@ -80,9 +109,8 @@ LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
           break;
         }
         default: {
-          return pgraphics
-                     ? pgraphics->MessageHandler(hWnd, message, wParam, lParam)
-                     : DefWindowProc(hWnd, message, wParam, lParam);
+          return Core::Application().MessageHandler(hWnd, message, wParam,
+                                                    lParam);
         }
       }
     }
@@ -91,9 +119,7 @@ LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
       break;
     }
     default: {
-      return pgraphics
-                 ? pgraphics->MessageHandler(hWnd, message, wParam, lParam)
-                 : DefWindowProc(hWnd, message, wParam, lParam);
+      return Core::Application().MessageHandler(hWnd, message, wParam, lParam);
     }
   }
   return 0;

@@ -98,7 +98,6 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
     <ClInclude Include="Core\Application.hpp" />
     <ClInclude Include="Core\IGraphics.hpp" />
     <ClInclude Include="Core\Interface\ICommand.hpp" />
@@ -106,7 +105,6 @@
     <ClInclude Include="Core\Message.hpp" />
     <ClInclude Include="Core\MessageHandler.hpp" />
     <ClInclude Include="Core\System.hpp" />
-    <ClInclude Include="DXTutorial.hpp" />
     <ClInclude Include="Entity\Entity.hpp" />
     <ClInclude Include="Entity\Font.hpp" />
     <ClInclude Include="Entity\Model3D.hpp" />
@@ -118,7 +116,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Core\Application.cpp" />
     <ClCompile Include="Core\MessageHandler.cpp" />
     <ClCompile Include="Core\System.cpp" />
@@ -126,6 +123,7 @@
     <ClCompile Include="Entity\Font.cpp" />
     <ClCompile Include="Entity\Model3D.cpp" />
     <ClCompile Include="Manager\GraphicsManager.cpp" />
+    <ClCompile Include="Manager\InputManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
