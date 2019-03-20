@@ -4,8 +4,11 @@
 
 #include "GraphicsManager.hpp"
 
+#include <Manager/InputManager.hpp>
 #include <Core/System.hpp>
 
+#include <sstream>
+#include <string>
 #include <vector>
 
 namespace Naiive::Manager {
@@ -69,7 +72,11 @@ BOOL GraphicsManagerClass::OnUpdate() {
   m_deviceContext->OMSetDepthStencilState(m_DSStateWithoutZ, 1);
   m_deviceContext->OMSetBlendState(m_BlendStateWithAlpha, blendFactor,
                                    0xFFFFFFFF);
-  m_gui->Render(m_device, m_deviceContext, "testaaaaaa", {512, 384}, ortho);
+  LONG x, y;
+  Manager::InputManager().GetMouse(x, y);
+  std::stringstream ss;
+  ss << x << " " << y;
+  m_gui->Render(m_device, m_deviceContext, ss.str(), {512, 384}, ortho);
   EndScene();
   return TRUE;
 }

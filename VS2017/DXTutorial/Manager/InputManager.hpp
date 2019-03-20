@@ -2,6 +2,8 @@
 #define __MANAGER_INPUT_MANAGER__
 #include <stdafx.h>
 
+#include <dinput.h>
+
 #include <Core/Interface/IView.hpp>
 #include <Core/MessageHandler.hpp>
 #include <Core/System.hpp>
@@ -16,39 +18,44 @@ class InputManagerClass : public Core::IView {
  public:
   /* Override */
   virtual void Awake() override {
-    messages = {"SYS_KEY_DOWN", "SYS_KEY_UP"};
-    Core::MessageHandler().RegisterViewCommand(this, messages);
+    // messages = {"SYS_KEY_DOWN", "SYS_KEY_UP"};
+    // Core::MessageHandler().RegisterViewCommand(this, messages);
   }
   virtual void Destroy() override {
-    Core::MessageHandler().RemoveViewCommand(this, messages);
+    // Core::MessageHandler().RemoveViewCommand(this, messages);
   }
   virtual void OnMessage(const Core::Message& msg) override {
-    if (msg.GetName() == "SYS_KEY_DOWN") {
-      KeyDown(msg.GetBody());
-    } else if (msg.GetName() == "SYS_KEY_UP") {
-      KeyUp(msg.GetBody());
-    }
+    // if (msg.GetName() == "SYS_KEY_DOWN") {
+    //  KeyDown(msg.GetBody());
+    //} else if (msg.GetName() == "SYS_KEY_UP") {
+    //  KeyUp(msg.GetBody());
+    //}
   }
+
+  void Initialize(HWND hWnd, UINT width, UINT height);
+  void Shutdown();
+  BOOL OnUpdate();
 
   BOOL IsKeyDown(std::remove_const<decltype(NUM_KEYS)>::type key) {
     assert(key < 256);
-    return m_keys[key];
+    return m_keyState[key] & 0x80;
+  }
+
+  void GetMouse(LONG& x, LONG& y) {
+    x = m_x;
+    y = m_y;
   }
 
  private:
   InputManagerClass() = default;
 
-  void KeyDown(std::remove_const<decltype(NUM_KEYS)>::type key) {
-    assert(key < NUM_KEYS);
-    Core::System().DebugInfo(key, " down");
-    m_keys[key] = true;
-  }
-  void KeyUp(std::remove_const<decltype(NUM_KEYS)>::type key) {
-    assert(key < NUM_KEYS);
-    Core::System().DebugInfo(key, " up");
-    m_keys[key] = false;
-  }
-  BOOL m_keys[NUM_KEYS];
+  IDirectInput8* m_dinput = nullptr;
+  IDirectInputDevice8* m_keyboard = nullptr;
+  IDirectInputDevice8* m_mouse = nullptr;
+  UCHAR m_keyState[NUM_KEYS];
+  DIMOUSESTATE m_mouseState;
+  LONG m_x = 0, m_y = 0;
+  LONG m_w = 0, m_h = 0;
 };
 
 InputManagerClass& InputManager();

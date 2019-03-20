@@ -37,6 +37,7 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
   InitializeWindowClass(hInst, nCmdShow);
   InitializeWindow(hInst, nCmdShow, graphics);
   Manager::InputManager().Awake();
+  Manager::InputManager().Initialize(m_hWnd, m_w, m_h);
   graphics.Initialize(m_hWnd, m_w, m_h);
 
   MSG msg;
@@ -47,7 +48,8 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
       DispatchMessage(&msg);
     }
     /* Input */
-    if (Manager::InputManager().IsKeyDown(VK_ESCAPE)) {
+    Manager::InputManager().OnUpdate();
+    if (Manager::InputManager().IsKeyDown(DIK_ESCAPE)) {
       break;
     }
     /* Graphics */
@@ -56,6 +58,7 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
     }
   }
 
+  Manager::InputManager().Shutdown();
   graphics.Shutdown();
   Manager::InputManager().Destroy();
   ShutdownWindow();
