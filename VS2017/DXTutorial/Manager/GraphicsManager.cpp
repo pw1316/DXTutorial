@@ -81,11 +81,6 @@ BOOL GraphicsManagerClass::OnUpdate() {
   return TRUE;
 }
 
-LRESULT GraphicsManagerClass::MessageHandler(HWND hWnd, UINT message,
-                                             WPARAM wParam, LPARAM lParam) {
-  return DefWindowProc(hWnd, message, wParam, lParam);
-}
-
 void GraphicsManagerClass::GetRefreshRate(UINT w, UINT h, UINT& num,
                                           UINT& den) {
   HRESULT hr = S_OK;

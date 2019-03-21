@@ -2,6 +2,8 @@
 #define __MANAGER_INPUT_MANAGER__
 #include <stdafx.h>
 
+#include <algorithm>
+
 #include <dinput.h>
 
 #include <Core/Interface/IView.hpp>
@@ -17,24 +19,9 @@ class InputManagerClass : public Core::IView {
 
  public:
   /* Override */
-  virtual void Awake() override {
-    // messages = {"SYS_KEY_DOWN", "SYS_KEY_UP"};
-    // Core::MessageHandler().RegisterViewCommand(this, messages);
-  }
-  virtual void Destroy() override {
-    // Core::MessageHandler().RemoveViewCommand(this, messages);
-  }
-  virtual void OnMessage(const Core::Message& msg) override {
-    // if (msg.GetName() == "SYS_KEY_DOWN") {
-    //  KeyDown(msg.GetBody());
-    //} else if (msg.GetName() == "SYS_KEY_UP") {
-    //  KeyUp(msg.GetBody());
-    //}
-  }
-
-  void Initialize(HWND hWnd, UINT width, UINT height);
-  void Shutdown();
-  BOOL OnUpdate();
+  virtual void Initialize(HWND hWnd, UINT width, UINT height) override;
+  virtual void Shutdown() override;
+  virtual BOOL OnUpdate() override;
 
   BOOL IsKeyDown(std::remove_const<decltype(NUM_KEYS)>::type key) {
     assert(key < 256);
@@ -42,12 +29,13 @@ class InputManagerClass : public Core::IView {
   }
 
   void GetMouse(LONG& x, LONG& y) {
-    x = m_x;
-    y = m_y;
+    x = std::clamp(m_x, 0L, m_w);
+    y = std::clamp(m_y, 0L, m_h);
   }
 
  private:
-  InputManagerClass() = default;
+  InputManagerClass() {}
+  virtual ~InputManagerClass() {}
 
   IDirectInput8* m_dinput = nullptr;
   IDirectInputDevice8* m_keyboard = nullptr;

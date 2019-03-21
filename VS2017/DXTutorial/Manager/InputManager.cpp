@@ -9,11 +9,11 @@ InputManagerClass& InputManager() {
 }
 
 void InputManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
+  HRESULT hr = S_OK;
+  auto hInst = HINSTANCE_FROM_HWND(hWnd);
+
   m_w = width;
   m_h = height;
-  HRESULT hr = S_OK;
-  auto hInst =
-      reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWnd, GWLP_HINSTANCE));
   hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8,
                           (void**)&m_dinput, nullptr);
   FAILTHROW;
@@ -67,19 +67,19 @@ BOOL InputManagerClass::OnUpdate() {
   m_x += m_mouseState.lX;
   m_y += m_mouseState.lY;
 
-  if (m_x < 0) {
-    m_x = 0;
-  }
-  if (m_y < 0) {
-    m_y = 0;
-  }
+  //if (m_x < 0) {
+  //  m_x = 0;
+  //}
+  //if (m_y < 0) {
+  //  m_y = 0;
+  //}
 
-  if (m_x > m_w) {
-    m_x = m_w;
-  }
-  if (m_y > m_h) {
-    m_y = m_h;
-  }
+  //if (m_x > m_w) {
+  //  m_x = m_w;
+  //}
+  //if (m_y > m_h) {
+  //  m_y = m_h;
+  //}
   return TRUE;
 }
 }  // namespace Naiive::Manager

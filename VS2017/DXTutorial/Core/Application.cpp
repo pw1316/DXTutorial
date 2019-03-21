@@ -2,11 +2,11 @@
 
 #include "Application.hpp"
 
-#include <Core/IGraphics.hpp>
+#include <Core/Interface/IView.hpp>
 #include <Manager/InputManager.hpp>
 
 void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
-                                         IGraphics& graphics) {
+                                         IView& graphics) {
   HRESULT hr = S_OK;
   // TODO 1. Init Host
   // TODO 1.1 Memory, skip for now, using system alloced memory
@@ -36,7 +36,6 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
   LoadString(hInst, IDS_WINDOW_CLASS, m_WindowClass, MAX_LOADSTRING);
   InitializeWindowClass(hInst, nCmdShow);
   InitializeWindow(hInst, nCmdShow, graphics);
-  Manager::InputManager().Awake();
   Manager::InputManager().Initialize(m_hWnd, m_w, m_h);
   graphics.Initialize(m_hWnd, m_w, m_h);
 
@@ -60,7 +59,6 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
 
   Manager::InputManager().Shutdown();
   graphics.Shutdown();
-  Manager::InputManager().Destroy();
   ShutdownWindow();
   ShutdownWindowClass();
 }
@@ -69,7 +67,7 @@ LRESULT Naiive::Core::ApplicationClass::MessageHandler(HWND hWnd, UINT message,
                                                        WPARAM wParam,
                                                        LPARAM lParam) {
   auto pgraphics =
-      reinterpret_cast<IGraphics*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+      reinterpret_cast<IView*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
   switch (message) {
     case WM_KEYDOWN: {
       Core::MessageHandler().ExecuteCommand({"SYS_KEY_DOWN", (UINT)wParam});
@@ -90,8 +88,7 @@ LRESULT Naiive::Core::ApplicationClass::MessageHandler(HWND hWnd, UINT message,
 
 LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
                                                 WPARAM wParam, LPARAM lParam) {
-  auto hInst =
-      reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWnd, GWLP_HINSTANCE));
+  auto hInst = HINSTANCE_FROM_HWND(hWnd);
   switch (message) {
     case WM_CREATE: {
       LPCREATESTRUCT pCreateStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);
@@ -173,7 +170,7 @@ void Naiive::Core::ApplicationClass::ShutdownWindowClass() {
 
 void Naiive::Core::ApplicationClass::InitializeWindow(HINSTANCE hInst,
                                                       INT nCmdShow,
-                                                      IGraphics& graphics) {
+                                                      IView& graphics) {
   HRESULT hr = S_OK;
   RECT paintRect{0, 0, static_cast<LONG>(m_w), static_cast<LONG>(m_h)};
   hr = AdjustWindowRect(&paintRect, WS_OVERLAPPEDWINDOW, false) ? S_OK : E_FAIL;

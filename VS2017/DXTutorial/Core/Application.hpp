@@ -5,7 +5,7 @@
 #include <Resource.h>
 
 namespace Naiive::Core {
-class IGraphics;
+class IView;
 
 class ApplicationClass {
   friend ApplicationClass& Application(UINT w, UINT h);
@@ -14,7 +14,7 @@ class ApplicationClass {
   static constexpr UINT MAX_LOADSTRING = 100;
 
  public:
-  void Run(HINSTANCE hInst, INT nCmdShow, IGraphics& graphics);
+  void Run(HINSTANCE hInst, INT nCmdShow, IView& graphics);
 
  private:
   ApplicationClass() = delete;
@@ -34,7 +34,7 @@ class ApplicationClass {
                                 LPARAM lParam);
   void InitializeWindowClass(HINSTANCE hInst, INT nCmdShow);
   void ShutdownWindowClass();
-  void InitializeWindow(HINSTANCE hInst, INT nCmdShow, IGraphics& graphics);
+  void InitializeWindow(HINSTANCE hInst, INT nCmdShow, IView& graphics);
   void ShutdownWindow();
 
   CHAR m_AppTitle[MAX_LOADSTRING];

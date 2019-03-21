@@ -95,7 +95,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Core\Application.hpp" />
-    <ClInclude Include="Core\IGraphics.hpp" />
     <ClInclude Include="Core\Interface\ICommand.hpp" />
     <ClInclude Include="Core\Interface\IView.hpp" />
     <ClInclude Include="Core\Message.hpp" />

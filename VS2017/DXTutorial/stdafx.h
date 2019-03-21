@@ -13,6 +13,9 @@
     throw 1;        \
   }
 
+#define HINSTANCE_FROM_HWND(hWnd) \
+  reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hWnd, GWLP_HINSTANCE));
+
 template <class COM>
 inline void SafeRelease(COM** ppCOM) {
   if (*ppCOM != nullptr) {

@@ -6,13 +6,12 @@
 #include <d3d11.h>
 #include <dxgi.h>
 
-#include <Core/IGraphics.hpp>
 #include <Core/Interface/IView.hpp>
 #include <Entity/Font.hpp>
 #include <Entity/Model3D.hpp>
 
 namespace Naiive::Manager {
-class GraphicsManagerClass : public Core::IView, public Core::IGraphics {
+class GraphicsManagerClass : public Core::IView {
   friend GraphicsManagerClass& GraphicsManager();
   struct Camera {
    public:
@@ -66,17 +65,9 @@ class GraphicsManagerClass : public Core::IView, public Core::IGraphics {
 
  public:
   /* IView */
-  virtual void Awake() override {}
-  virtual void Destroy() override {}
-  virtual void OnMessage(const Naiive::Core::Message& msg) override {}
-
-  /* IGraphics */
   virtual void Initialize(HWND hWnd, UINT width, UINT height) override;
   virtual void Shutdown() override;
   virtual BOOL OnUpdate() override;
-  virtual LRESULT CALLBACK MessageHandler(HWND hWnd, UINT message,
-                                          WPARAM wParam,
-                                          LPARAM lParam) override;
 
  private:
   GraphicsManagerClass() = default;

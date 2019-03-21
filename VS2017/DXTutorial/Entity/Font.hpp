@@ -7,10 +7,8 @@
 #include <DirectXMath.h>
 #include <d3d11_4.h>
 
-#include <Core/Interface/IView.hpp>
-
 namespace PW::Entity {
-class Font : public Naiive::Core::IView {
+class Font{
  private:
   struct FontType {
     float left, right;
@@ -30,11 +28,6 @@ class Font : public Naiive::Core::IView {
  public:
   Font() = default;
   ~Font() = default;
-
-  /* Override */
-  virtual void Awake() override{};
-  virtual void Destroy() override{};
-  virtual void OnMessage(const Naiive::Core::Message& msg) override{};
 
   void Initialize(ID3D11Device* device);
   void Shutdown();

@@ -77,9 +77,6 @@
     <ClInclude Include="Core\Application.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\IGraphics.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DirectX\DDSTextureLoader.h">
       <Filter>DirectX</Filter>
     </ClInclude>

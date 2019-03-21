@@ -9,11 +9,9 @@
 #include <DirectXMath.h>
 #include <d3d11.h>
 
-#include <Core/Interface/IView.hpp>
-
 namespace PW {
 namespace Entity {
-class Model3D : public Naiive::Core::IView {
+class Model3D {
  private:
   struct VBType {
     DirectX::XMFLOAT3 pos;
@@ -47,11 +45,6 @@ class Model3D : public Naiive::Core::IView {
   Model3D() = delete;
   explicit Model3D(const std::string path) : m_name(path) {}
   ~Model3D() = default;
-
-  /* Override */
-  virtual void Awake() override{};
-  virtual void Destroy() override{};
-  virtual void OnMessage(const Naiive::Core::Message& msg) override{};
 
   void Initialize(ID3D11Device* device);
   void Shutdown();

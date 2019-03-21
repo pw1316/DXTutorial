@@ -1,5 +1,5 @@
-#ifndef __CORE_VIEW__
-#define __CORE_VIEW__
+#ifndef __CORE_IVIEW__
+#define __CORE_IVIEW__
 #include <stdafx.h>
 
 #include <set>
@@ -23,9 +23,14 @@ class IView {
   IView& operator=(const IView& rhs) = delete;
   IView& operator=(IView&& rhs) = delete;
 
-  virtual void Awake() = 0;
-  virtual void Destroy() = 0;
-  virtual void OnMessage(const Message& msg) = 0;
+  virtual void Initialize(HWND hWnd, UINT width, UINT height) = 0;
+  virtual void Shutdown() = 0;
+  virtual BOOL OnUpdate() = 0;
+  virtual void OnMessage(const Message& msg) {}
+  virtual LRESULT CALLBACK MessageHandler(HWND hWnd, UINT message,
+                                          WPARAM wParam, LPARAM lParam) {
+    return DefWindowProc(hWnd, message, wParam, lParam);
+  }
 
  protected:
   std::set<std::string> messages;
