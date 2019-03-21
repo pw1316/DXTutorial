@@ -2,14 +2,15 @@
 #define __CORE_ICOMMAND__
 #include <stdafx.h>
 
-#include <Core/Message.hpp>
-
 namespace Naiive::Core {
+class Message;
+
 class ICommand {
  public:
   ICommand() = default;
-  virtual void operator()(Message msg) = 0;
   virtual ~ICommand() = default;
+  virtual void operator()(const Message& msg) = 0;
+  virtual void operator()(Message&& msg) = 0;
 };
 }  // namespace Naiive::Core
 #endif

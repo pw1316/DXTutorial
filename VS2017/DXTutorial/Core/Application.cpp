@@ -2,6 +2,7 @@
 
 #include "Application.hpp"
 
+#include <Core/Message.hpp>
 #include <Core/Interface/IView.hpp>
 #include <Manager/InputManager.hpp>
 

@@ -10,7 +10,7 @@ class Message {
   explicit Message(std::string name) : m_name(name){};
   Message(std::string name, ULONG body) : m_name(name), m_body(body){};
 
-  std::string GetName() const { return m_name; }
+  const std::string& GetName() const { return m_name; }
   void SetName(const std::string& name) { m_name = name; }
   void SetName(std::string&& name) { m_name = std::move(name); }
 

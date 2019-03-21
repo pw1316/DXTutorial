@@ -3,6 +3,7 @@
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN
+#define DIRECTINPUT_VERSION 0x0800
 // Windows Header Files:
 #include <Windows.h>
 #include <assert.h>

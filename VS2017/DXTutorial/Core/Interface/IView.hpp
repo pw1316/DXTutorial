@@ -5,9 +5,9 @@
 #include <set>
 #include <string>
 
-#include <Core/Message.hpp>
-
 namespace Naiive::Core {
+class Message;
+
 class IView {
   // public Facade facade
   //{
