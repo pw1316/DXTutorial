@@ -8,6 +8,7 @@
 #include <Windows.h>
 #include <assert.h>
 #include <type_traits>
+#include <mmreg.h>
 
 #define FAILTHROW   \
   if (FAILED(hr)) { \

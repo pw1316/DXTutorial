@@ -2,6 +2,7 @@
 
 #include "Application.hpp"
 
+#include <Manager/SoundManager.hpp>
 #include <Manager/GraphicsManager.hpp>
 #include <Manager/InputManager.hpp>
 
@@ -36,6 +37,7 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
   InitializeWindowClass(hInst, nCmdShow);
   InitializeWindow(hInst, nCmdShow);
   Manager::InputManager().Initialize(m_hWnd, m_w, m_h);
+  Manager::SoundManager().Initialize(m_hWnd, m_w, m_h);
   Manager::GraphicsManager().Initialize(m_hWnd, m_w, m_h);
 
   MSG msg;
@@ -58,8 +60,9 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
     }
   }
 
-  Manager::InputManager().Shutdown();
   Manager::GraphicsManager().Shutdown();
+  Manager::SoundManager().Shutdown();
+  Manager::InputManager().Shutdown();
   ShutdownWindow();
   ShutdownWindowClass();
 }
