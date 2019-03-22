@@ -14,6 +14,8 @@ class MessageHandlerClass {
   friend MessageHandlerClass& MessageHandler();
   using MessageSet = std::unordered_set<std::string>;
   using CRMessageSet = const MessageSet&;
+  using RRMessageSet = MessageSet&&;
+
  public:
   void RegisterCommand(const std::string& name, ICommand* cmd);
   void RemoveCommand(const std::string& name);
@@ -32,7 +34,7 @@ class MessageHandlerClass {
   /* ICommand's deletion handled HERE, NOT refer to its CREATOR */
   std::unordered_map<std::string, ICommand*> m_commandMap;
   /* IView's deletion is handled by its CREATOR, NOT HERE */
-  std::unordered_map<IView*, std::unordered_set<std::string>> m_viewCommandMap;
+  std::unordered_map<IView*, MessageSet> m_viewCommandMap;
 };
 
 MessageHandlerClass& MessageHandler();

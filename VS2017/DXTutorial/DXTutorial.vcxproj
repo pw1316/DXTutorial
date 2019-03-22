@@ -101,7 +101,6 @@
     <ClInclude Include="Core\MessageHandler.hpp" />
     <ClInclude Include="Core\System.hpp" />
     <ClInclude Include="DirectX\DDSTextureLoader.h" />
-    <ClInclude Include="Entity\Entity.hpp" />
     <ClInclude Include="Entity\Font.hpp" />
     <ClInclude Include="Entity\Model3D.hpp" />
     <ClInclude Include="Manager\GraphicsManager.hpp" />

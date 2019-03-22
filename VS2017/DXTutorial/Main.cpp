@@ -12,6 +12,6 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
   auto&& sys = Naiive::Core::System();
   sys.DebugInfo("System setup done at ", sys.GameTime());
   auto&& app = Naiive::Core::Application(1024, 768);
-  app.Run(hInstance, nCmdShow, Naiive::Manager::GraphicsManager());
+  app.Run(hInstance, nCmdShow);
   return 0;
 }

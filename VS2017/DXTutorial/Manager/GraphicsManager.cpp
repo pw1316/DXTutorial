@@ -1,15 +1,14 @@
 #include <stdafx.h>
 
-#include <DirectXMath.h>
-
 #include "GraphicsManager.hpp"
-
-#include <Manager/InputManager.hpp>
-#include <Core/System.hpp>
 
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include <Entity/Font.hpp>
+#include <Entity/Model3D.hpp>
+#include <Manager/InputManager.hpp>
 
 namespace Naiive::Manager {
 void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {

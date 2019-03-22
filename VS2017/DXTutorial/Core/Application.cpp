@@ -2,12 +2,10 @@
 
 #include "Application.hpp"
 
-#include <Core/Message.hpp>
-#include <Core/Interface/IView.hpp>
+#include <Manager/GraphicsManager.hpp>
 #include <Manager/InputManager.hpp>
 
-void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
-                                         IView& graphics) {
+void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
   HRESULT hr = S_OK;
   // TODO 1. Init Host
   // TODO 1.1 Memory, skip for now, using system alloced memory
@@ -36,9 +34,9 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
   LoadString(hInst, IDS_APP_TITLE, m_AppTitle, MAX_LOADSTRING);
   LoadString(hInst, IDS_WINDOW_CLASS, m_WindowClass, MAX_LOADSTRING);
   InitializeWindowClass(hInst, nCmdShow);
-  InitializeWindow(hInst, nCmdShow, graphics);
+  InitializeWindow(hInst, nCmdShow);
   Manager::InputManager().Initialize(m_hWnd, m_w, m_h);
-  graphics.Initialize(m_hWnd, m_w, m_h);
+  Manager::GraphicsManager().Initialize(m_hWnd, m_w, m_h);
 
   MSG msg;
   ZeroMemory(&msg, sizeof(MSG));
@@ -48,18 +46,20 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
       DispatchMessage(&msg);
     }
     /* Input */
-    Manager::InputManager().OnUpdate();
+    if (!Manager::InputManager().OnUpdate()) {
+      break;
+    }
     if (Manager::InputManager().IsKeyDown(DIK_ESCAPE)) {
       break;
     }
     /* Graphics */
-    if (!graphics.OnUpdate()) {
+    if (!Manager::GraphicsManager().OnUpdate()) {
       break;
     }
   }
 
   Manager::InputManager().Shutdown();
-  graphics.Shutdown();
+  Manager::GraphicsManager().Shutdown();
   ShutdownWindow();
   ShutdownWindowClass();
 }
@@ -67,21 +67,10 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow,
 LRESULT Naiive::Core::ApplicationClass::MessageHandler(HWND hWnd, UINT message,
                                                        WPARAM wParam,
                                                        LPARAM lParam) {
-  auto pgraphics =
-      reinterpret_cast<IView*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
   switch (message) {
-    case WM_KEYDOWN: {
-      Core::MessageHandler().ExecuteCommand({"SYS_KEY_DOWN", (UINT)wParam});
-      break;
-    }
-    case WM_KEYUP: {
-      Core::MessageHandler().ExecuteCommand({"SYS_KEY_UP", (UINT)wParam});
-      break;
-    }
     default: {
-      return pgraphics
-                 ? pgraphics->MessageHandler(hWnd, message, wParam, lParam)
-                 : DefWindowProc(hWnd, message, wParam, lParam);
+      return Manager::GraphicsManager().MessageHandler(hWnd, message, wParam,
+                                                       lParam);
     }
   }
   return 0;
@@ -170,8 +159,7 @@ void Naiive::Core::ApplicationClass::ShutdownWindowClass() {
 }
 
 void Naiive::Core::ApplicationClass::InitializeWindow(HINSTANCE hInst,
-                                                      INT nCmdShow,
-                                                      IView& graphics) {
+                                                      INT nCmdShow) {
   HRESULT hr = S_OK;
   RECT paintRect{0, 0, static_cast<LONG>(m_w), static_cast<LONG>(m_h)};
   hr = AdjustWindowRect(&paintRect, WS_OVERLAPPEDWINDOW, false) ? S_OK : E_FAIL;
@@ -179,7 +167,7 @@ void Naiive::Core::ApplicationClass::InitializeWindow(HINSTANCE hInst,
   m_hWnd = CreateWindow(m_WindowClass, m_AppTitle, WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, 0, paintRect.right - paintRect.left,
                         paintRect.bottom - paintRect.top, nullptr, nullptr,
-                        hInst, &graphics);
+                        hInst, nullptr);
   hr = m_hWnd ? S_OK : E_FAIL;
   FAILTHROW;
   ShowWindow(m_hWnd, nCmdShow);

@@ -23,41 +23,37 @@ void MessageHandlerClass::RemoveCommand(const std::string& name) {
 }
 
 void MessageHandlerClass::RegisterViewCommand(IView* view, CRMessageSet list) {
-  auto iter = m_viewCommandMap.find(view);
-  if (iter != m_viewCommandMap.end()) {
-    iter->second.insert(list.cbegin(), list.cend());
+  if (m_viewCommandMap.count(view)) {
+    m_viewCommandMap[view].insert(list.begin(), list.end());
   } else {
     m_viewCommandMap[view] = list;
   }
 }
 
 void MessageHandlerClass::RemoveViewCommand(IView* view, CRMessageSet list) {
-  auto iter = m_viewCommandMap.find(view);
-  if (iter != m_viewCommandMap.end()) {
-    for (auto cmd : list) {
-      auto cmdIter = iter->second.find(cmd);
-      if (cmdIter != iter->second.end()) {
-        iter->second.erase(cmdIter);
+  if (m_viewCommandMap.count(view)) {
+    for (auto&& cmd : list) {
+      if (m_viewCommandMap[view].count(cmd)) {
+        m_viewCommandMap[view].erase(cmd);
       }
-    }
-    if (iter->second.empty()) {
-      m_viewCommandMap.erase(iter);
+      if (m_viewCommandMap[view].empty()) {
+        m_viewCommandMap.erase(view);
+      }
     }
   }
 }
 
 void MessageHandlerClass::ExecuteCommand(const Message& message) {
-  auto iter = m_commandMap.find(message.GetName());
   /* Is command message, directly execute */
-  if (iter != m_commandMap.end()) {
-    (*(iter->second))(message);
+  auto&& name = message.GetName();
+  if (m_commandMap.count(name)) {
+    (*m_commandMap[name])(message);
   }
   /* Is view message, send to view */
   else {
-    for (auto view : m_viewCommandMap) {
-      if (view.second.find(message.GetName()) != view.second.end()) {
-        (*(view.first)).OnMessage(message);  // View must implement member
-                                             // function: OnMessage(message)
+    for (auto&& view : m_viewCommandMap) {
+      if (view.second.count(name)) {
+        view.first->OnMessage(message);
       }
     }
   }

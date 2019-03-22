@@ -7,8 +7,11 @@
 #include <dxgi.h>
 
 #include <Core/Interface/IView.hpp>
-#include <Entity/Font.hpp>
-#include <Entity/Model3D.hpp>
+
+namespace PW::Entity {
+class Model3D;
+class Font;
+}  // namespace PW::Entity
 
 namespace Naiive::Manager {
 class GraphicsManagerClass : public Core::IView {
@@ -114,9 +117,9 @@ class GraphicsManagerClass : public Core::IView {
   DirectX::XMFLOAT4X4 m_MatrixOrtho{};
 
   Camera m_camera;
+  Light m_light;
   PW::Entity::Model3D* m_model = nullptr;
   PW::Entity::Font* m_gui = nullptr;
-  Light m_light;
 };
 
 GraphicsManagerClass& GraphicsManager();

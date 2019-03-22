@@ -62,9 +62,6 @@
     <ClInclude Include="Manager\GraphicsManager.hpp">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Entity\Entity.hpp">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="Entity\Model3D.hpp">
       <Filter>Entity</Filter>
     </ClInclude>

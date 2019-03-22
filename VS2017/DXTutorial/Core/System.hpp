@@ -2,10 +2,10 @@
 #define __CORE_SYSTEM__
 #include <stdafx.h>
 
-#include <dxgidebug.h>
-
 #include <sstream>
 #include <string>
+
+#include <dxgidebug.h>
 
 namespace Naiive::Core {
 class SystemClass {

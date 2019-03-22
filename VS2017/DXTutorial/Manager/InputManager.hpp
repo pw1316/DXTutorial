@@ -7,8 +7,6 @@
 #include <dinput.h>
 
 #include <Core/Interface/IView.hpp>
-#include <Core/MessageHandler.hpp>
-#include <Core/System.hpp>
 
 namespace Naiive::Manager {
 class InputManagerClass : public Core::IView {
