@@ -3,6 +3,7 @@
 #include "Model3D.hpp"
 
 #include <locale>
+#include <vector>
 
 #include <DirectX/DDSTextureLoader.h>
 #include <d3dcompiler.h>
@@ -87,11 +88,9 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   D3D11_SAMPLER_DESC sampleDesc;
 
   /* =====VB & IB===== */
-  VBType* vertices = nullptr;
-  ULONG* indices = nullptr;
   m_VN = static_cast<UINT>(obj.shapes[0].mesh.indices.size());
-  vertices = new VBType[m_VN];
-  indices = new ULONG[m_VN];
+  std::vector<VBType> vertices(m_VN);
+  std::vector<ULONG> indices(m_VN);
   for (std::remove_const<decltype(m_VN)>::type triId = 0; triId < m_VN / 3;
        ++triId) {
     for (UINT j = 0; j < 3; ++j) {
@@ -112,6 +111,22 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
       indices[3 * triId + j] = 3 * triId + j;
     }
   }
+  // m_VN = 3;
+  // std::vector<VBType> vertices(m_VN);
+  // std::vector<ULONG> indices(m_VN);
+  // vertices[0].pos = DirectX::XMFLOAT3(-1.0f, 1.0f, 0.0f);
+  // vertices[0].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
+  // vertices[0].uv = DirectX::XMFLOAT2(0.0f, 0.0f);
+  // indices[0] = 0;
+  // vertices[1].pos = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);
+  // vertices[1].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
+  // vertices[1].uv = DirectX::XMFLOAT2(1.0f, 0.0f);
+  // indices[1] = 1;
+  // vertices[2].pos = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);
+  // vertices[2].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
+  // vertices[2].uv = DirectX::XMFLOAT2(1.0f, 1.0f);
+  // indices[2] = 2;
+
   ZeroMemory(&bufferDesc, sizeof(bufferDesc));
   bufferDesc.ByteWidth = sizeof(VBType) * m_VN;
   bufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -120,7 +135,7 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   bufferDesc.MiscFlags = 0;
   bufferDesc.StructureByteStride = 0;
   ZeroMemory(&subData, sizeof(subData));
-  subData.pSysMem = vertices;
+  subData.pSysMem = vertices.data();
   subData.SysMemPitch = 0;
   subData.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&bufferDesc, &subData, &m_VB);
@@ -134,15 +149,11 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   bufferDesc.MiscFlags = 0;
   bufferDesc.StructureByteStride = 0;
   ZeroMemory(&subData, sizeof(subData));
-  subData.pSysMem = indices;
+  subData.pSysMem = indices.data();
   subData.SysMemPitch = 0;
   subData.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&bufferDesc, &subData, &m_IB);
   FAILTHROW;
-  delete[] vertices;
-  vertices = nullptr;
-  delete[] indices;
-  indices = nullptr;
 
   /* =====CB===== */
   ZeroMemory(&bufferDesc, sizeof(bufferDesc));
@@ -189,8 +200,8 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   /* =====Texture=====*/
   auto texture_name = m_name + ".dds";
   WCHAR texture_name_l[128] = {0};
-  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(), (int)texture_name.size(),
-                      texture_name_l, 128);
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)texture_name.size(), texture_name_l, 128);
   DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
                                     &m_SRVTexture0);
   FAILTHROW;

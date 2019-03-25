@@ -41,7 +41,7 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   m_gui = new PW::Entity::Font;
   m_gui->Initialize(m_device);
 
-  m_light.m_dir = DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f);
+  m_light.m_dir = DirectX::XMFLOAT3(1.0f, 0.0f, 1.0f);
 }
 void GraphicsManagerClass::Shutdown() {
   if (m_gui) {

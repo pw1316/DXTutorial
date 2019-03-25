@@ -8,7 +8,7 @@
 #include <d3d11_4.h>
 
 namespace PW::Entity {
-class Font{
+class Font {
  private:
   struct FontType {
     float left, right;

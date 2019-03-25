@@ -1,4 +1,5 @@
 *.vcxproj.user
 .vs/
+.vscode/
 build/
 temp/

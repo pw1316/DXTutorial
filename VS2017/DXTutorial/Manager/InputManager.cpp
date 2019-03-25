@@ -31,7 +31,8 @@ void InputManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   FAILTHROW;
   hr = m_mouse->SetDataFormat(&c_dfDIMouse);
   FAILTHROW;
-  hr = m_mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+  hr =
+      m_mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
   FAILTHROW;
   hr = m_mouse->Acquire();
   FAILTHROW;
@@ -67,17 +68,17 @@ BOOL InputManagerClass::OnUpdate() {
   m_x += m_mouseState.lX;
   m_y += m_mouseState.lY;
 
-  //if (m_x < 0) {
+  // if (m_x < 0) {
   //  m_x = 0;
   //}
-  //if (m_y < 0) {
+  // if (m_y < 0) {
   //  m_y = 0;
   //}
 
-  //if (m_x > m_w) {
+  // if (m_x > m_w) {
   //  m_x = m_w;
   //}
-  //if (m_y > m_h) {
+  // if (m_y > m_h) {
   //  m_y = m_h;
   //}
   return TRUE;

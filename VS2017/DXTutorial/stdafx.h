@@ -7,8 +7,8 @@
 // Windows Header Files:
 #include <Windows.h>
 #include <assert.h>
-#include <type_traits>
 #include <mmreg.h>
+#include <type_traits>
 
 #define FAILTHROW   \
   if (FAILED(hr)) { \

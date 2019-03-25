@@ -35,12 +35,12 @@ void SoundManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   waveFormat.cbSize = 0;
   hr = m_primaryBuffer->SetFormat(&waveFormat);
 
-  LoadWave();
+  // LoadWave();
   OnUpdate();
 }
 
 void SoundManagerClass::Shutdown() {
-  UnloadWave();
+  // UnloadWave();
 
   SafeRelease(&m_primaryBuffer);
   SafeRelease(&m_dsound);
@@ -48,16 +48,16 @@ void SoundManagerClass::Shutdown() {
 }
 
 BOOL SoundManagerClass::OnUpdate() {
-  HRESULT hr = S_OK;
+  // HRESULT hr = S_OK;
 
-  hr = m_secondaryBuffer->SetCurrentPosition(0);
-  FAILTHROW;
+  // hr = m_secondaryBuffer->SetCurrentPosition(0);
+  // FAILTHROW;
 
-  hr = m_secondaryBuffer->SetVolume(DSBVOLUME_MAX);
-  FAILTHROW;
+  // hr = m_secondaryBuffer->SetVolume(DSBVOLUME_MAX);
+  // FAILTHROW;
 
-  hr = m_secondaryBuffer->Play(0, 0, 0);
-  FAILTHROW;
+  // hr = m_secondaryBuffer->Play(0, 0, 0);
+  // FAILTHROW;
   return TRUE;
 }
 

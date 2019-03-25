@@ -2,9 +2,9 @@
 
 #include "Application.hpp"
 
-#include <Manager/SoundManager.hpp>
 #include <Manager/GraphicsManager.hpp>
 #include <Manager/InputManager.hpp>
+#include <Manager/SoundManager.hpp>
 
 void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
   HRESULT hr = S_OK;
