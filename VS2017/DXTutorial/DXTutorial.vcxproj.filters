@@ -33,6 +33,9 @@
     <Filter Include="DirectX">
       <UniqueIdentifier>{ed01deaa-94c9-4b98-89ca-8401794a75c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{fd263e23-faeb-4ef2-a131-f8369a28af7e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -79,6 +82,12 @@
     </ClInclude>
     <ClInclude Include="Manager\SoundManager.hpp">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Debug.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\SlideAverage.hpp">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

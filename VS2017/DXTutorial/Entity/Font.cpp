@@ -49,7 +49,9 @@ void PW::Entity::Font::Render(ID3D11Device* device,
   for (UINT vId = 0; vId < VN / 6; ++vId) {
     auto letter = text[vId] - 32;
     if (letter == 0) {
-      x += 3.0f;
+    } else if (letter == -22) {
+      x = -512 + pos.x;
+      y -= 16.0f;
     } else {
       vertices[vId * 6 + 0].pos = DirectX::XMFLOAT3(x, y, 1.0f);
       vertices[vId * 6 + 0].uv = DirectX::XMFLOAT2(m_Font[letter].left, 0.0f);

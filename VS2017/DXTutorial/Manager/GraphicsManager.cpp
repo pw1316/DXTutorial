@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include <Core/System.hpp>
 #include <Entity/Font.hpp>
 #include <Entity/Model3D.hpp>
 #include <Manager/InputManager.hpp>
@@ -74,8 +75,10 @@ BOOL GraphicsManagerClass::OnUpdate() {
   LONG x, y;
   Manager::InputManager().GetMouse(x, y);
   std::stringstream ss;
-  ss << x << " " << y;
-  m_gui->Render(m_device, m_deviceContext, ss.str(), {512, 384}, ortho);
+  ss << "MouseX: " << x << "\n";
+  ss << "MouseY: " << y << "\n";
+  ss << "FPS: " << Core::System().GetFPS();
+  m_gui->Render(m_device, m_deviceContext, ss.str(), {0, 1}, ortho);
   EndScene();
   return TRUE;
 }

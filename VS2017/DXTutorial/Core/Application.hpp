@@ -24,7 +24,7 @@ class ApplicationClass {
   ApplicationClass& operator=(const ApplicationClass& rhs) = delete;
   ApplicationClass& operator=(ApplicationClass&& rhs) = delete;
 
-  LRESULT CALLBACK MessageHandler(HWND hWnd, UINT message, WPARAM wParam,
+  void CALLBACK MessageHandler(HWND hWnd, UINT message, WPARAM wParam,
                                   LPARAM lParam);
   static LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam,
                                   LPARAM lParam);
@@ -38,6 +38,7 @@ class ApplicationClass {
   CHAR m_AppTitle[MAX_LOADSTRING];
   CHAR m_WindowClass[MAX_LOADSTRING];
   HWND m_hWnd = nullptr;
+  HACCEL m_hAccel = nullptr;
   UINT m_w = 640;
   UINT m_h = 480;
 };

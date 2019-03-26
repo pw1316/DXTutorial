@@ -27,10 +27,8 @@ class IView {
   virtual void Shutdown() = 0;
   virtual BOOL OnUpdate() = 0;
   virtual void OnMessage(const Message& msg) {}
-  virtual LRESULT CALLBACK MessageHandler(HWND hWnd, UINT message,
-                                          WPARAM wParam, LPARAM lParam) {
-    return DefWindowProc(hWnd, message, wParam, lParam);
-  }
+  virtual void CALLBACK MessageHandler(HWND hWnd, UINT message, WPARAM wParam,
+                                       LPARAM lParam) {}
 
  protected:
   std::set<std::string> messages;

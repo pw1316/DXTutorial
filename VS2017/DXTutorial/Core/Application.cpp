@@ -2,6 +2,7 @@
 
 #include "Application.hpp"
 
+#include <Core/System.hpp>
 #include <Manager/GraphicsManager.hpp>
 #include <Manager/InputManager.hpp>
 #include <Manager/SoundManager.hpp>
@@ -43,7 +44,11 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
   MSG msg;
   ZeroMemory(&msg, sizeof(MSG));
   while (msg.message != WM_QUIT) {
+    System().CountFrame();
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+#if not NAIIVE_NO_MENU
+      TranslateAccelerator(m_hWnd, m_hAccel, &msg);
+#endif
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
@@ -67,16 +72,10 @@ void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
   ShutdownWindowClass();
 }
 
-LRESULT Naiive::Core::ApplicationClass::MessageHandler(HWND hWnd, UINT message,
-                                                       WPARAM wParam,
-                                                       LPARAM lParam) {
-  switch (message) {
-    default: {
-      return Manager::GraphicsManager().MessageHandler(hWnd, message, wParam,
-                                                       lParam);
-    }
-  }
-  return 0;
+void Naiive::Core::ApplicationClass::MessageHandler(HWND hWnd, UINT message,
+                                                    WPARAM wParam,
+                                                    LPARAM lParam) {
+  Manager::GraphicsManager().MessageHandler(hWnd, message, wParam, lParam);
 }
 
 LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
@@ -90,11 +89,30 @@ LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
           reinterpret_cast<LONG_PTR>(pCreateStruct->lpCreateParams));
       break;
     }
+    case WM_SYSCOMMAND: {
+      switch (wParam & 0xFFF0) {
+        case SC_MOVE:
+        case SC_KEYMENU:
+        case SC_MOUSEMENU: {
+          return 0;
+        }
+        default:
+          break;
+      }
+      break;
+    }
+    // case WM_NCLBUTTONDOWN:
+    case WM_NCRBUTTONDOWN: {
+      return 0;
+    }
+#if not NAIIVE_NO_MENU
     case WM_COMMAND: {
       int wmId = LOWORD(wParam);
       switch (wmId) {
         case IDM_ABOUT: {
-          DialogBox(hInst, MAKEINTRESOURCE(IDD_NAIIVE_ABOUT), hWnd, About);
+          auto dialog = CreateDialog(hInst, MAKEINTRESOURCE(IDD_NAIIVE_ABOUT),
+                                     hWnd, About);
+          ShowWindow(dialog, SW_SHOW);
           break;
         }
         case IDM_EXIT: {
@@ -102,20 +120,23 @@ LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
           break;
         }
         default: {
-          return Core::Application().MessageHandler(hWnd, message, wParam,
-                                                    lParam);
+          Application().MessageHandler(hWnd, message, wParam, lParam);
+          break;
         }
       }
+      break;
     }
+#endif
     case WM_DESTROY: {
       PostQuitMessage(0);
       break;
     }
     default: {
-      return Core::Application().MessageHandler(hWnd, message, wParam, lParam);
+      Application().MessageHandler(hWnd, message, wParam, lParam);
+      break;
     }
   }
-  return 0;
+  return DefWindowProc(hWnd, message, wParam, lParam);
 }
 
 INT_PTR Naiive::Core::ApplicationClass::About(HWND hDlg, UINT message,
@@ -148,7 +169,11 @@ void Naiive::Core::ApplicationClass::InitializeWindowClass(HINSTANCE hInst,
   wcex.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_NAIIVE_ICON));
   wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
   wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+#if NAIIVE_NO_MENU
+  wcex.lpszMenuName = nullptr;
+#else
   wcex.lpszMenuName = MAKEINTRESOURCE(IDC_NAIIVE_MENU);
+#endif
   wcex.lpszClassName = m_WindowClass;
   wcex.hIconSm = LoadIcon(hInst, MAKEINTRESOURCE(IDI_NAIIVE_ICON_SMALL));
   hr = (RegisterClassEx(&wcex) == 0) ? E_FAIL : S_OK;
@@ -164,21 +189,30 @@ void Naiive::Core::ApplicationClass::ShutdownWindowClass() {
 void Naiive::Core::ApplicationClass::InitializeWindow(HINSTANCE hInst,
                                                       INT nCmdShow) {
   HRESULT hr = S_OK;
+  DWORD dwStyle =
+      WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX;
   RECT paintRect{0, 0, static_cast<LONG>(m_w), static_cast<LONG>(m_h)};
-  hr = AdjustWindowRect(&paintRect, WS_OVERLAPPEDWINDOW, false) ? S_OK : E_FAIL;
+  hr = AdjustWindowRect(&paintRect, dwStyle, false) ? S_OK : E_FAIL;
   FAILTHROW;
-  m_hWnd = CreateWindow(m_WindowClass, m_AppTitle, WS_OVERLAPPEDWINDOW,
-                        CW_USEDEFAULT, 0, paintRect.right - paintRect.left,
+  m_hWnd = CreateWindow(m_WindowClass, m_AppTitle, dwStyle, 0, 0,
+                        paintRect.right - paintRect.left,
                         paintRect.bottom - paintRect.top, nullptr, nullptr,
                         hInst, nullptr);
   hr = m_hWnd ? S_OK : E_FAIL;
   FAILTHROW;
   ShowWindow(m_hWnd, nCmdShow);
   UpdateWindow(m_hWnd);
+#if not NAIIVE_NO_MENU
+  m_hAccel = LoadAccelerators(hInst, MAKEINTRESOURCE(IDC_NAIIVE_ACCEL));
+#endif
 }
 
 void Naiive::Core::ApplicationClass::ShutdownWindow() {
   ShowCursor(true);
+#if not NAIIVE_NO_MENU
+  DestroyAcceleratorTable(m_hAccel);
+  m_hAccel = nullptr;
+#endif
   DestroyWindow(m_hWnd);
   m_hWnd = nullptr;
 }
