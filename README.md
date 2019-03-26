@@ -60,7 +60,5 @@ $$I=texture(uv)\times (ka+kd\times dot(n, -l))+ks\times dot(view-l,n)^{kn}$$
 
 ## Tut 15 System Info
 
-TODO
-
 - FPS
-- CPU Usage
+- CPU Usage(PDH library)

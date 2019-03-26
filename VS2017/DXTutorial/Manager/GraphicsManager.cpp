@@ -77,7 +77,8 @@ BOOL GraphicsManagerClass::OnUpdate() {
   std::stringstream ss;
   ss << "MouseX: " << x << "\n";
   ss << "MouseY: " << y << "\n";
-  ss << "FPS: " << Core::System().GetFPS();
+  ss << "FPS: " << Core::System().GetFPS() << "\n";
+  ss << "CPU: " << Core::System().GetCPU() << "%\n";
   m_gui->Render(m_device, m_deviceContext, ss.str(), {0, 1}, ortho);
   EndScene();
   return TRUE;
