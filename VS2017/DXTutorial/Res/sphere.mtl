@@ -1,7 +1,7 @@
 newmtl sphere_mirror
 illum 4
-Kd 0.50 0.00 0.00
+Kd 0.50 0.50 0.50
 Ka 0.10 0.10 0.10
 Ks 0.60 0.60 0.60
-Ns 100
+Ns 50
 map_Kd sphere.dds
