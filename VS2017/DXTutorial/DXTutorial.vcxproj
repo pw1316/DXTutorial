@@ -101,7 +101,9 @@
     <ClInclude Include="Core\MessageHandler.hpp" />
     <ClInclude Include="Core\System.hpp" />
     <ClInclude Include="DirectX\DDSTextureLoader.h" />
+    <ClInclude Include="Entity\BoundingBox.hpp" />
     <ClInclude Include="Entity\Font.hpp" />
+    <ClInclude Include="Entity\Frustum.hpp" />
     <ClInclude Include="Entity\Model3D.hpp" />
     <ClInclude Include="Manager\GraphicsManager.hpp" />
     <ClInclude Include="Manager\InputManager.hpp" />
@@ -110,6 +112,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Utils\Debug.hpp" />
+    <ClInclude Include="Utils\Range.hpp" />
     <ClInclude Include="Utils\SlideAverage.hpp" />
   </ItemGroup>
   <ItemGroup>

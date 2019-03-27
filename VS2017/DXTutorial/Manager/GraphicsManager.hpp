@@ -2,16 +2,19 @@
 #define __MANAGER_GRAPHICS_MANAGER__
 #include <stdafx.h>
 
+#include <random>
+#include <vector>
+
 #include <DirectXMath.h>
 #include <d3d11.h>
 #include <dxgi.h>
 
 #include <Core/Interface/IView.hpp>
 
-namespace PW::Entity {
+namespace Naiive::Entity {
 class Model3D;
 class Font;
-}  // namespace PW::Entity
+}  // namespace Naiive::Entity
 
 namespace Naiive::Manager {
 class GraphicsManagerClass : public Core::IView {
@@ -73,7 +76,7 @@ class GraphicsManagerClass : public Core::IView {
   virtual BOOL OnUpdate() override;
 
  private:
-  GraphicsManagerClass() = default;
+  GraphicsManagerClass() : m_rng(m_dev()), m_distXY(-40, 40), m_distZ(-5, 40) {}
 
   void GetRefreshRate(UINT w, UINT h, UINT& num, UINT& den);
 
@@ -95,7 +98,7 @@ class GraphicsManagerClass : public Core::IView {
     m_deviceContext->ClearDepthStencilView(m_DSView, D3D11_CLEAR_DEPTH, 1.0f,
                                            0);
   }
-  void EndScene() { m_swapChain->Present(1, 0); }
+  void EndScene() { m_swapChain->Present(0, 0); }
 
   /* D3D Basic */
   IDXGISwapChain* m_swapChain = nullptr;
@@ -116,10 +119,17 @@ class GraphicsManagerClass : public Core::IView {
   DirectX::XMFLOAT4X4 m_MatrixProj{};
   DirectX::XMFLOAT4X4 m_MatrixOrtho{};
 
+  /* RNG */
+  std::random_device m_dev;
+  std::mt19937 m_rng;
+  std::uniform_real_distribution<FLOAT> m_distXY;
+  std::uniform_real_distribution<FLOAT> m_distZ;
+
   Camera m_camera;
   Light m_light;
-  PW::Entity::Model3D* m_model = nullptr;
-  PW::Entity::Font* m_gui = nullptr;
+  Naiive::Entity::Model3D* m_model = nullptr;
+  std::vector<DirectX::XMFLOAT3> m_model_dup;
+  Naiive::Entity::Font* m_gui = nullptr;
 };
 
 GraphicsManagerClass& GraphicsManager();

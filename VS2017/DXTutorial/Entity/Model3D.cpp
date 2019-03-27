@@ -8,40 +8,61 @@
 #include <DirectX/DDSTextureLoader.h>
 #include <d3dcompiler.h>
 
-void PW::Entity::Model3D::Initialize(ID3D11Device* device) {
+#include <Entity/Frustum.hpp>
+#include <Utils/Range.hpp>
+
+void Naiive::Entity::Model3D::Initialize(ID3D11Device* device) {
   InitializeBuffer(device);
   InitializeShader(device);
 }
-void PW::Entity::Model3D::Shutdown() {
+
+void Naiive::Entity::Model3D::Shutdown() {
   ShutdownShader();
   ShutdownBuffer();
 }
-void PW::Entity::Model3D::Render(ID3D11DeviceContext* context,
-                                 DirectX::XMFLOAT4X4 view,
-                                 DirectX::XMFLOAT4X4 proj,
-                                 DirectX::XMFLOAT4 camPos,
-                                 DirectX::XMFLOAT3 dir) {
-  rotation += (float)DirectX::XM_PI * 0.005f;
-  if (rotation > (float)DirectX::XM_PI * 2) {
-    rotation -= (float)DirectX::XM_PI * 2;
-  }
-  HRESULT hr = S_OK;
 
+BOOL Naiive::Entity::Model3D::Render(ID3D11DeviceContext* context,
+                                     DirectX::XMFLOAT4X4 view,
+                                     DirectX::XMFLOAT4X4 proj,
+                                     DirectX::XMFLOAT4 camPos,
+                                     DirectX::XMFLOAT3 dir) {
+  HRESULT hr = S_OK;
   D3D11_MAPPED_SUBRESOURCE mapped{};
 
+  auto xmworld = DirectX::XMMatrixRotationRollPitchYawFromVector(
+      DirectX::XMLoadFloat3(&m_rotationPYR));
+  xmworld = DirectX::XMMatrixMultiply(xmworld,
+                                      DirectX::XMMatrixTranslationFromVector(
+                                          DirectX::XMLoadFloat3(&m_translate)));
+  auto xmview = DirectX::XMLoadFloat4x4(&view);
+  auto xmproj = DirectX::XMLoadFloat4x4(&proj);
+#if NAIIVE_FRUSTUM_CULL
+  FrustumWorld frustum(DirectX::XMMatrixMultiply(xmview, xmproj));
+  BOOL visible = FALSE;
+  for (auto i : Utils::Range(8)) {
+    auto cnr = m_aabb.Corner(i);
+    auto xmcnr =
+        DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&cnr), xmworld);
+    DirectX::XMStoreFloat3(&cnr, xmcnr);
+    if (frustum.Check(cnr)) {
+      visible = TRUE;
+      break;
+    }
+  }
+  if (!visible) {
+    return FALSE;
+  }
+#endif
   context->Map(m_CBTransform, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
     auto rawdata = (CBTransformType*)mapped.pData;
-    auto temp = DirectX::XMMatrixRotationY(rotation);
-    temp = DirectX::XMMatrixTranspose(temp);
-    DirectX::XMStoreFloat4x4(&rawdata->world, temp);
-    auto view2 = DirectX::XMLoadFloat4x4(&view);
-    temp = DirectX::XMMatrixTranspose(view2);
-    DirectX::XMStoreFloat4x4(&rawdata->view, temp);
 
-    auto proj2 = DirectX::XMLoadFloat4x4(&proj);
-    temp = DirectX::XMMatrixTranspose(proj2);
-    DirectX::XMStoreFloat4x4(&rawdata->proj, temp);
+    DirectX::XMStoreFloat4x4(&rawdata->world,
+                             DirectX::XMMatrixTranspose(xmworld));
+    DirectX::XMStoreFloat4x4(&rawdata->view,
+                             DirectX::XMMatrixTranspose(xmview));
+    DirectX::XMStoreFloat4x4(&rawdata->proj,
+                             DirectX::XMMatrixTranspose(xmproj));
   }
   context->Unmap(m_CBTransform, 0);
 
@@ -71,9 +92,10 @@ void PW::Entity::Model3D::Render(ID3D11DeviceContext* context,
   context->PSSetShader(m_PS, nullptr, 0);
 
   context->DrawIndexed(m_VN, 0, 0);
+  return TRUE;
 }
 
-void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
+void Naiive::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   TinyObj obj;
@@ -100,6 +122,7 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
       auto x = obj.attr.vertices[3 * vi + 0];
       auto y = obj.attr.vertices[3 * vi + 1];
       auto z = obj.attr.vertices[3 * vi + 2];
+      m_aabb.Add(DirectX::XMFLOAT3(x, y, -z));
       vertices[3 * triId + j].pos = DirectX::XMFLOAT3(x, y, -z);
       x = obj.attr.texcoords[2 * ti + 0];
       y = obj.attr.texcoords[2 * ti + 1];
@@ -223,7 +246,7 @@ void PW::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   hr = device->CreateSamplerState(&sampleDesc, &m_SamplerState);
   FAILTHROW;
 }
-void PW::Entity::Model3D::ShutdownBuffer() {
+void Naiive::Entity::Model3D::ShutdownBuffer() {
   SafeRelease(&m_SamplerState);
   SafeRelease(&m_SRVTexture0);
   SafeRelease(&m_CBMaterial);
@@ -233,7 +256,7 @@ void PW::Entity::Model3D::ShutdownBuffer() {
   SafeRelease(&m_VB);
 }
 
-void PW::Entity::Model3D::InitializeShader(ID3D11Device* device) {
+void Naiive::Entity::Model3D::InitializeShader(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   ID3D10Blob* blob = nullptr;
@@ -286,7 +309,7 @@ void PW::Entity::Model3D::InitializeShader(ID3D11Device* device) {
   FAILTHROW;
   SafeRelease(&blob);
 }
-void PW::Entity::Model3D::ShutdownShader() {
+void Naiive::Entity::Model3D::ShutdownShader() {
   SafeRelease(&m_PS);
   SafeRelease(&m_Layout);
   SafeRelease(&m_VS);

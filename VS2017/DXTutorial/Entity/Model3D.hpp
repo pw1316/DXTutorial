@@ -9,8 +9,9 @@
 #include <DirectXMath.h>
 #include <d3d11.h>
 
-namespace PW {
-namespace Entity {
+#include <Entity/BoundingBox.hpp>
+
+namespace Naiive::Entity {
 class Model3D {
  private:
   struct VBType {
@@ -43,14 +44,18 @@ class Model3D {
 
  public:
   Model3D() = delete;
-  explicit Model3D(const std::string path) : m_name(path) {}
+  explicit Model3D(const std::string path)
+      : m_name(path),
+        m_translate(0.0f, 0.0f, 0.0f),
+        m_rotationPYR(0.0f, 0.0f, 0.0f) {}
   ~Model3D() = default;
 
   void Initialize(ID3D11Device* device);
   void Shutdown();
-  void Render(ID3D11DeviceContext* context, DirectX::XMFLOAT4X4 view,
+  BOOL Render(ID3D11DeviceContext* context, DirectX::XMFLOAT4X4 view,
               DirectX::XMFLOAT4X4 proj, DirectX::XMFLOAT4 camPos,
               DirectX::XMFLOAT3 dir);
+  void MoveTo(const DirectX::XMFLOAT3& tgt) { m_translate = tgt; }
 
  private:
   /* Resources */
@@ -62,7 +67,9 @@ class Model3D {
   void ShutdownShader();
 
   std::string m_name;
-  float rotation = 0.0f;
+  /* Transform */
+  DirectX::XMFLOAT3 m_translate;
+  DirectX::XMFLOAT3 m_rotationPYR;
 
   /* Resources */
   UINT m_VN = 0;
@@ -73,12 +80,12 @@ class Model3D {
   ID3D11Buffer* m_CBMaterial = nullptr;
   ID3D11ShaderResourceView* m_SRVTexture0 = nullptr;
   ID3D11SamplerState* m_SamplerState = nullptr;
+  BoundingBox3D m_aabb;
 
   /* Shader */
   ID3D11VertexShader* m_VS = nullptr;
   ID3D11PixelShader* m_PS = nullptr;
   ID3D11InputLayout* m_Layout = nullptr;
 };
-}  // namespace Entity
-}  // namespace PW
+}  // namespace Naiive::Entity
 #endif

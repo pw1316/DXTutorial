@@ -89,6 +89,15 @@
     <ClInclude Include="Utils\SlideAverage.hpp">
       <Filter>Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Entity\Frustum.hpp">
+      <Filter>Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Range.hpp">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity\BoundingBox.hpp">
+      <Filter>Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

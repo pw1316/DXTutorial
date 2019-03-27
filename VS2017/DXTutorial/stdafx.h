@@ -3,8 +3,10 @@
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #define DIRECTINPUT_VERSION 0x0800
 #define NAIIVE_NO_MENU 1
+#define NAIIVE_FRUSTUM_CULL 1
 
 // Windows Header Files:
 #include <Windows.h>

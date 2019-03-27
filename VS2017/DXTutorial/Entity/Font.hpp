@@ -7,7 +7,7 @@
 #include <DirectXMath.h>
 #include <d3d11_4.h>
 
-namespace PW::Entity {
+namespace Naiive::Entity {
 class Font {
  private:
   struct FontType {

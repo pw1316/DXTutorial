@@ -4,7 +4,6 @@
 
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include <Core/System.hpp>
 #include <Entity/Font.hpp>
@@ -36,10 +35,17 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
 
   m_camera.SetPos(0.0f, 2.0f, -10.0f);
 
-  m_model = new PW::Entity::Model3D("Res/sphere");
+  m_model = new Naiive::Entity::Model3D("Res/sphere");
   m_model->Initialize(m_device);
+  m_model_dup.resize(1000);
+  m_rng.seed(0);
+  for (auto&& pos : m_model_dup) {
+    pos.x = m_distXY(m_rng);
+    pos.y = m_distXY(m_rng);
+    pos.z = m_distZ(m_rng);
+  }
 
-  m_gui = new PW::Entity::Font;
+  m_gui = new Naiive::Entity::Font;
   m_gui->Initialize(m_device);
 
   m_light.m_dir = DirectX::XMFLOAT3(1.0f, 0.0f, 1.0f);
@@ -67,8 +73,16 @@ BOOL GraphicsManagerClass::OnUpdate() {
   m_deviceContext->OMSetDepthStencilState(m_DSStateWithZ, 1);
   m_deviceContext->OMSetBlendState(m_BlendStateWithoutAlpha, blendFactor,
                                    0xFFFFFFFF);
-  m_model->Render(m_deviceContext, view, proj, m_camera.GetPos(),
-                  m_light.m_dir);
+
+  ULONG total_models = static_cast<ULONG>(m_model_dup.size());
+  ULONG frustum_visible_models = 0UL;
+  for (auto&& pos : m_model_dup) {
+    m_model->MoveTo(pos);
+    if (m_model->Render(m_deviceContext, view, proj, m_camera.GetPos(),
+                        m_light.m_dir)) {
+      ++frustum_visible_models;
+    }
+  }
   m_deviceContext->OMSetDepthStencilState(m_DSStateWithoutZ, 1);
   m_deviceContext->OMSetBlendState(m_BlendStateWithAlpha, blendFactor,
                                    0xFFFFFFFF);
@@ -79,6 +93,8 @@ BOOL GraphicsManagerClass::OnUpdate() {
   ss << "MouseY: " << y << "\n";
   ss << "FPS: " << Core::System().GetFPS() << "\n";
   ss << "CPU: " << Core::System().GetCPU() << "%\n";
+  ss << "Frustum Culling: " << frustum_visible_models << "/" << total_models
+     << "\n";
   m_gui->Render(m_device, m_deviceContext, ss.str(), {0, 1}, ortho);
   EndScene();
   return TRUE;

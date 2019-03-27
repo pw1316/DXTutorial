@@ -62,3 +62,11 @@ $$I=texture(uv)\times (ka+kd\times dot(n, -l))+ks\times dot(view-l,n)^{kn}$$
 
 - FPS
 - CPU Usage(PDH library)
+
+## Tut 16 Frustum Culling
+
+Host based pre-culling
+
+1. Reproject culling space to world space
+2. Add AABB for model
+3. AABB culling test, if failed, do not render
