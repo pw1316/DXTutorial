@@ -1,5 +1,5 @@
-#ifndef __STDAFX_H__
-#define __STDAFX_H__
+#ifndef __STDAFX__
+#define __STDAFX__
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN
