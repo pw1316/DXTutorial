@@ -1,6 +1,5 @@
 #ifndef __UTILS_SLIDE_AVERAGE__
 #define __UTILS_SLIDE_AVERAGE__
-#include <stdafx.h>
 
 namespace Naiive::Utils {
 template <class _Type>

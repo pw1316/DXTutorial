@@ -1,7 +1,5 @@
 #ifndef __ENTITY_FRUSTUM__
 #define __ENTITY_FRUSTUM__
-#include <stdafx.h>
-
 #include <DirectXMath.h>
 
 #include <Utils/Range.hpp>

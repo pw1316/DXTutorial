@@ -1,7 +1,5 @@
 #ifndef __CORE_MESSAGE_HANDLER__
 #define __CORE_MESSAGE_HANDLER__
-#include <stdafx.h>
-
 #include <unordered_map>
 #include <unordered_set>
 

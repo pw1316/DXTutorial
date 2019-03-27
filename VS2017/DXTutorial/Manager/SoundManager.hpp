@@ -1,7 +1,5 @@
 #ifndef __MANAGER_SOUND_MANAGER__
 #define __MANAGER_SOUND_MANAGER__
-#include <stdafx.h>
-
 #include <dsound.h>
 
 #include <Core/Interface/IView.hpp>

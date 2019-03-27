@@ -1,7 +1,5 @@
 #ifndef __CORE_MESSAGE__
 #define __CORE_MESSAGE__
-#include <stdafx.h>
-
 #include <string>
 
 namespace Naiive::Core {

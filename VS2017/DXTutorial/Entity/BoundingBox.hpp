@@ -1,7 +1,5 @@
 #ifndef __ENTITY_BOUNDING_BOX__
 #define __ENTITY_BOUNDING_BOX__
-#include <stdafx.h>
-
 #include <algorithm>
 #include <limits>
 
@@ -23,6 +21,7 @@ class BoundingBox3D {
       return pMax;
     }
     assert(FALSE);
+    return pMin;
   }
   DirectX::XMFLOAT3& operator[](int i) {
     if (i == 0) {

@@ -1,9 +1,6 @@
-#include <stdafx.h>
-
-#include <Utils/Debug.hpp>
 #include <Core/Application.hpp>
 #include <Core/System.hpp>
-#include <Manager/GraphicsManager.hpp>
+#include <Utils/Debug.hpp>
 
 int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {

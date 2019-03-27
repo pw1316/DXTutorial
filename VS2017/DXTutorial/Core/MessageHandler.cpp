@@ -1,5 +1,3 @@
-#include <stdafx.h>
-
 #include "MessageHandler.hpp"
 
 #include <Core/Interface/ICommand.hpp>

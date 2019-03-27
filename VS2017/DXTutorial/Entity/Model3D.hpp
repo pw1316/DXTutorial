@@ -1,7 +1,5 @@
 #ifndef __ENTITY_MODEL3D__
 #define __ENTITY_MODEL3D__
-#include <stdafx.h>
-
 #include <string>
 #include <vector>
 

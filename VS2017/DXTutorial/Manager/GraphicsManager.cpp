@@ -1,5 +1,3 @@
-#include <stdafx.h>
-
 #include "GraphicsManager.hpp"
 
 #include <sstream>

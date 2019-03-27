@@ -1,5 +1,3 @@
-#include <stdafx.h>
-
 #include "SoundManager.hpp"
 
 #include <fstream>

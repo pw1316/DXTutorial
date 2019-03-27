@@ -1,6 +1,5 @@
 #ifndef __UTILS_RANGE__
 #define __UTILS_RANGE__
-#include <stdafx.h>
 
 namespace Naiive::Utils {
 template <class _Type>

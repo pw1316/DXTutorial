@@ -1,7 +1,5 @@
 #ifndef __ENTITY_FONT__
 #define __ENTITY_FONT__
-#include <stdafx.h>
-
 #include <string>
 
 #include <DirectXMath.h>

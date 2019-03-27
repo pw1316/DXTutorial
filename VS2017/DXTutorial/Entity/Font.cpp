@@ -1,5 +1,3 @@
-#include <stdafx.h>
-
 #include "Font.hpp"
 
 #include <fstream>

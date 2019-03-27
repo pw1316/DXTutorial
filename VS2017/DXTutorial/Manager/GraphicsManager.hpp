@@ -1,7 +1,5 @@
 #ifndef __MANAGER_GRAPHICS_MANAGER__
 #define __MANAGER_GRAPHICS_MANAGER__
-#include <stdafx.h>
-
 #include <random>
 #include <vector>
 

@@ -1,7 +1,5 @@
 #ifndef __UTILS_DEBUG__
 #define __UTILS_DEBUG__
-#include <stdafx.h>
-
 #include <sstream>
 
 namespace Naiive::Utils {

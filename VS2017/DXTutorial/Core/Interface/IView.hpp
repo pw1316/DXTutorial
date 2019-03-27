@@ -1,7 +1,5 @@
 #ifndef __CORE_IVIEW__
 #define __CORE_IVIEW__
-#include <stdafx.h>
-
 #include <set>
 #include <string>
 

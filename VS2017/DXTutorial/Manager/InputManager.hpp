@@ -1,7 +1,5 @@
 #ifndef __MANAGER_INPUT_MANAGER__
 #define __MANAGER_INPUT_MANAGER__
-#include <stdafx.h>
-
 #include <algorithm>
 
 #include <dinput.h>

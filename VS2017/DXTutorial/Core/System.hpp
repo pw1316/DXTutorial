@@ -1,7 +1,5 @@
 #ifndef __CORE_SYSTEM__
 #define __CORE_SYSTEM__
-#include <stdafx.h>
-
 #include <sstream>
 #include <string>
 

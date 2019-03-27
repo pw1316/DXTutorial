@@ -1,5 +1,3 @@
-#include <stdafx.h>
-
 #include "Application.hpp"
 
 #include <Core/System.hpp>
@@ -9,30 +7,6 @@
 
 void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
   HRESULT hr = S_OK;
-  // TODO 1. Init Host
-  // TODO 1.1 Memory, skip for now, using system alloced memory
-  // TODO 1.2 CMD
-  // TODO 1.3 View
-  // TODO 1.4 Chase
-  // TODO 1.5 Common
-  // TODO 1.6 HostLocal->host.c
-  // TODO 1.7 WAD
-  // TODO 1.8 Keys
-  // TODO 1.9 Console
-  // TODO 1.10 Menu
-  // TODO 1.11 EntiryDict
-  // TODO 1.12 Model
-  // TODO 1.13 Net(opt)
-  // TODO 1.14 Server(opt)
-  // TODO 1.15 Texture
-  // TODO 1.16 Graphics(<- hWnd here)
-  // TODO 1.17 Draw
-  // TODO 1.18 Render R
-  // TODO 1.19 Rasterizer D
-  // TODO 1.20 Status Bar
-  // TODO 1.21 ClientMainLoop
-  // TODO 1.22 Input
-  // TODO 2 HostMainLoop
   LoadString(hInst, IDS_APP_TITLE, m_AppTitle, MAX_LOADSTRING);
   LoadString(hInst, IDS_WINDOW_CLASS, m_WindowClass, MAX_LOADSTRING);
   InitializeWindowClass(hInst, nCmdShow);

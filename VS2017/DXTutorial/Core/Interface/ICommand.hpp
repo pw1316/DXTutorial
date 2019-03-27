@@ -1,6 +1,5 @@
 #ifndef __CORE_ICOMMAND__
 #define __CORE_ICOMMAND__
-#include <stdafx.h>
 
 namespace Naiive::Core {
 class Message;
