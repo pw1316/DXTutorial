@@ -5,6 +5,10 @@
 #include <Manager/InputManager.hpp>
 #include <Manager/SoundManager.hpp>
 
+#ifndef NAIIVE_NO_MENU
+#define NAIIVE_NO_MENU 1
+#endif
+
 void Naiive::Core::ApplicationClass::Run(HINSTANCE hInst, INT nCmdShow) {
   HRESULT hr = S_OK;
   LoadString(hInst, IDS_APP_TITLE, m_AppTitle, MAX_LOADSTRING);
@@ -54,7 +58,7 @@ void Naiive::Core::ApplicationClass::MessageHandler(HWND hWnd, UINT message,
 
 LRESULT Naiive::Core::ApplicationClass::WinProc(HWND hWnd, UINT message,
                                                 WPARAM wParam, LPARAM lParam) {
-  auto hInst = HINSTANCE_FROM_HWND(hWnd);
+  auto hInst = HinstanceFromHwnd(hWnd);
   switch (message) {
     case WM_CREATE: {
       LPCREATESTRUCT pCreateStruct = reinterpret_cast<LPCREATESTRUCT>(lParam);

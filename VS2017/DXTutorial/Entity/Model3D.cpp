@@ -9,6 +9,10 @@
 #include <Entity/Frustum.hpp>
 #include <Utils/Range.hpp>
 
+#ifndef NAIIVE_FRUSTUM_CULL
+#define NAIIVE_FRUSTUM_CULL 1
+#endif
+
 void Naiive::Entity::Model3D::Initialize(ID3D11Device* device) {
   InitializeBuffer(device);
   InitializeShader(device);

@@ -8,7 +8,7 @@ InputManagerClass& InputManager() {
 
 void InputManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   HRESULT hr = S_OK;
-  auto hInst = HINSTANCE_FROM_HWND(hWnd);
+  auto hInst = HinstanceFromHwnd(hWnd);
 
   m_w = width;
   m_h = height;
