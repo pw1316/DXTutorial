@@ -97,9 +97,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\GraphicsManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -127,7 +124,10 @@
     <ClCompile Include="core\system.cc">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

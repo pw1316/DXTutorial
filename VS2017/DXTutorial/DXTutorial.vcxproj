@@ -118,13 +118,13 @@
     <ClCompile Include="core\message_handler.cc" />
     <ClCompile Include="core\system.cc" />
     <ClCompile Include="DirectX\DDSTextureLoader.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main.cc" />
     <ClCompile Include="Entity\Font.cpp" />
     <ClCompile Include="Entity\Model3D.cpp" />
     <ClCompile Include="Manager\GraphicsManager.cpp" />
     <ClCompile Include="Manager\InputManager.cpp" />
     <ClCompile Include="Manager\SoundManager.cpp" />
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="stdafx.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
