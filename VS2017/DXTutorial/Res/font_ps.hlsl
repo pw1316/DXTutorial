@@ -24,7 +24,10 @@ SOFTWARE.
 Texture2D shaderTexture : register(t0);
 SamplerState SampleType;
 
-cbuffer consts0 : register(b0) { float4 color; };
+cbuffer consts0 : register(b0) {
+  matrix MatrixProj;
+  float4 color;
+};
 
 struct PixelIn {
   float4 pos : SV_POSITION;

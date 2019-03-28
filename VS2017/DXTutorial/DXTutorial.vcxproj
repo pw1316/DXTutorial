@@ -99,10 +99,10 @@
     <ClInclude Include="core\message_handler.h" />
     <ClInclude Include="core\system.h" />
     <ClInclude Include="DirectX\DDSTextureLoader.h" />
-    <ClInclude Include="Entity\BoundingBox.hpp" />
-    <ClInclude Include="Entity\Font.hpp" />
-    <ClInclude Include="Entity\Frustum.hpp" />
-    <ClInclude Include="Entity\Model3D.hpp" />
+    <ClInclude Include="entity\bounding_box.h" />
+    <ClInclude Include="entity\font.h" />
+    <ClInclude Include="entity\frustum.h" />
+    <ClInclude Include="entity\model.h" />
     <ClInclude Include="Manager\GraphicsManager.hpp" />
     <ClInclude Include="Manager\InputManager.hpp" />
     <ClInclude Include="Manager\SoundManager.hpp" />
@@ -118,9 +118,9 @@
     <ClCompile Include="core\message_handler.cc" />
     <ClCompile Include="core\system.cc" />
     <ClCompile Include="DirectX\DDSTextureLoader.cpp" />
+    <ClCompile Include="entity\font.cc" />
+    <ClCompile Include="entity\model.cc" />
     <ClCompile Include="main.cc" />
-    <ClCompile Include="Entity\Font.cpp" />
-    <ClCompile Include="Entity\Model3D.cpp" />
     <ClCompile Include="Manager\GraphicsManager.cpp" />
     <ClCompile Include="Manager\InputManager.cpp" />
     <ClCompile Include="Manager\SoundManager.cpp" />

@@ -21,7 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-cbuffer consts0 : register(b0) { matrix MatrixProj; };
+cbuffer consts0 : register(b0) {
+  matrix MatrixProj;
+  float4 color;
+};
 
 struct VertexIn {
   float4 pos : POSITION;

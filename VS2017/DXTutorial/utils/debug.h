@@ -24,6 +24,7 @@ SOFTWARE.
 #ifndef __UTILS_DEBUG__
 #define __UTILS_DEBUG__
 #include <sstream>
+#include <iostream>
 
 namespace naiive::utils {
 class DebugClass {
@@ -39,6 +40,9 @@ class DebugClass {
        << "IWE"[static_cast<int>(log_level_)] << "] " << file_name_ << " "
        << line_number_ << " " << ss_.str();
     OutputDebugString(ss.str().c_str());
+    if (log_level_ == LogLevel::LOG_ERROR) {
+      std::abort();
+    }
   }
 
   template <class _Arg, class... _Args>

@@ -9,10 +9,10 @@
 
 #include <core/iview.h>
 
-namespace naiive::Entity {
+namespace naiive::entity {
 class Model3D;
 class Font;
-}  // namespace naiive::Entity
+}  // namespace naiive::entity
 
 namespace naiive::Manager {
 class GraphicsManagerClass : public core::IView {
@@ -125,9 +125,9 @@ class GraphicsManagerClass : public core::IView {
 
   Camera m_camera;
   Light m_light;
-  naiive::Entity::Model3D* m_model = nullptr;
+  naiive::entity::Model3D* m_model = nullptr;
   std::vector<DirectX::XMFLOAT3> m_model_dup;
-  naiive::Entity::Font* m_gui = nullptr;
+  naiive::entity::Font* m_gui = nullptr;
 };
 
 GraphicsManagerClass& GraphicsManager();

@@ -16,9 +16,6 @@
     <Filter Include="Manager">
       <UniqueIdentifier>{a46fec6d-e238-494f-a814-42e762680067}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Entity">
-      <UniqueIdentifier>{0cd9b723-0134-45bc-8f5b-ad686e2ff0c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Res">
       <UniqueIdentifier>{7b21fdbd-504d-436f-baa0-7b6537520ae2}</UniqueIdentifier>
     </Filter>
@@ -32,6 +29,9 @@
     </Filter>
     <Filter Include="utils">
       <UniqueIdentifier>{f030c5db-12c3-43e0-8da4-722c85a0a99b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="entity">
+      <UniqueIdentifier>{0cd9b723-0134-45bc-8f5b-ad686e2ff0c7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -50,23 +50,11 @@
     <ClInclude Include="Manager\GraphicsManager.hpp">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Entity\Model3D.hpp">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\Font.hpp">
-      <Filter>Entity</Filter>
-    </ClInclude>
     <ClInclude Include="DirectX\DDSTextureLoader.h">
       <Filter>DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Manager\SoundManager.hpp">
       <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\Frustum.hpp">
-      <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity\BoundingBox.hpp">
-      <Filter>Entity</Filter>
     </ClInclude>
     <ClInclude Include="core\application.h">
       <Filter>core</Filter>
@@ -95,16 +83,22 @@
     <ClInclude Include="utils\slide_average.h">
       <Filter>utils</Filter>
     </ClInclude>
+    <ClInclude Include="entity\frustum.h">
+      <Filter>entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\bounding_box.h">
+      <Filter>entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\font.h">
+      <Filter>entity</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\model.h">
+      <Filter>entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Manager\GraphicsManager.cpp">
       <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity\Model3D.cpp">
-      <Filter>Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity\Font.cpp">
-      <Filter>Entity</Filter>
     </ClCompile>
     <ClCompile Include="Manager\InputManager.cpp">
       <Filter>Manager</Filter>
@@ -129,6 +123,12 @@
     </ClCompile>
     <ClCompile Include="stdafx.cc">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\font.cc">
+      <Filter>entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\model.cc">
+      <Filter>entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

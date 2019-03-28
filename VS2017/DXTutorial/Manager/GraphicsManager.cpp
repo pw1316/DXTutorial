@@ -4,8 +4,8 @@
 #include <string>
 
 #include <core/system.h>
-#include <Entity/Font.hpp>
-#include <Entity/Model3D.hpp>
+#include <entity/font.h>
+#include <entity/model.h>
 #include <Manager/InputManager.hpp>
 
 namespace naiive::Manager {
@@ -33,7 +33,7 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
 
   m_camera.SetPos(0.0f, 2.0f, -10.0f);
 
-  m_model = new naiive::Entity::Model3D("Res/sphere");
+  m_model = new naiive::entity::Model3D("Res/sphere");
   m_model->Initialize(m_device);
   m_model_dup.resize(1000);
   m_rng.seed(0);
@@ -43,7 +43,7 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
     pos.z = m_distZ(m_rng);
   }
 
-  m_gui = new naiive::Entity::Font;
+  m_gui = new naiive::entity::Font;
   m_gui->Initialize(m_device);
 
   m_light.m_dir = DirectX::XMFLOAT3(1.0f, 0.0f, 1.0f);
@@ -326,4 +326,4 @@ GraphicsManagerClass& GraphicsManager() {
   static GraphicsManagerClass obj;
   return obj;
 }
-}  // namespace Naiive::Manager
+}  // namespace naiive::Manager
