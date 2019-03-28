@@ -19,9 +19,6 @@
     <Filter Include="Res">
       <UniqueIdentifier>{7b21fdbd-504d-436f-baa0-7b6537520ae2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DirectX">
-      <UniqueIdentifier>{ed01deaa-94c9-4b98-89ca-8401794a75c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core">
       <UniqueIdentifier>{589bea79-4ad6-4ef6-99f1-362e4cbdf8fa}</UniqueIdentifier>
       <Extensions>
@@ -32,6 +29,9 @@
     </Filter>
     <Filter Include="entity">
       <UniqueIdentifier>{0cd9b723-0134-45bc-8f5b-ad686e2ff0c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="directx">
+      <UniqueIdentifier>{ed01deaa-94c9-4b98-89ca-8401794a75c7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,7 +51,7 @@
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="DirectX\DDSTextureLoader.h">
-      <Filter>DirectX</Filter>
+      <Filter>directx</Filter>
     </ClInclude>
     <ClInclude Include="Manager\SoundManager.hpp">
       <Filter>Manager</Filter>
@@ -104,7 +104,7 @@
       <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="DirectX\DDSTextureLoader.cpp">
-      <Filter>DirectX</Filter>
+      <Filter>directx</Filter>
     </ClCompile>
     <ClCompile Include="Manager\SoundManager.cpp">
       <Filter>Manager</Filter>
