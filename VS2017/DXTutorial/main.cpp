@@ -21,39 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-cbuffer consts0 : register(b0) {
-  matrix MatrixWorld;
-  matrix MatrixView;
-  matrix MatrixProj;
-};
+#include <core/application.h>
+#include <core/system.h>
+#include <utils/debug.h>
 
-cbuffer consts1 : register(b1) {
-  float4 CameraPos;
-  float3 LightDir;
-};
+int APIENTRY WinMain(_In_ HINSTANCE hinstance,
+                     _In_opt_ HINSTANCE previous_hinstance,
+                     _In_ LPSTR command_line, _In_ int command_show) {
+  UNREFERENCED_PARAMETER(previous_hinstance);
+  UNREFERENCED_PARAMETER(command_line);
 
-struct VertexIn {
-  float4 pos : POSITION;
-  float2 uv : TEXCOORD0;
-  float3 normal : NORMAL;
-};
-
-struct VertexOut {
-  float4 pos : SV_POSITION;
-  float2 uv : TEXCOORD0;
-  float3 normal : NORMAL;
-  float3 pos_world : TEXCOORD1;
-};
-
-VertexOut VS(VertexIn vin) {
-  VertexOut vout;
-  vin.pos.w = 1;
-  float4 pos;
-  pos = mul(vin.pos, MatrixWorld);
-  vout.pos_world = pos.xyz;
-  pos = mul(pos, MatrixView);
-  vout.pos = mul(pos, MatrixProj);
-  vout.uv = vin.uv;
-  vout.normal = normalize(mul(vin.normal, (float3x3)MatrixWorld));
-  return vout;
+  auto&& sys = naiive::core::System();
+  LOG(LOG_INFO)("System setup done at ", sys.GameTime());
+  auto&& app = naiive::core::Application(1024, 768);
+  app.Run(hinstance, command_show);
+  return 0;
 }

@@ -118,7 +118,7 @@
     <ClCompile Include="core\message_handler.cc" />
     <ClCompile Include="core\system.cc" />
     <ClCompile Include="DirectX\DDSTextureLoader.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Entity\Font.cpp" />
     <ClCompile Include="Entity\Model3D.cpp" />
     <ClCompile Include="Manager\GraphicsManager.cpp" />
