@@ -54,5 +54,5 @@ class SlideAverage {
   ULONG cnt_ = 0;
   _Type sum_ = 0;
 };
-}  // namespace Naiive::utils
+}  // namespace naiive::utils
 #endif

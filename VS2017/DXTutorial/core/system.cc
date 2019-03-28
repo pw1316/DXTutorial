@@ -28,4 +28,4 @@ SystemClass& System() {
   static SystemClass obj;
   return obj;
 }
-}  // namespace Naiive::Core
+}  // namespace naiive::core

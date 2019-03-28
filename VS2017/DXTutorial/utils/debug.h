@@ -23,8 +23,8 @@ SOFTWARE.
 
 #ifndef __UTILS_DEBUG__
 #define __UTILS_DEBUG__
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 namespace naiive::utils {
 class DebugClass {

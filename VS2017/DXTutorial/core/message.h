@@ -46,5 +46,5 @@ class Message {
   ULONG body_ = 0;
   BOOL handled_ = FALSE;
 };
-}  // namespace Naiive::Core
+}  // namespace naiive::core
 #endif

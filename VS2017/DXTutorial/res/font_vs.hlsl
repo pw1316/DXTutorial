@@ -36,7 +36,7 @@ struct VertexOut {
   float2 uv : TEXCOORD0;
 };
 
-VertexOut VS(VertexIn vin) {
+VertexOut main(VertexIn vin) {
   VertexOut vout;
   vout.pos = mul(vin.pos, MatrixProj);
   vout.uv = vin.uv;

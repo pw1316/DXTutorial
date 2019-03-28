@@ -120,7 +120,7 @@ class SystemClass {
   /* DXGI */
   HMODULE dxgi_debug_module_ = nullptr;
   IDXGIDebug* dxgi_debug_ = nullptr;
-};  // namespace Naiive::Core
+};
 
 SystemClass& System();
 }  // namespace naiive::core

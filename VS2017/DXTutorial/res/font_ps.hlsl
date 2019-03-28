@@ -34,7 +34,7 @@ struct PixelIn {
   float2 uv : TEXCOORD0;
 };
 
-float4 PS(PixelIn pin) : SV_TARGET {
+float4 main(PixelIn pin) : SV_TARGET {
   float4 pout;
   pout = shaderTexture.Sample(SampleType, pin.uv);
   if (pout.r == 0.0f && pout.g == 0.0f && pout.b == 0.0f) {

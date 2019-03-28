@@ -294,10 +294,10 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   D3D11_INPUT_ELEMENT_DESC layout[layout_number];
 
   UINT shader_flag = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
-                    D3DCOMPILE_SKIP_OPTIMIZATION;
+                     D3DCOMPILE_SKIP_OPTIMIZATION;
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"Res/sphere_vs.hlsl", nullptr, nullptr, "VS",
+  hr = D3DCompileFromFile(L"res/sphere_vs.hlsl", nullptr, nullptr, "main",
                           "vs_5_0", shader_flag, 0, &blob, nullptr);
   FAILTHROW;
   hr = device->CreateVertexShader(blob->GetBufferPointer(),
@@ -327,12 +327,13 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
   layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[2].InstanceDataStepRate = 0;
-  hr = device->CreateInputLayout(layout, layout_number, blob->GetBufferPointer(),
-                                 blob->GetBufferSize(), &input_layout_);
+  hr =
+      device->CreateInputLayout(layout, layout_number, blob->GetBufferPointer(),
+                                blob->GetBufferSize(), &input_layout_);
   FAILTHROW;
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"Res/sphere_ps.hlsl", nullptr, nullptr, "PS",
+  hr = D3DCompileFromFile(L"res/sphere_ps.hlsl", nullptr, nullptr, "main",
                           "ps_5_0", shader_flag, 0, &blob, nullptr);
   FAILTHROW;
   hr = device->CreatePixelShader(

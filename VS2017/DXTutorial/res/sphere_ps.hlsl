@@ -43,7 +43,7 @@ struct PixelIn {
   float3 pos_world : TEXCOORD1;
 };
 
-float4 PS(PixelIn pin) : SV_TARGET {
+float4 main(PixelIn pin) : SV_TARGET {
   float4 color = shaderTexture.Sample(SampleType, pin.uv);
   float3 view = normalize(CameraPos.xyz - pin.pos_world);
   float3 ld = normalize(LightDir);

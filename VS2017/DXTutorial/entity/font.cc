@@ -228,8 +228,8 @@ void Font::InitializeShader(ID3D11Device* device) {
                      D3DCOMPILE_SKIP_OPTIMIZATION;
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"Res/font_vs.hlsl", nullptr, nullptr, "VS", "vs_5_0",
-                          shader_flag, 0, &blob, nullptr);
+  hr = D3DCompileFromFile(L"res/font_vs.hlsl", nullptr, nullptr, "main",
+                          "vs_5_0", shader_flag, 0, &blob, nullptr);
   FAILTHROW;
   hr = device->CreateVertexShader(blob->GetBufferPointer(),
                                   blob->GetBufferSize(), nullptr,
@@ -257,8 +257,8 @@ void Font::InitializeShader(ID3D11Device* device) {
   FAILTHROW;
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"Res/font_ps.hlsl", nullptr, nullptr, "PS", "ps_5_0",
-                          shader_flag, 0, &blob, nullptr);
+  hr = D3DCompileFromFile(L"res/font_ps.hlsl", nullptr, nullptr, "main",
+                          "ps_5_0", shader_flag, 0, &blob, nullptr);
   FAILTHROW;
   hr = device->CreatePixelShader(
       blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixel_shader_);

@@ -1,21 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Res">
-      <UniqueIdentifier>{7b21fdbd-504d-436f-baa0-7b6537520ae2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core">
       <UniqueIdentifier>{589bea79-4ad6-4ef6-99f1-362e4cbdf8fa}</UniqueIdentifier>
       <Extensions>
@@ -33,17 +18,15 @@
     <Filter Include="manager">
       <UniqueIdentifier>{a46fec6d-e238-494f-a814-42e762680067}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{7b21fdbd-504d-436f-baa0-7b6537520ae2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="core\application.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -95,6 +78,9 @@
     <ClInclude Include="Manager\graphics_manager.h">
       <Filter>manager</Filter>
     </ClInclude>
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
@@ -105,12 +91,6 @@
     </ClCompile>
     <ClCompile Include="core\system.cc">
       <Filter>core</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cc">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="entity\font.cc">
       <Filter>entity</Filter>
@@ -130,45 +110,34 @@
     <ClCompile Include="Manager\graphics_manager.cc">
       <Filter>manager</Filter>
     </ClCompile>
+    <ClCompile Include="main.cc" />
+    <ClCompile Include="stdafx.cc" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DXTutorial.rc">
-      <Filter>Resource Files</Filter>
+      <Filter>resource</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>resource</Filter>
     </Image>
     <Image Include="DXTutorial.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Res\sphere.dds">
-      <Filter>Res</Filter>
+      <Filter>resource</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Res\sphere.mtl">
-      <Filter>Res</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="Res\sphere.obj">
-      <Filter>Res</Filter>
-    </Object>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Res\sphere_ps.hlsl">
-      <Filter>Res</Filter>
+    <FxCompile Include="res\font_ps.hlsl">
+      <Filter>shader</Filter>
     </FxCompile>
-    <FxCompile Include="Res\sphere_vs.hlsl">
-      <Filter>Res</Filter>
+    <FxCompile Include="res\font_vs.hlsl">
+      <Filter>shader</Filter>
     </FxCompile>
-    <FxCompile Include="Res\font_vs.hlsl">
-      <Filter>Res</Filter>
+    <FxCompile Include="res\sphere_ps.hlsl">
+      <Filter>shader</Filter>
     </FxCompile>
-    <FxCompile Include="Res\font_ps.hlsl">
-      <Filter>Res</Filter>
+    <FxCompile Include="res\sphere_vs.hlsl">
+      <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

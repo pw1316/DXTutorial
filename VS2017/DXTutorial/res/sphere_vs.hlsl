@@ -45,7 +45,7 @@ struct VertexOut {
   float3 pos_world : TEXCOORD1;
 };
 
-VertexOut VS(VertexIn vin) {
+VertexOut main(VertexIn vin) {
   VertexOut vout;
   vin.pos.w = 1;
   float4 pos;
