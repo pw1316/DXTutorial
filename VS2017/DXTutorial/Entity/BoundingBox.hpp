@@ -5,7 +5,7 @@
 
 #include <DirectXMath.h>
 
-namespace Naiive::Entity {
+namespace naiive::Entity {
 class BoundingBox3D {
  public:
   BoundingBox3D() {

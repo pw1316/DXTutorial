@@ -4,10 +4,10 @@
 
 #include <dinput.h>
 
-#include <Core/Interface/IView.hpp>
+#include <core/iview.h>
 
-namespace Naiive::Manager {
-class InputManagerClass : public Core::IView {
+namespace naiive::Manager {
+class InputManagerClass : public core::IView {
   friend InputManagerClass& InputManager();
 
  private:
@@ -43,6 +43,6 @@ class InputManagerClass : public Core::IView {
 };
 
 InputManagerClass& InputManager();
-}  // namespace Naiive::Manager
+}  // namespace naiive::Manager
 
 #endif

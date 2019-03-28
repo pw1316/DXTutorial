@@ -3,12 +3,12 @@
 #include <sstream>
 #include <string>
 
-#include <Core/System.hpp>
+#include <core/system.h>
 #include <Entity/Font.hpp>
 #include <Entity/Model3D.hpp>
 #include <Manager/InputManager.hpp>
 
-namespace Naiive::Manager {
+namespace naiive::Manager {
 void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   HRESULT hr = S_OK;
   /* Create SwapChain, Device and Context */
@@ -33,7 +33,7 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
 
   m_camera.SetPos(0.0f, 2.0f, -10.0f);
 
-  m_model = new Naiive::Entity::Model3D("Res/sphere");
+  m_model = new naiive::Entity::Model3D("Res/sphere");
   m_model->Initialize(m_device);
   m_model_dup.resize(1000);
   m_rng.seed(0);
@@ -43,7 +43,7 @@ void GraphicsManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
     pos.z = m_distZ(m_rng);
   }
 
-  m_gui = new Naiive::Entity::Font;
+  m_gui = new naiive::Entity::Font;
   m_gui->Initialize(m_device);
 
   m_light.m_dir = DirectX::XMFLOAT3(1.0f, 0.0f, 1.0f);
@@ -89,8 +89,8 @@ BOOL GraphicsManagerClass::OnUpdate() {
   std::stringstream ss;
   ss << "MouseX: " << x << "\n";
   ss << "MouseY: " << y << "\n";
-  ss << "FPS: " << Core::System().GetFPS() << "\n";
-  ss << "CPU: " << Core::System().GetCPU() << "%\n";
+  ss << "FPS: " << core::System().Fps() << "\n";
+  ss << "CPU: " << core::System().get_cpu_usage() << "%\n";
   ss << "Frustum Culling: " << frustum_visible_models << "/" << total_models
      << "\n";
   m_gui->Render(m_device, m_deviceContext, ss.str(), {0, 1}, ortho);

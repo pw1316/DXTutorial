@@ -92,12 +92,12 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Application.hpp" />
-    <ClInclude Include="Core\Interface\ICommand.hpp" />
-    <ClInclude Include="Core\Interface\IView.hpp" />
-    <ClInclude Include="Core\Message.hpp" />
-    <ClInclude Include="Core\MessageHandler.hpp" />
-    <ClInclude Include="Core\System.hpp" />
+    <ClInclude Include="core\application.h" />
+    <ClInclude Include="core\command_interface.h" />
+    <ClInclude Include="core\iview.h" />
+    <ClInclude Include="core\message.h" />
+    <ClInclude Include="core\message_handler.h" />
+    <ClInclude Include="core\system.h" />
     <ClInclude Include="DirectX\DDSTextureLoader.h" />
     <ClInclude Include="Entity\BoundingBox.hpp" />
     <ClInclude Include="Entity\Font.hpp" />
@@ -114,9 +114,9 @@
     <ClInclude Include="Utils\SlideAverage.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\Application.cpp" />
-    <ClCompile Include="Core\MessageHandler.cpp" />
-    <ClCompile Include="Core\System.cpp" />
+    <ClCompile Include="core\application.cc" />
+    <ClCompile Include="core\message_handler.cc" />
+    <ClCompile Include="core\system.cc" />
     <ClCompile Include="DirectX\DDSTextureLoader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Entity\Font.cpp" />

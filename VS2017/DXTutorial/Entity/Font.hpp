@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 #include <d3d11_4.h>
 
-namespace Naiive::Entity {
+namespace naiive::Entity {
 class Font {
  private:
   struct FontType {

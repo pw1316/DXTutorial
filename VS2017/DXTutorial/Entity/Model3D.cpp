@@ -13,17 +13,17 @@
 #define NAIIVE_FRUSTUM_CULL 1
 #endif
 
-void Naiive::Entity::Model3D::Initialize(ID3D11Device* device) {
+void naiive::Entity::Model3D::Initialize(ID3D11Device* device) {
   InitializeBuffer(device);
   InitializeShader(device);
 }
 
-void Naiive::Entity::Model3D::Shutdown() {
+void naiive::Entity::Model3D::Shutdown() {
   ShutdownShader();
   ShutdownBuffer();
 }
 
-BOOL Naiive::Entity::Model3D::Render(ID3D11DeviceContext* context,
+BOOL naiive::Entity::Model3D::Render(ID3D11DeviceContext* context,
                                      DirectX::XMFLOAT4X4 view,
                                      DirectX::XMFLOAT4X4 proj,
                                      DirectX::XMFLOAT4 camPos,
@@ -97,7 +97,7 @@ BOOL Naiive::Entity::Model3D::Render(ID3D11DeviceContext* context,
   return TRUE;
 }
 
-void Naiive::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
+void naiive::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   TinyObj obj;
@@ -248,7 +248,7 @@ void Naiive::Entity::Model3D::InitializeBuffer(ID3D11Device* device) {
   hr = device->CreateSamplerState(&sampleDesc, &m_SamplerState);
   FAILTHROW;
 }
-void Naiive::Entity::Model3D::ShutdownBuffer() {
+void naiive::Entity::Model3D::ShutdownBuffer() {
   SafeRelease(&m_SamplerState);
   SafeRelease(&m_SRVTexture0);
   SafeRelease(&m_CBMaterial);
@@ -258,7 +258,7 @@ void Naiive::Entity::Model3D::ShutdownBuffer() {
   SafeRelease(&m_VB);
 }
 
-void Naiive::Entity::Model3D::InitializeShader(ID3D11Device* device) {
+void naiive::Entity::Model3D::InitializeShader(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   ID3D10Blob* blob = nullptr;
@@ -311,7 +311,7 @@ void Naiive::Entity::Model3D::InitializeShader(ID3D11Device* device) {
   FAILTHROW;
   SafeRelease(&blob);
 }
-void Naiive::Entity::Model3D::ShutdownShader() {
+void naiive::Entity::Model3D::ShutdownShader() {
   SafeRelease(&m_PS);
   SafeRelease(&m_Layout);
   SafeRelease(&m_VS);

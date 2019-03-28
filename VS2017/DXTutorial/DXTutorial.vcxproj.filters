@@ -13,16 +13,8 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{589bea79-4ad6-4ef6-99f1-362e4cbdf8fa}</UniqueIdentifier>
-      <Extensions>
-      </Extensions>
-    </Filter>
     <Filter Include="Manager">
       <UniqueIdentifier>{a46fec6d-e238-494f-a814-42e762680067}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Interface">
-      <UniqueIdentifier>{70bdf96b-a044-44ee-a437-ddfbd4588bc6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Entity">
       <UniqueIdentifier>{0cd9b723-0134-45bc-8f5b-ad686e2ff0c7}</UniqueIdentifier>
@@ -36,6 +28,11 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{fd263e23-faeb-4ef2-a131-f8369a28af7e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="core">
+      <UniqueIdentifier>{589bea79-4ad6-4ef6-99f1-362e4cbdf8fa}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -47,20 +44,8 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Message.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\MessageHandler.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Manager\InputManager.hpp">
       <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Interface\ICommand.hpp">
-      <Filter>Core\Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Interface\IView.hpp">
-      <Filter>Core\Interface</Filter>
     </ClInclude>
     <ClInclude Include="Manager\GraphicsManager.hpp">
       <Filter>Manager</Filter>
@@ -70,12 +55,6 @@
     </ClInclude>
     <ClInclude Include="Entity\Font.hpp">
       <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\System.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Application.hpp">
-      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="DirectX\DDSTextureLoader.h">
       <Filter>DirectX</Filter>
@@ -98,13 +77,28 @@
     <ClInclude Include="Entity\BoundingBox.hpp">
       <Filter>Entity</Filter>
     </ClInclude>
+    <ClInclude Include="core\application.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\message.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\message_handler.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\system.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\command_interface.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\iview.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\MessageHandler.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Manager\GraphicsManager.cpp">
       <Filter>Manager</Filter>
@@ -118,12 +112,6 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\System.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Application.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Manager\InputManager.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
@@ -132,6 +120,15 @@
     </ClCompile>
     <ClCompile Include="Manager\SoundManager.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="core\application.cc">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\message_handler.cc">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\system.cc">
+      <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

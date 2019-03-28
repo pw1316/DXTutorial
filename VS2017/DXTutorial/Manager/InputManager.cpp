@@ -1,6 +1,6 @@
 #include "InputManager.hpp"
 
-namespace Naiive::Manager {
+namespace naiive::Manager {
 InputManagerClass& InputManager() {
   static InputManagerClass obj;
   return obj;
@@ -73,11 +73,11 @@ BOOL InputManagerClass::OnUpdate() {
   //  m_y = 0;
   //}
 
-  // if (m_x > m_w) {
-  //  m_x = m_w;
+  // if (m_x > width_) {
+  //  m_x = width_;
   //}
-  // if (m_y > m_h) {
-  //  m_y = m_h;
+  // if (m_y > height_) {
+  //  m_y = height_;
   //}
   return TRUE;
 }

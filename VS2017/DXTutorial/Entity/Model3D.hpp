@@ -9,7 +9,7 @@
 
 #include <Entity/BoundingBox.hpp>
 
-namespace Naiive::Entity {
+namespace naiive::Entity {
 class Model3D {
  private:
   struct VBType {

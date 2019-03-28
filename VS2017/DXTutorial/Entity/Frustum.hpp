@@ -4,7 +4,7 @@
 
 #include <Utils/Range.hpp>
 
-namespace Naiive::Entity {
+namespace naiive::Entity {
 class FrustumWorld {
  public:
   FrustumWorld(const DirectX::XMMATRIX& VP) {

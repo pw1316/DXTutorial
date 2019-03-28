@@ -2,10 +2,10 @@
 #define __MANAGER_SOUND_MANAGER__
 #include <dsound.h>
 
-#include <Core/Interface/IView.hpp>
+#include <core/iview.h>
 
-namespace Naiive::Manager {
-class SoundManagerClass : public Core::IView {
+namespace naiive::Manager {
+class SoundManagerClass : public core::IView {
   friend SoundManagerClass& SoundManager();
 
  private:
@@ -40,5 +40,5 @@ class SoundManagerClass : public Core::IView {
 };
 
 SoundManagerClass& SoundManager();
-}  // namespace Naiive::Manager
+}  // namespace naiive::Manager
 #endif

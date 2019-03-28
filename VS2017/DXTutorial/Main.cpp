@@ -1,5 +1,5 @@
-#include <Core/Application.hpp>
-#include <Core/System.hpp>
+#include <core/application.h>
+#include <core/system.h>
 #include <Utils/Debug.hpp>
 
 int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
@@ -7,9 +7,9 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
 
-  auto&& sys = Naiive::Core::System();
+  auto&& sys = naiive::core::System();
   Debug(LOG_INFO)("System setup done at ", sys.GameTime());
-  auto&& app = Naiive::Core::Application(1024, 768);
+  auto&& app = naiive::core::Application(1024, 768);
   app.Run(hInstance, nCmdShow);
   return 0;
 }

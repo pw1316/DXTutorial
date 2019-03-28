@@ -1,7 +1,7 @@
 #ifndef __UTILS_SLIDE_AVERAGE__
 #define __UTILS_SLIDE_AVERAGE__
 
-namespace Naiive::Utils {
+namespace naiive::Utils {
 template <class _Type>
 class SlideAverage {
  public:

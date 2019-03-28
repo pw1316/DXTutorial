@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 
-namespace Naiive::Manager {
+namespace naiive::Manager {
 void SoundManagerClass::Initialize(HWND hWnd, UINT width, UINT height) {
   HRESULT hr = S_OK;
   hr = DirectSoundCreate8(nullptr, &m_dsound, nullptr);
@@ -139,7 +139,7 @@ void SoundManagerClass::LoadWave() {
 
 void SoundManagerClass::UnloadWave() { SafeRelease(&m_secondaryBuffer); }
 
-SoundManagerClass& Naiive::Manager::SoundManager() {
+SoundManagerClass& naiive::Manager::SoundManager() {
   static SoundManagerClass obj;
   return obj;
 }

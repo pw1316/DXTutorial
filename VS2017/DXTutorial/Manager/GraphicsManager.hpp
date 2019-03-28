@@ -7,15 +7,15 @@
 #include <d3d11.h>
 #include <dxgi.h>
 
-#include <Core/Interface/IView.hpp>
+#include <core/iview.h>
 
-namespace Naiive::Entity {
+namespace naiive::Entity {
 class Model3D;
 class Font;
-}  // namespace Naiive::Entity
+}  // namespace naiive::Entity
 
-namespace Naiive::Manager {
-class GraphicsManagerClass : public Core::IView {
+namespace naiive::Manager {
+class GraphicsManagerClass : public core::IView {
   friend GraphicsManagerClass& GraphicsManager();
   struct Camera {
    public:
@@ -125,12 +125,12 @@ class GraphicsManagerClass : public Core::IView {
 
   Camera m_camera;
   Light m_light;
-  Naiive::Entity::Model3D* m_model = nullptr;
+  naiive::Entity::Model3D* m_model = nullptr;
   std::vector<DirectX::XMFLOAT3> m_model_dup;
-  Naiive::Entity::Font* m_gui = nullptr;
+  naiive::Entity::Font* m_gui = nullptr;
 };
 
 GraphicsManagerClass& GraphicsManager();
-}  // namespace Naiive::Manager
+}  // namespace naiive::Manager
 
 #endif

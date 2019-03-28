@@ -1,7 +1,7 @@
 #ifndef __UTILS_RANGE__
 #define __UTILS_RANGE__
 
-namespace Naiive::Utils {
+namespace naiive::Utils {
 template <class _Type>
 class Range {
  public:

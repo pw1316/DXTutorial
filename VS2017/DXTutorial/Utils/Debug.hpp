@@ -2,7 +2,7 @@
 #define __UTILS_DEBUG__
 #include <sstream>
 
-namespace Naiive::Utils {
+namespace naiive::Utils {
 class DebugClass {
  public:
   enum class LogLevel : int { LOG_INFO = 0, LOG_WARN = 1, LOG_ERROR = 2 };
@@ -38,7 +38,7 @@ class DebugClass {
 #define Debug(LEVEL) 
 #else
 #define Debug(LEVEL)                            \
-  Naiive::Utils::DebugClass(__FILE__, __LINE__, \
-                            Naiive::Utils::DebugClass::LogLevel::LEVEL)
+  naiive::Utils::DebugClass(__FILE__, __LINE__, \
+                            naiive::Utils::DebugClass::LogLevel::LEVEL)
 #endif
 #endif

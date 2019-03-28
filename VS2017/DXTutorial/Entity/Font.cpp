@@ -7,7 +7,7 @@
 
 #include <DirectX/DDSTextureLoader.h>
 
-void Naiive::Entity::Font::Initialize(ID3D11Device* device) {
+void naiive::Entity::Font::Initialize(ID3D11Device* device) {
   HRESULT hr = S_OK;
   std::ifstream fontMeta("Res/font_meta.txt");
   hr = fontMeta ? S_OK : E_FAIL;
@@ -25,11 +25,11 @@ void Naiive::Entity::Font::Initialize(ID3D11Device* device) {
   InitializeBuffer(device);
   InitializeShader(device);
 }
-void Naiive::Entity::Font::Shutdown() {
+void naiive::Entity::Font::Shutdown() {
   ShutdownShader();
   ShutdownBuffer();
 }
-void Naiive::Entity::Font::Render(ID3D11Device* device,
+void naiive::Entity::Font::Render(ID3D11Device* device,
                                   ID3D11DeviceContext* context,
                                   const std::string& text,
                                   const DirectX::XMFLOAT2& pos,
@@ -150,7 +150,7 @@ void Naiive::Entity::Font::Render(ID3D11Device* device,
   context->DrawIndexed(RVN, 0, 0);
 }
 
-void Naiive::Entity::Font::InitializeBuffer(ID3D11Device* device) {
+void naiive::Entity::Font::InitializeBuffer(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   D3D11_BUFFER_DESC bufferDesc;
@@ -205,7 +205,7 @@ void Naiive::Entity::Font::InitializeBuffer(ID3D11Device* device) {
   hr = device->CreateSamplerState(&sampleDesc, &m_SamplerState);
   FAILTHROW;
 }
-void Naiive::Entity::Font::ShutdownBuffer() {
+void naiive::Entity::Font::ShutdownBuffer() {
   SafeRelease(&m_SamplerState);
   SafeRelease(&m_SRVTexture);
   SafeRelease(&m_CBColor);
@@ -214,7 +214,7 @@ void Naiive::Entity::Font::ShutdownBuffer() {
   SafeRelease(&m_VB);
 }
 
-void Naiive::Entity::Font::InitializeShader(ID3D11Device* device) {
+void naiive::Entity::Font::InitializeShader(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   ID3D10Blob* blob = nullptr;
@@ -260,7 +260,7 @@ void Naiive::Entity::Font::InitializeShader(ID3D11Device* device) {
   FAILTHROW;
   SafeRelease(&blob);
 }
-void Naiive::Entity::Font::ShutdownShader() {
+void naiive::Entity::Font::ShutdownShader() {
   SafeRelease(&m_PS);
   SafeRelease(&m_Layout);
   SafeRelease(&m_VS);
