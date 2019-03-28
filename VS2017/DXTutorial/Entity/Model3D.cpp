@@ -7,7 +7,7 @@
 #include <d3dcompiler.h>
 
 #include <Entity/Frustum.hpp>
-#include <Utils/Range.hpp>
+#include <utils/range.h>
 
 #ifndef NAIIVE_FRUSTUM_CULL
 #define NAIIVE_FRUSTUM_CULL 1
@@ -41,7 +41,7 @@ BOOL naiive::Entity::Model3D::Render(ID3D11DeviceContext* context,
 #if NAIIVE_FRUSTUM_CULL
   FrustumWorld frustum(DirectX::XMMatrixMultiply(xmview, xmproj));
   BOOL visible = FALSE;
-  for (auto i : Utils::Range(8)) {
+  for (auto i : utils::Range(8)) {
     auto cnr = m_aabb.Corner(i);
     auto xmcnr =
         DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&cnr), xmworld);

@@ -25,13 +25,13 @@
     <Filter Include="DirectX">
       <UniqueIdentifier>{ed01deaa-94c9-4b98-89ca-8401794a75c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utils">
-      <UniqueIdentifier>{fd263e23-faeb-4ef2-a131-f8369a28af7e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="core">
       <UniqueIdentifier>{589bea79-4ad6-4ef6-99f1-362e4cbdf8fa}</UniqueIdentifier>
       <Extensions>
       </Extensions>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{f030c5db-12c3-43e0-8da4-722c85a0a99b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,17 +62,8 @@
     <ClInclude Include="Manager\SoundManager.hpp">
       <Filter>Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Utils\Debug.hpp">
-      <Filter>Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\SlideAverage.hpp">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Entity\Frustum.hpp">
       <Filter>Entity</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils\Range.hpp">
-      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Entity\BoundingBox.hpp">
       <Filter>Entity</Filter>
@@ -94,6 +85,15 @@
     </ClInclude>
     <ClInclude Include="core\iview.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\debug.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\range.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\slide_average.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

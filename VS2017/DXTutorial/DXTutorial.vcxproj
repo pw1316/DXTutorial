@@ -109,9 +109,9 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Utils\Debug.hpp" />
-    <ClInclude Include="Utils\Range.hpp" />
-    <ClInclude Include="Utils\SlideAverage.hpp" />
+    <ClInclude Include="utils\debug.h" />
+    <ClInclude Include="utils\range.h" />
+    <ClInclude Include="utils\slide_average.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc" />

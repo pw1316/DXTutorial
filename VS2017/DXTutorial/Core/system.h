@@ -29,8 +29,8 @@ SOFTWARE.
 #include <Pdh.h>
 #include <dxgidebug.h>
 
-#include <Utils/Debug.hpp>
-#include <Utils/SlideAverage.hpp>
+#include <utils/debug.h>
+#include <utils/slide_average.h>
 
 namespace naiive::core {
 class SystemClass {
@@ -68,9 +68,9 @@ class SystemClass {
 
   /* Debug DXGI */
   void ReportLiveObjects() {
-    Debug(LOG_INFO)("=====A=====");
+    LOG(LOG_INFO)("=====A=====");
     dxgi_debug_->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-    Debug(LOG_INFO)("=====B=====");
+    LOG(LOG_INFO)("=====B=====");
   }
 
  private:
@@ -109,7 +109,7 @@ class SystemClass {
   LARGE_INTEGER last_frame_time_;
   LARGE_INTEGER current_frame_time_;
   ULONG frame_count_since_last_frame_ = 0UL;
-  Utils::SlideAverage<ULONG> fps_slide_average_;
+  utils::SlideAverage<ULONG> fps_slide_average_;
 
   /* CPU */
   BOOL cpu_readable_ = TRUE;

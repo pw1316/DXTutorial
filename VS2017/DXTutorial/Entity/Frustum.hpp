@@ -2,7 +2,7 @@
 #define __ENTITY_FRUSTUM__
 #include <DirectXMath.h>
 
-#include <Utils/Range.hpp>
+#include <utils/range.h>
 
 namespace naiive::Entity {
 class FrustumWorld {
@@ -47,7 +47,7 @@ class FrustumWorld {
   }
 
   BOOL Check(const DirectX::XMFLOAT3& p) {
-    for (auto i : Utils::Range(6)) {
+    for (auto i : utils::Range(6)) {
       auto xmres =
           DirectX::XMPlaneDotCoord(m_plane[i], DirectX::XMLoadFloat3(&p));
       FLOAT res;
