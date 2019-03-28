@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Manager">
-      <UniqueIdentifier>{a46fec6d-e238-494f-a814-42e762680067}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Res">
       <UniqueIdentifier>{7b21fdbd-504d-436f-baa0-7b6537520ae2}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,9 @@
     <Filter Include="directx">
       <UniqueIdentifier>{ed01deaa-94c9-4b98-89ca-8401794a75c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="manager">
+      <UniqueIdentifier>{a46fec6d-e238-494f-a814-42e762680067}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -43,18 +43,6 @@
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\InputManager.hpp">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\GraphicsManager.hpp">
-      <Filter>Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectX\DDSTextureLoader.h">
-      <Filter>directx</Filter>
-    </ClInclude>
-    <ClInclude Include="Manager\SoundManager.hpp">
-      <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="core\application.h">
       <Filter>core</Filter>
@@ -95,20 +83,20 @@
     <ClInclude Include="entity\model.h">
       <Filter>entity</Filter>
     </ClInclude>
+    <ClInclude Include="directx\DDSTextureLoader.h">
+      <Filter>directx</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\input_manager.h">
+      <Filter>manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\sound_manager.h">
+      <Filter>manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager\graphics_manager.h">
+      <Filter>manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Manager\GraphicsManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\InputManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectX\DDSTextureLoader.cpp">
-      <Filter>directx</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager\SoundManager.cpp">
-      <Filter>Manager</Filter>
-    </ClCompile>
     <ClCompile Include="core\application.cc">
       <Filter>core</Filter>
     </ClCompile>
@@ -129,6 +117,18 @@
     </ClCompile>
     <ClCompile Include="entity\model.cc">
       <Filter>entity</Filter>
+    </ClCompile>
+    <ClCompile Include="directx\DDSTextureLoader.cpp">
+      <Filter>directx</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\input_manager.cc">
+      <Filter>manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\sound_manager.cc">
+      <Filter>manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager\graphics_manager.cc">
+      <Filter>manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

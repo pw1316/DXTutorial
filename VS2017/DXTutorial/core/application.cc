@@ -24,9 +24,9 @@ SOFTWARE.
 #include "application.h"
 
 #include <core/system.h>
-#include <Manager/GraphicsManager.hpp>
-#include <Manager/InputManager.hpp>
-#include <Manager/SoundManager.hpp>
+#include <manager/graphics_manager.h>
+#include <manager/input_manager.h>
+#include <manager/sound_manager.h>
 
 #ifndef NAIIVE_NO_MENU
 #define NAIIVE_NO_MENU 1
@@ -39,9 +39,9 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
   LoadString(hinstance, IDS_WINDOW_CLASS, window_class_, kMaxLoadString);
   InitializeWindowClass(hinstance, command_show);
   InitializeWindow(hinstance, command_show);
-  Manager::InputManager().Initialize(hwnd_, width_, height_);
-  Manager::SoundManager().Initialize(hwnd_, width_, height_);
-  Manager::GraphicsManager().Initialize(hwnd_, width_, height_);
+  manager::InputManager().Initialize(hwnd_, width_, height_);
+  manager::SoundManager().Initialize(hwnd_, width_, height_);
+  manager::GraphicsManager().Initialize(hwnd_, width_, height_);
 
   MSG msg;
   ZeroMemory(&msg, sizeof(MSG));
@@ -55,28 +55,28 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
       DispatchMessage(&msg);
     }
     /* Input */
-    if (!Manager::InputManager().OnUpdate()) {
+    if (!manager::InputManager().OnUpdate()) {
       break;
     }
-    if (Manager::InputManager().IsKeyDown(DIK_ESCAPE)) {
+    if (manager::InputManager().IsKeyDown(DIK_ESCAPE)) {
       break;
     }
     /* Graphics */
-    if (!Manager::GraphicsManager().OnUpdate()) {
+    if (!manager::GraphicsManager().OnUpdate()) {
       break;
     }
   }
 
-  Manager::GraphicsManager().Shutdown();
-  Manager::SoundManager().Shutdown();
-  Manager::InputManager().Shutdown();
+  manager::GraphicsManager().Shutdown();
+  manager::SoundManager().Shutdown();
+  manager::InputManager().Shutdown();
   ShutdownWindow();
   ShutdownWindowClass();
 }
 
 void ApplicationClass::MessageHandler(HWND hwnd, UINT message, WPARAM wparam,
                                       LPARAM lparam) {
-  Manager::GraphicsManager().MessageHandler(hwnd, message, wparam, lparam);
+  manager::GraphicsManager().MessageHandler(hwnd, message, wparam, lparam);
 }
 
 LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
@@ -139,8 +139,8 @@ LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
   return DefWindowProc(hwnd, message, wparam, lparam);
 }
 
-INT_PTR ApplicationClass::About(HWND hwnd, UINT message,
-                                              WPARAM wparam, LPARAM lparam) {
+INT_PTR ApplicationClass::About(HWND hwnd, UINT message, WPARAM wparam,
+                                LPARAM lparam) {
   UNREFERENCED_PARAMETER(lparam);
   switch (message) {
     case WM_INITDIALOG:
@@ -156,7 +156,7 @@ INT_PTR ApplicationClass::About(HWND hwnd, UINT message,
 }
 
 void ApplicationClass::InitializeWindowClass(HINSTANCE hinstance,
-                                                           INT command_show) {
+                                             INT command_show) {
   UNREFERENCED_PARAMETER(command_show);
   HRESULT hr = S_OK;
   WNDCLASSEX wndclassex;
@@ -186,8 +186,7 @@ void ApplicationClass::ShutdownWindowClass() {
   UnregisterClass(window_class_, hinstance);
 }
 
-void ApplicationClass::InitializeWindow(HINSTANCE hinstance,
-                                                      INT command_show) {
+void ApplicationClass::InitializeWindow(HINSTANCE hinstance, INT command_show) {
   HRESULT hr = S_OK;
   DWORD window_style =
       WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX;
