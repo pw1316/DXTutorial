@@ -27,8 +27,8 @@ SOFTWARE.
 #include <vector>
 
 #include <DirectXMath.h>
-#include <d3d11.h>
-#include <dxgi.h>
+#include <d3d11_4.h>
+#include <dxgi1_6.h>
 
 #include <core/iview.h>
 

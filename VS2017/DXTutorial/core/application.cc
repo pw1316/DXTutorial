@@ -47,7 +47,7 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
   ZeroMemory(&msg, sizeof(MSG));
   while (msg.message != WM_QUIT) {
     System().CountFrame();
-    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 #if not NAIIVE_NO_MENU
       TranslateAccelerator(hwnd_, haccel_, &msg);
 #endif

@@ -185,7 +185,7 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
   swap_chain_desc.Windowed = TRUE;
   swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
   swap_chain_desc.Flags = 0;  // No Advanced Flags
-  D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_0;
+  D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_1;
   hr = D3D11CreateDeviceAndSwapChain(
       nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG,
       &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain_,

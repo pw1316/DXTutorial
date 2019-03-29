@@ -27,7 +27,7 @@ SOFTWARE.
 #include <vector>
 
 #include <DirectXMath.h>
-#include <d3d11.h>
+#include <d3d11_4.h>
 
 #include <3rdparty/include/tiny_obj_loader.h>
 #include <entity/bounding_box.h>
