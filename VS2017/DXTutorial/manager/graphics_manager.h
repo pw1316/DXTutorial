@@ -120,7 +120,7 @@ class GraphicsManagerClass : public core::IView {
     device_context_->ClearDepthStencilView(depth_stencil_view_,
                                            D3D11_CLEAR_DEPTH, 1.0f, 0);
   }
-  void EndScene() { swap_chain_->Present(0, 0); }
+  void EndScene() { swap_chain_->Present(1, 0); }
 
   /* D3D Basic */
   IDXGISwapChain* swap_chain_ = nullptr;

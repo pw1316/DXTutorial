@@ -39,6 +39,8 @@ class Model3D {
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT2 uv;
     DirectX::XMFLOAT3 normal;
+    DirectX::XMFLOAT3 tangent;
+    DirectX::XMFLOAT3 binormal;
   };
   struct CBTransformType {
     DirectX::XMFLOAT4X4 world;
@@ -100,7 +102,8 @@ class Model3D {
   ID3D11Buffer* const_buffer_transform_ = nullptr;
   ID3D11Buffer* const_buffer_camera_light_ = nullptr;
   ID3D11Buffer* const_buffer_material_ = nullptr;
-  ID3D11ShaderResourceView* shader_resource_texture_ = nullptr;
+  ID3D11ShaderResourceView* shader_resource_texture_[3] = {nullptr, nullptr,
+                                                           nullptr};
   ID3D11SamplerState* sampler_state_ = nullptr;
   BoundingBox3D aabb_;
 

@@ -56,7 +56,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
 
   camera_.SetPos(0.0f, 2.0f, -10.0f);
 
-  model_ = new naiive::entity::Model3D("Res/sphere");
+  model_ = new naiive::entity::Model3D("res/sphere");
   model_->Initialize(device_);
   model_dup_.resize(1000);
   for (auto&& pos : model_dup_) {

@@ -36,12 +36,16 @@ struct VertexIn {
   float4 pos : POSITION;
   float2 uv : TEXCOORD0;
   float3 normal : NORMAL;
+  float3 tangent : TANGENT;
+  float3 binormal : BINORMAL;
 };
 
 struct VertexOut {
   float4 pos : SV_POSITION;
   float2 uv : TEXCOORD0;
   float3 normal : NORMAL;
+  float3 tangent : TANGENT;
+  float3 binormal : BINORMAL;
   float3 pos_world : TEXCOORD1;
 };
 
@@ -55,5 +59,7 @@ VertexOut main(VertexIn vin) {
   vout.pos = mul(pos, MatrixProj);
   vout.uv = vin.uv;
   vout.normal = normalize(mul(vin.normal, (float3x3)MatrixWorld));
+  vout.tangent = normalize(mul(vin.tangent, (float3x3)MatrixWorld));
+  vout.binormal = normalize(mul(vin.binormal, (float3x3)MatrixWorld));
   return vout;
 }

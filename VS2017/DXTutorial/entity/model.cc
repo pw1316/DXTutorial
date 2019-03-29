@@ -117,7 +117,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
 
   context->PSSetConstantBuffers(0, 1, &const_buffer_material_);
   context->PSSetConstantBuffers(1, 1, &const_buffer_camera_light_);
-  context->PSSetShaderResources(0, 1, &shader_resource_texture_);
+  context->PSSetShaderResources(0, 3, shader_resource_texture_);
   context->PSSetSamplers(0, 1, &sampler_state_);
   context->PSSetShader(pixel_shader_, nullptr, 0);
 
@@ -130,7 +130,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
 
   TinyObj obj;
   hr = tinyobj::LoadObj(&obj.attr, &obj.shapes, &obj.materials, nullptr,
-                        nullptr, (name_ + ".obj").c_str(), "Res/", true)
+                        nullptr, (name_ + ".obj").c_str(), "res/", true)
            ? S_OK
            : E_FAIL;
   FAILTHROW;
@@ -163,6 +163,31 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
       vertices[3 * triId + j].normal = {x, y, -z};
       indices[3 * triId + j] = 3 * triId + j;
     }
+    /* Calculate T and B */
+    FLOAT du1 = vertices[3 * triId + 1].uv.x - vertices[3 * triId].uv.x;
+    FLOAT dv1 = vertices[3 * triId + 1].uv.y - vertices[3 * triId].uv.y;
+    FLOAT du2 = vertices[3 * triId + 2].uv.x - vertices[3 * triId].uv.x;
+    FLOAT dv2 = vertices[3 * triId + 2].uv.y - vertices[3 * triId].uv.y;
+    FLOAT dx1 = vertices[3 * triId + 1].pos.x - vertices[3 * triId].pos.x;
+    FLOAT dy1 = vertices[3 * triId + 1].pos.y - vertices[3 * triId].pos.y;
+    FLOAT dz1 = vertices[3 * triId + 1].pos.z - vertices[3 * triId].pos.z;
+    FLOAT dx2 = vertices[3 * triId + 2].pos.x - vertices[3 * triId].pos.x;
+    FLOAT dy2 = vertices[3 * triId + 2].pos.y - vertices[3 * triId].pos.y;
+    FLOAT dz2 = vertices[3 * triId + 2].pos.z - vertices[3 * triId].pos.z;
+    FLOAT coef = 1.0f / (du1 * dv2 - du2 * dv1);
+    DirectX::XMFLOAT3X3 lhs = {dv2, -dv1, 0, -du2, du1, 0, 0, 0, 0};
+    DirectX::XMFLOAT3X3 rhs = {dx1, dy1, dz1, dx2, dy2, dz2, 0, 0, 0};
+    auto xmresult =
+        coef * DirectX::XMLoadFloat3x3(&lhs) * DirectX::XMLoadFloat3x3(&rhs);
+    DirectX::XMStoreFloat3(&vertices[3 * triId].tangent,
+                           DirectX::XMVector3Normalize(xmresult.r[0]));
+    DirectX::XMStoreFloat3(&vertices[3 * triId].binormal,
+                           DirectX::XMVector3Normalize(xmresult.r[1]));
+
+    vertices[3 * triId + 1].tangent = vertices[3 * triId].tangent;
+    vertices[3 * triId + 1].binormal = vertices[3 * triId].binormal;
+    vertices[3 * triId + 2].tangent = vertices[3 * triId].tangent;
+    vertices[3 * triId + 2].binormal = vertices[3 * triId].binormal;
   }
   // vertex_number_ = 3;
   // std::vector<VBType> vertices(vertex_number_);
@@ -254,9 +279,21 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   auto texture_name = name_ + "_stone.dds";
   WCHAR texture_name_l[128] = {0};
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
-                      (int)texture_name.size(), texture_name_l, 128);
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
   DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
-                                    &shader_resource_texture_);
+                                    &shader_resource_texture_[0]);
+  
+  texture_name = name_ + "_stone_bump.dds";
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
+                                    &shader_resource_texture_[1]);
+  
+  texture_name = name_ + "_dirt.dds";
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
+                                    &shader_resource_texture_[2]);
   FAILTHROW;
 
   /* =====SamplerState===== */
@@ -278,7 +315,9 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
 }
 void Model3D::ShutdownBuffer() {
   SafeRelease(&sampler_state_);
-  SafeRelease(&shader_resource_texture_);
+  SafeRelease(&shader_resource_texture_[2]);
+  SafeRelease(&shader_resource_texture_[1]);
+  SafeRelease(&shader_resource_texture_[0]);
   SafeRelease(&const_buffer_material_);
   SafeRelease(&const_buffer_camera_light_);
   SafeRelease(&const_buffer_transform_);
@@ -290,8 +329,8 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   ID3D10Blob* blob = nullptr;
-  const UINT layout_number = 3;
-  D3D11_INPUT_ELEMENT_DESC layout[layout_number];
+  const UINT kNumLayout = 5;
+  D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
 
   UINT shader_flag = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
                      D3DCOMPILE_SKIP_OPTIMIZATION;
@@ -313,6 +352,7 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   layout[0].AlignedByteOffset = 0;
   layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[0].InstanceDataStepRate = 0;
+
   layout[1].SemanticName = "TEXCOORD";
   layout[1].SemanticIndex = 0;
   layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
@@ -320,6 +360,7 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
   layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[1].InstanceDataStepRate = 0;
+
   layout[2].SemanticName = "NORMAL";
   layout[2].SemanticIndex = 0;
   layout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -327,9 +368,24 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
   layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[2].InstanceDataStepRate = 0;
-  hr =
-      device->CreateInputLayout(layout, layout_number, blob->GetBufferPointer(),
-                                blob->GetBufferSize(), &input_layout_);
+
+  layout[3].SemanticName = "TANGENT";
+  layout[3].SemanticIndex = 0;
+  layout[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[3].InputSlot = 0;
+  layout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[3].InstanceDataStepRate = 0;
+
+  layout[4].SemanticName = "BINORMAL";
+  layout[4].SemanticIndex = 0;
+  layout[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[4].InputSlot = 0;
+  layout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[4].InstanceDataStepRate = 0;
+  hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
+                                 blob->GetBufferSize(), &input_layout_);
   FAILTHROW;
 
   SafeRelease(&blob);

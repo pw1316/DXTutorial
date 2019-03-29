@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-Texture2D shaderTexture : register(t0);
+Texture2D shaderTexture[3] : register(t0);
 SamplerState SampleType;
 
 cbuffer consts0 : register(b0) {
@@ -40,15 +40,23 @@ struct PixelIn {
   float4 pos : SV_POSITION;
   float2 uv : TEXCOORD0;
   float3 normal : NORMAL;
+  float3 tangent : TANGENT;
+  float3 binormal : BINORMAL;
   float3 pos_world : TEXCOORD1;
 };
 
 float4 main(PixelIn pin) : SV_TARGET {
-  float4 color = shaderTexture.Sample(SampleType, pin.uv);
+  float4 color1 = shaderTexture[0].Sample(SampleType, pin.uv);
+  float4 color2 = shaderTexture[2].Sample(SampleType, pin.uv);
+  float4 color = 2 * pow(abs(color1), 2.2) * pow(abs(color2), 2.2);
   float3 view = normalize(CameraPos.xyz - pin.pos_world);
   float3 ld = normalize(LightDir);
   float3 normal = normalize(pin.normal);
-  color = color * saturate(Ka + Kd * saturate(dot(normal, -ld))) +
+  float4 bump = shaderTexture[1].Sample(SampleType, pin.uv) * 2.0 - 1.0;
+  normal =
+      normalize(bump.x * pin.tangent + bump.y * pin.binormal + bump.z * normal);
+  color = color * (Ka + Kd * saturate(dot(normal, -ld))) +
           Ks * pow(saturate(dot(normalize(view - ld), normal)), Ns);
+  color = pow(abs(color), 1.0 / 2.2);
   return color;
 }
