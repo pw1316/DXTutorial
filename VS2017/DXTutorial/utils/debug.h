@@ -23,6 +23,7 @@ SOFTWARE.
 
 #ifndef __UTILS_DEBUG__
 #define __UTILS_DEBUG__
+#ifndef NDEBUG
 #include <iostream>
 #include <sstream>
 
@@ -63,13 +64,13 @@ class DebugClass {
 };
 }  // namespace naiive::utils
 
-#ifdef NDEBUG
-#define LOG(level)
-#else
 #define LOG(level)                              \
   naiive::utils::DebugClass(__FILE__, __LINE__, \
                             naiive::utils::DebugClass::LogLevel::level)
+#else
+#define LOG(level)
 #endif
+
 #define LOG_IF(level, expression) \
   if ((expression)) LOG(level)
 

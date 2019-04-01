@@ -45,15 +45,20 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
 
   MSG msg;
   ZeroMemory(&msg, sizeof(MSG));
-  while (msg.message != WM_QUIT) {
-    System().CountFrame();
+  while (TRUE) {
+    BOOL is_quit = FALSE;
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+      if (msg.message == WM_QUIT) {
+        is_quit = TRUE;
+        break;
+      }
 #if not NAIIVE_NO_MENU
       TranslateAccelerator(hwnd_, haccel_, &msg);
 #endif
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
+    if (is_quit) break;
     /* Input */
     if (!manager::InputManager().OnUpdate()) {
       break;
@@ -65,6 +70,7 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
     if (!manager::GraphicsManager().OnUpdate()) {
       break;
     }
+    System().CountFrame();
   }
 
   manager::GraphicsManager().Shutdown();
