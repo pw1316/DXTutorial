@@ -42,8 +42,8 @@ class InputManagerClass : public core::IView {
   virtual void Shutdown() override;
   virtual BOOL OnUpdate() override;
 
-  BOOL IsKeyDown(std::remove_const<decltype(kNumKeys)>::type key) {
-    assert(key < 256);
+  BOOL IsKeyDown(UINT key) {
+    ASSERT(key < kNumKeys)("Invalid key");
     return keyboard_state_[key] & 0x80;
   }
 

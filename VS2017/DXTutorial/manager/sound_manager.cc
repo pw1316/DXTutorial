@@ -26,8 +26,6 @@ SOFTWARE.
 #include <fstream>
 #include <vector>
 
-#include <utils/debug.h>
-
 namespace naiive::manager {
 void SoundManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   UNREFERENCED_PARAMETER(width);

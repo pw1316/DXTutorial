@@ -27,7 +27,6 @@ SOFTWARE.
 #include <manager/graphics_manager.h>
 #include <manager/input_manager.h>
 #include <manager/sound_manager.h>
-#include <utils/debug.h>
 
 #ifndef NAIIVE_NO_MENU
 #define NAIIVE_NO_MENU 1

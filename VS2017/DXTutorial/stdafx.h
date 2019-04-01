@@ -36,10 +36,77 @@ SOFTWARE.
 #include <assert.h>
 
 /* C++ libs */
+#include <iostream>
+#include <sstream>
 #include <type_traits>
 
 /* 3rdparty libs */
 #include <mmreg.h>
+
+#ifndef NDEBUG
+namespace noaccess {
+class DebugClass {
+  typedef std::ios_base&(__cdecl* ManipulatorType)(std::ios_base&);
+
+ public:
+  enum class LogLevel : int { LOG_INFO = 0, LOG_WARN = 1, LOG_ERROR = 2 };
+  DebugClass(const char* file_name, int line_number, LogLevel log_level)
+      : file_name_(file_name),
+        line_number_(line_number),
+        log_level_(log_level) {}
+  ~DebugClass() {
+    std::stringstream ss;
+    ss << "IWE"[static_cast<int>(log_level_)] << " " << file_name_ << ":"
+       << line_number_ << "] " << ss_.str();
+    std::cout << ss.str();
+    std::cerr << ss.str();
+    if (log_level_ == LogLevel::LOG_ERROR) {
+      std::abort();
+    }
+  }
+
+  template <class _Arg, class... _Args>
+  void operator()(_Arg&& arg, _Args&&... args) {
+    if constexpr (sizeof...(args) > 0) {
+      ss_ << arg << " ";
+      (*this)(std::forward<_Args>(args)...);
+    } else {
+      ss_ << arg << "\n";
+    }
+  }
+
+  // No space after manipulator
+  template <class... _Args>
+  void operator()(ManipulatorType&& arg, _Args&&... args) {
+    if constexpr (sizeof...(args) > 0) {
+      ss_ << arg;
+      (*this)(std::forward<_Args>(args)...);
+    } else {
+      ss_ << arg << "\n";
+    }
+  }
+
+ private:
+  std::stringstream ss_;
+  std::string file_name_;
+  int line_number_;
+  LogLevel log_level_;
+};
+}  // namespace noaccess
+
+#define LOG(level)                         \
+  noaccess::DebugClass(__FILE__, __LINE__, \
+                       noaccess::DebugClass::LogLevel::level)
+#define LOG_IF(level, expression) \
+  if ((expression)) LOG(level)
+#else
+#define LOG(level)
+#define LOG_IF(level, expression)
+#endif
+#define ASSERT(expression) LOG_IF(LOG_ERROR, !(expression))
+#define ASSERT_EQ(a, b) ASSERT((a) == (b))
+// TODO DEPRECATED
+#define FAILTHROW LOG_IF(LOG_ERROR, FAILED((hr)))
 
 inline HINSTANCE HinstanceFromHwnd(HWND hwnd) {
   return reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hwnd, GWLP_HINSTANCE));

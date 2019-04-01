@@ -22,3 +22,17 @@ SOFTWARE.
 ==============================================================================*/
 
 #include "stdafx.h"
+
+#ifndef NDEBUG
+namespace noaccess {
+auto cli_console = []() {
+  AllocConsole();
+  SetConsoleTitle("Debug Window");
+  FILE* fp;
+  freopen_s(&fp, "CONIN$", "r", stdin);
+  freopen_s(&fp, "CONOUT$", "w", stderr);
+  std::ios::sync_with_stdio();
+  return 0;
+}();
+}  // namespace noaccess
+#endif

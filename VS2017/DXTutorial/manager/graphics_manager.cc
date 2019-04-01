@@ -111,7 +111,7 @@ BOOL GraphicsManagerClass::OnUpdate() {
   ss << "MouseX: " << x << "\n";
   ss << "MouseY: " << y << "\n";
   ss << "FPS: " << core::System().Fps() << "\n";
-  ss << "CPU: " << core::System().get_cpu_usage() << "%\n";
+  ss << "CPU: " << core::System().CpuUsage() << "%\n";
   ss << "Frustum Culling: " << frustum_visible_models << "/" << total_models
      << "\n";
   gui_->Render(device_, device_context_, ss.str(), {0, 1}, matrix_orthogonal_);

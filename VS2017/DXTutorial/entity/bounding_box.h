@@ -28,8 +28,6 @@ SOFTWARE.
 
 #include <DirectXMath.h>
 
-#include <utils/debug.h>
-
 namespace naiive::entity {
 class BoundingBox3D {
  public:

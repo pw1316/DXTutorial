@@ -27,11 +27,12 @@ SOFTWARE.
 #include <string>
 
 #include <Pdh.h>
-#include <dxgidebug.h>
 
 #include <utils/slide_average.h>
 
 namespace naiive::core {
+// System information of the engine.
+// Singleton using friend function
 class SystemClass {
   friend SystemClass& System();
   static constexpr char kCpuQuery[] = "\\Processor(_Total)\\% processor time";
@@ -44,7 +45,7 @@ class SystemClass {
   void CountFrame();
 
   ULONG Fps() { return fps_slide_average_.Average(); }
-  LONG get_cpu_usage() { return cpu_readable_ ? cpu_usage_ : 0L; }
+  LONG CpuUsage() { return cpu_readable_ ? cpu_usage_ : 0L; }
 
  private:
   SystemClass();

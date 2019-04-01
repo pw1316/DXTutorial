@@ -23,7 +23,6 @@ SOFTWARE.
 
 #include <core/application.h>
 #include <core/system.h>
-#include <utils/debug.h>
 
 int APIENTRY WinMain(_In_ HINSTANCE hinstance,
                      _In_opt_ HINSTANCE previous_hinstance,
@@ -32,7 +31,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hinstance,
   UNREFERENCED_PARAMETER(command_line);
 
   auto&& sys = naiive::core::System();
-  LOG(LOG_INFO)("System setup done at ", sys.GameTime());
+  LOG(LOG_INFO)("System setup done at", sys.GameTime());
   auto&& app = naiive::core::Application(1024, 768);
   app.Run(hinstance, command_show);
   return 0;

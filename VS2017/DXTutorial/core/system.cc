@@ -23,8 +23,6 @@ SOFTWARE.
 
 #include "system.h"
 
-#include <utils/debug.h>
-
 namespace naiive::core {
 FLOAT SystemClass::GameTime() {
   UpdateTime();
@@ -40,10 +38,13 @@ void SystemClass::CountFrame() {
     last_frame_time_ = current_frame_time_;
 
     if (cpu_readable_) {
+      HRESULT hr = S_OK;
       PDH_FMT_COUNTERVALUE cpu_counter_value;
-      PdhCollectQueryData(cpu_hquery_);
-      PdhGetFormattedCounterValue(cpu_hcounter, PDH_FMT_LONG, nullptr,
-                                  &cpu_counter_value);
+      hr = PdhCollectQueryData(cpu_hquery_);
+      ASSERT(SUCCEEDED(hr))("Collect CPU data failed", std::hex, hr);
+      hr = PdhGetFormattedCounterValue(cpu_hcounter, PDH_FMT_LONG, nullptr,
+                                       &cpu_counter_value);
+      LOG_IF(LOG_WARN, FAILED(hr))("Get CPU data failed", std::hex, hr);
       cpu_usage_ = cpu_counter_value.longValue;
     }
   }

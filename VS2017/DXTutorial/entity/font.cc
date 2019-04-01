@@ -30,8 +30,6 @@ SOFTWARE.
 
 #include <DirectX/DDSTextureLoader.h>
 
-#include <utils/debug.h>
-
 namespace naiive::entity {
 void Font::Initialize(ID3D11Device* device) {
   HRESULT hr = S_OK;
