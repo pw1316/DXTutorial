@@ -40,7 +40,8 @@ class DebugClass {
     ss << "["
        << "IWE"[static_cast<int>(log_level_)] << "] " << file_name_ << " "
        << line_number_ << " " << ss_.str();
-    OutputDebugString(ss.str().c_str());
+    std::cout << ss.str();
+    std::cerr << ss.str();
     if (log_level_ == LogLevel::LOG_ERROR) {
       std::abort();
     }

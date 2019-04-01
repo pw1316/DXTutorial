@@ -112,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="main.cc" />
     <ClCompile Include="stdafx.cc" />
+    <ClCompile Include="utils\debug.cc">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DXTutorial.rc">
