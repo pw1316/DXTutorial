@@ -24,11 +24,6 @@ SOFTWARE.
 #include "system.h"
 
 namespace naiive::core {
-FLOAT SystemClass::GameTime() {
-  UpdateTime();
-  return DeltaTime(start_time_, current_frame_time_);
-}
-
 void SystemClass::CountFrame() {
   ++frame_count_since_last_frame_;
   UpdateTime();

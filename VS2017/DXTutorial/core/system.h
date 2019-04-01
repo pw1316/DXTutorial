@@ -41,7 +41,10 @@ class SystemClass {
   void UpdateTime() {
     QueryPerformanceCounter(&current_frame_time_);  // Never fail
   }
-  FLOAT GameTime();
+  FLOAT GameTime() {
+    UpdateTime();
+    return DeltaTime(start_time_, current_frame_time_);
+  }
   void CountFrame();
 
   ULONG Fps() { return fps_slide_average_.Average(); }
