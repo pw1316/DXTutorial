@@ -34,7 +34,6 @@ class SlideAverage {
     sum_ = 0;
   }
   void Add(_Type i) {
-    _Type f = static_cast<_Type>(i);
     if (cnt_ < 8UL) {
       cache_[tail_] = i;
       tail_ = (tail_ + 1UL) & 7UL;

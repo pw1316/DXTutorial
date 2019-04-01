@@ -47,9 +47,16 @@ class IView {
   virtual void Initialize(HWND hwnd, UINT width, UINT height) = 0;
   virtual void Shutdown() = 0;
   virtual BOOL OnUpdate() = 0;
-  virtual void OnMessage(const Message& message) {}
+  virtual void OnMessage(const Message& message) {
+    UNREFERENCED_PARAMETER(message);
+  }
   virtual void CALLBACK MessageHandler(HWND hwnd, UINT message, WPARAM wparam,
-                                       LPARAM lparam) {}
+                                       LPARAM lparam) {
+    UNREFERENCED_PARAMETER(hwnd);
+    UNREFERENCED_PARAMETER(message);
+    UNREFERENCED_PARAMETER(wparam);
+    UNREFERENCED_PARAMETER(lparam);
+  }
 
  protected:
   std::set<std::string> messages_;

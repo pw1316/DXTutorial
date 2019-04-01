@@ -27,6 +27,7 @@ SOFTWARE.
 #include <manager/graphics_manager.h>
 #include <manager/input_manager.h>
 #include <manager/sound_manager.h>
+#include <utils/debug.h>
 
 #ifndef NAIIVE_NO_MENU
 #define NAIIVE_NO_MENU 1
@@ -34,7 +35,6 @@ SOFTWARE.
 
 namespace naiive::core {
 void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
-  HRESULT hr = S_OK;
   LoadString(hinstance, IDS_APP_TITLE, app_title_, kMaxLoadString);
   LoadString(hinstance, IDS_WINDOW_CLASS, window_class_, kMaxLoadString);
   InitializeWindowClass(hinstance, command_show);
@@ -87,7 +87,6 @@ void ApplicationClass::MessageHandler(HWND hwnd, UINT message, WPARAM wparam,
 
 LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
                                   LPARAM lparam) {
-  auto hinstance = HinstanceFromHwnd(hwnd);
   switch (message) {
     case WM_CREATE: {
       auto create_struct = reinterpret_cast<LPCREATESTRUCT>(lparam);
@@ -116,6 +115,7 @@ LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
       int command_id = LOWORD(wparam);
       switch (command_id) {
         case IDM_ABOUT: {
+          auto hinstance = HinstanceFromHwnd(hwnd);
           auto dialog = CreateDialog(
               hinstance, MAKEINTRESOURCE(IDD_NAIIVE_ABOUT), hwnd, About);
           ShowWindow(dialog, SW_SHOW);

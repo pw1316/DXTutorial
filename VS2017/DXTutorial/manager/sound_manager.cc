@@ -26,8 +26,12 @@ SOFTWARE.
 #include <fstream>
 #include <vector>
 
+#include <utils/debug.h>
+
 namespace naiive::manager {
 void SoundManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
+  UNREFERENCED_PARAMETER(width);
+  UNREFERENCED_PARAMETER(height);
   HRESULT hr = S_OK;
   hr = DirectSoundCreate8(nullptr, &dsound_, nullptr);
   FAILTHROW;

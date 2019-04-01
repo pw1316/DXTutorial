@@ -68,15 +68,17 @@ class DebugClass {
 #define LOG(level)                              \
   naiive::utils::DebugClass(__FILE__, __LINE__, \
                             naiive::utils::DebugClass::LogLevel::level)
-#else
-#define LOG(level)
-#endif
-
 #define LOG_IF(level, expression) \
   if ((expression)) LOG(level)
+#else
+#define LOG(level)
+#define LOG_IF(level, expression)
+#endif
 
 #define CHECK(expression) \
   LOG_IF(LOG_ERROR, !(expression))("Check failed: " #expression " ")
 
 #define CHECK_EQ(a, b) CHECK((a) == (b))
+
+#define FAILTHROW LOG_IF(LOG_ERROR, FAILED((hr)))
 #endif

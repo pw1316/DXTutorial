@@ -29,16 +29,17 @@ SOFTWARE.
 #define NOMINMAX
 #define DIRECTINPUT_VERSION 0x0800
 
-// Windows Header Files:
+/* Windows Header Files: */
 #include <Windows.h>
+
+/* C libs */
 #include <assert.h>
-#include <mmreg.h>
+
+/* C++ libs */
 #include <type_traits>
 
-#define FAILTHROW   \
-  if (FAILED(hr)) { \
-    throw 1;        \
-  }
+/* 3rdparty libs */
+#include <mmreg.h>
 
 inline HINSTANCE HinstanceFromHwnd(HWND hwnd) {
   return reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hwnd, GWLP_HINSTANCE));

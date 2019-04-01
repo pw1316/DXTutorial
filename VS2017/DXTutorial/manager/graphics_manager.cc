@@ -33,7 +33,6 @@ SOFTWARE.
 
 namespace naiive::manager {
 void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
-  HRESULT hr = S_OK;
   /* Create SwapChain, Device and Context */
   InitializeDevice(hwnd, width, height);
 
@@ -199,6 +198,7 @@ void GraphicsManagerClass::ShutdownDevice() {
 }
 
 void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
+  UNREFERENCED_PARAMETER(hwnd);
   HRESULT hr = S_OK;
 
   /* Create RTV */
@@ -317,6 +317,7 @@ void GraphicsManagerClass::ShutdownOM() {
 
 void GraphicsManagerClass::InitializeRasterizer(HWND hwnd, UINT width,
                                                 UINT height) {
+  UNREFERENCED_PARAMETER(hwnd);
   HRESULT hr = S_OK;
 
   /* State */

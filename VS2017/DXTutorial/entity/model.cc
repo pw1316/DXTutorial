@@ -52,7 +52,6 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
                      const DirectX::XMFLOAT4X4& proj,
                      const DirectX::XMFLOAT4& camera_pos,
                      const DirectX::XMFLOAT3& dir) {
-  HRESULT hr = S_OK;
   D3D11_MAPPED_SUBRESOURCE mapped{};
 
   auto xmworld = DirectX::XMMatrixRotationRollPitchYaw(

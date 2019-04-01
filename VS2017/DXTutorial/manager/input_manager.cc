@@ -23,6 +23,8 @@ SOFTWARE.
 
 #include "input_manager.h"
 
+#include <utils/debug.h>
+
 namespace naiive::manager {
 void InputManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   HRESULT hr = S_OK;

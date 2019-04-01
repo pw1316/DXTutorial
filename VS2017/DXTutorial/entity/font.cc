@@ -30,6 +30,8 @@ SOFTWARE.
 
 #include <DirectX/DDSTextureLoader.h>
 
+#include <utils/debug.h>
+
 namespace naiive::entity {
 void Font::Initialize(ID3D11Device* device) {
   HRESULT hr = S_OK;
@@ -187,7 +189,6 @@ void Font::InitializeBuffer(ID3D11Device* device) {
   FAILTHROW;
 
   /* =====Texture===== */
-  ID3D11Resource* resource = nullptr;
   hr = DirectX::CreateDDSTextureFromFile(device, L"Res/font.dds", nullptr,
                                          &shader_resource_font_texture_);
   FAILTHROW;
