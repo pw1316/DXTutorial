@@ -34,73 +34,32 @@ SOFTWARE.
 namespace naiive::core {
 class SystemClass {
   friend SystemClass& System();
+  static constexpr char kCpuQuery[] = "\\Processor(_Total)\\% processor time";
 
  public:
-  FLOAT GameTime() {
-    QueryPerformanceCounter(&current_frame_time_);
-    return 1.0f * (current_frame_time_.QuadPart - start_time_.QuadPart) /
-           cpu_frequency_.QuadPart;
+  void UpdateTime() {
+    QueryPerformanceCounter(&current_frame_time_);  // Never fail
   }
-
-  void CountFrame() {
-    ++frame_count_since_last_frame_;
-    QueryPerformanceCounter(&current_frame_time_);
-    if (1.0f * (current_frame_time_.QuadPart - last_frame_time_.QuadPart) /
-            cpu_frequency_.QuadPart >
-        1.0f) {
-      fps_slide_average_.Add(frame_count_since_last_frame_);
-      frame_count_since_last_frame_ = 0UL;
-      last_frame_time_ = current_frame_time_;
-
-      if (cpu_readable_) {
-        PDH_FMT_COUNTERVALUE cpu_counter_value;
-        PdhCollectQueryData(cpu_hquery_);
-        PdhGetFormattedCounterValue(cpu_hcounter, PDH_FMT_LONG, nullptr,
-                                    &cpu_counter_value);
-        cpu_usage_ = cpu_counter_value.longValue;
-      }
-    }
-  }
+  FLOAT GameTime();
+  void CountFrame();
 
   ULONG Fps() { return fps_slide_average_.Average(); }
   LONG get_cpu_usage() { return cpu_readable_ ? cpu_usage_ : 0L; }
 
-  /* Debug DXGI */
-  void ReportLiveObjects() {
-    OutputDebugString("=====A=====\n");
-    dxgi_debug_->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-    OutputDebugString("=====B=====\n");
-  }
+  void ReportLiveObjects();  // Debug DXGI
 
  private:
-  SystemClass() {
-    QueryPerformanceFrequency(&cpu_frequency_);
-    QueryPerformanceCounter(&start_time_);
-    current_frame_time_ = last_frame_time_ = start_time_;
-
-    PDH_STATUS status;
-    status = PdhOpenQuery(NULL, 0, &cpu_hquery_);
-    if (status != ERROR_SUCCESS) {
-      cpu_readable_ = FALSE;
-    }
-    status = PdhAddCounter(cpu_hquery_,
-                           TEXT("\\Processor(_Total)\\% processor time"), 0,
-                           &cpu_hcounter);
-    if (status != ERROR_SUCCESS) {
-      cpu_readable_ = FALSE;
-    }
-
-    typedef HRESULT(WINAPI * funcdef)(const IID& iid, void** pp_debug);
-    dxgi_debug_module_ = LoadLibrary("Dxgidebug.dll");
-    ((funcdef)GetProcAddress(dxgi_debug_module_, "DXGIGetDebugInterface"))(
-        IID_PPV_ARGS(&dxgi_debug_));
-  }
+  SystemClass();
   ~SystemClass() {
     SafeRelease(&dxgi_debug_);
     FreeLibrary(dxgi_debug_module_);
     if (cpu_readable_) {
       PdhCloseQuery(cpu_hquery_);
     }
+  }
+
+  FLOAT DeltaTime(const LARGE_INTEGER& src, const LARGE_INTEGER& dst) {
+    return 1.0f * (dst.QuadPart - src.QuadPart) / cpu_frequency_.QuadPart;
   }
   /* Timing */
   LARGE_INTEGER cpu_frequency_;

@@ -75,10 +75,10 @@ class DebugClass {
 #define LOG_IF(level, expression)
 #endif
 
-#define CHECK(expression) \
-  LOG_IF(LOG_ERROR, !(expression))("Check failed: " #expression " ")
+#define ASSERT(expression) LOG_IF(LOG_ERROR, !(expression))
 
-#define CHECK_EQ(a, b) CHECK((a) == (b))
+#define ASSERT_EQ(a, b) ASSERT((a) == (b))
 
+/* TODO DEPRECATED */
 #define FAILTHROW LOG_IF(LOG_ERROR, FAILED((hr)))
 #endif

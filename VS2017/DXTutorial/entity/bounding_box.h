@@ -40,7 +40,7 @@ class BoundingBox3D {
     max_ = DirectX::XMFLOAT3(low, low, low);
   }
   const DirectX::XMFLOAT3& operator[](int i) const {
-    CHECK(i == 0 || i == 1);
+    ASSERT(i == 0 || i == 1);
     if (i == 0) {
       return min_;
     } else {
@@ -48,7 +48,7 @@ class BoundingBox3D {
     }
   }
   DirectX::XMFLOAT3& operator[](int i) {
-    CHECK(i == 0 || i == 1);
+    ASSERT(i == 0 || i == 1);
     if (i == 0) {
       return min_;
     } else {
