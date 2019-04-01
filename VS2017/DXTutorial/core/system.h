@@ -46,13 +46,9 @@ class SystemClass {
   ULONG Fps() { return fps_slide_average_.Average(); }
   LONG get_cpu_usage() { return cpu_readable_ ? cpu_usage_ : 0L; }
 
-  void ReportLiveObjects();  // Debug DXGI
-
  private:
   SystemClass();
   ~SystemClass() {
-    SafeRelease(&dxgi_debug_);
-    FreeLibrary(dxgi_debug_module_);
     if (cpu_readable_) {
       PdhCloseQuery(cpu_hquery_);
     }
@@ -74,10 +70,6 @@ class SystemClass {
   HQUERY cpu_hquery_ = nullptr;
   HCOUNTER cpu_hcounter = nullptr;
   LONG cpu_usage_ = 0L;
-
-  /* DXGI */
-  HMODULE dxgi_debug_module_ = nullptr;
-  IDXGIDebug* dxgi_debug_ = nullptr;
 };
 
 SystemClass& System();

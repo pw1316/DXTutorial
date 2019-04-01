@@ -49,14 +49,6 @@ void SystemClass::CountFrame() {
   }
 }
 
-void SystemClass::ReportLiveObjects() {
-  OutputDebugString("=====A=====\n");
-  HRESULT hr = S_OK;
-  hr = dxgi_debug_->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-  ASSERT(SUCCEEDED(hr))("Get DirectX objects failed");
-  OutputDebugString("=====B=====\n");
-}
-
 SystemClass::SystemClass() {
   HRESULT hr = S_OK;
   QueryPerformanceFrequency(&cpu_frequency_);  // Never fail
@@ -74,18 +66,6 @@ SystemClass::SystemClass() {
       cpu_readable_ = FALSE;
     }
   }
-
-  typedef HRESULT(WINAPI * funcdef)(const IID& iid, void** pp_debug);
-  dxgi_debug_module_ = LoadLibrary("Dxgidebug.dll");
-  hr = dxgi_debug_module_ == nullptr ? E_FAIL : S_OK;
-  ASSERT(SUCCEEDED(hr))("Load module \"Dxgidebug.dll\" failed");
-
-  auto dxgi_debug_function =
-      (funcdef)GetProcAddress(dxgi_debug_module_, "DXGIGetDebugInterface");
-  hr = dxgi_debug_function == nullptr ? E_FAIL : S_OK;
-  ASSERT(SUCCEEDED(hr))("Get address of \"DXGIGetDebugInterface\" failed");
-  hr = dxgi_debug_function(IID_PPV_ARGS(&dxgi_debug_));
-  ASSERT(SUCCEEDED(hr))("Get \"IDXGIDebug\" failed");
 }
 
 SystemClass& System() {

@@ -105,6 +105,7 @@ class GraphicsManagerClass : public core::IView {
   /* D3D Basic */
   void InitializeDevice(HWND hwnd, UINT width, UINT height);
   void ShutdownDevice();
+  void DebugDevice();
 
   /* Output Merger */
   void InitializeOM(HWND hwnd, UINT width, UINT height);
@@ -126,6 +127,7 @@ class GraphicsManagerClass : public core::IView {
   IDXGISwapChain* swap_chain_ = nullptr;
   ID3D11Device* device_ = nullptr;
   ID3D11DeviceContext* device_context_ = nullptr;
+  ID3D11Debug* debug_ = nullptr;
 
   /* Output Merger */
   ID3D11RenderTargetView* render_target_view_ = nullptr;

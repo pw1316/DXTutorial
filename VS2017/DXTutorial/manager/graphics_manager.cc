@@ -190,11 +190,21 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
       &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain_,
       &device_, nullptr, &device_context_);
   FAILTHROW;
+  hr = device_->QueryInterface(IID_PPV_ARGS(&debug_));
+  FAILTHROW;
 }
 void GraphicsManagerClass::ShutdownDevice() {
+  SafeRelease(&debug_);
   SafeRelease(&device_context_);
   SafeRelease(&device_);
   SafeRelease(&swap_chain_);
+}
+
+void GraphicsManagerClass::DebugDevice() {
+  OutputDebugString("=====A=====\n");
+  auto hr = debug_->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+  ASSERT(SUCCEEDED(hr))(hr);
+  OutputDebugString("=====B=====\n");
 }
 
 void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
