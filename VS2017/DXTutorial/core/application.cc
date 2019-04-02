@@ -28,16 +28,15 @@ SOFTWARE.
 #include <manager/input_manager.h>
 #include <manager/sound_manager.h>
 
-#ifndef NAIIVE_NO_MENU
-#define NAIIVE_NO_MENU 1
-#endif
-
 namespace naiive::core {
 void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
-  LoadString(hinstance, IDS_APP_TITLE, app_title_, kMaxLoadString);
-  LoadString(hinstance, IDS_WINDOW_CLASS, window_class_, kMaxLoadString);
-  InitializeWindowClass(hinstance, command_show);
-  InitializeWindow(hinstance, command_show);
+  INT int_res = 0;
+
+  int_res = LoadString(hinstance, IDS_APP_TITLE, app_title_, kMaxLoad);
+  LOG_IF(LOG_WARN, !int_res)("Missing app title");
+  int_res = LoadString(hinstance, IDS_WINDOW_CLASS, window_class_, kMaxLoad);
+  ASSERT(int_res)("Missing window class name");
+  Initialize(hinstance, command_show);
   manager::InputManager().Initialize(hwnd_, width_, height_);
   manager::SoundManager().Initialize(hwnd_, width_, height_);
   manager::GraphicsManager().Initialize(hwnd_, width_, height_);
@@ -51,9 +50,6 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
         is_quit = TRUE;
         break;
       }
-#if not NAIIVE_NO_MENU
-      TranslateAccelerator(hwnd_, haccel_, &msg);
-#endif
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
@@ -75,8 +71,7 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
   manager::GraphicsManager().Shutdown();
   manager::SoundManager().Shutdown();
   manager::InputManager().Shutdown();
-  ShutdownWindow();
-  ShutdownWindowClass();
+  Shutdown();
 }
 
 void ApplicationClass::MessageHandler(HWND hwnd, UINT message, WPARAM wparam,
@@ -87,13 +82,6 @@ void ApplicationClass::MessageHandler(HWND hwnd, UINT message, WPARAM wparam,
 LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
                                   LPARAM lparam) {
   switch (message) {
-    case WM_CREATE: {
-      auto create_struct = reinterpret_cast<LPCREATESTRUCT>(lparam);
-      SetWindowLongPtr(
-          hwnd, GWLP_USERDATA,
-          reinterpret_cast<LONG_PTR>(create_struct->lpCreateParams));
-      break;
-    }
     case WM_SYSCOMMAND: {
       switch (wparam & 0xFFF0) {
         case SC_MOVE:
@@ -109,29 +97,6 @@ LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
     case WM_NCRBUTTONDOWN: {
       return 0;
     }
-#if not NAIIVE_NO_MENU
-    case WM_COMMAND: {
-      int command_id = LOWORD(wparam);
-      switch (command_id) {
-        case IDM_ABOUT: {
-          auto hinstance = HinstanceFromHwnd(hwnd);
-          auto dialog = CreateDialog(
-              hinstance, MAKEINTRESOURCE(IDD_NAIIVE_ABOUT), hwnd, About);
-          ShowWindow(dialog, SW_SHOW);
-          break;
-        }
-        case IDM_EXIT: {
-          PostQuitMessage(0);
-          break;
-        }
-        default: {
-          Application().MessageHandler(hwnd, message, wparam, lparam);
-          break;
-        }
-      }
-      break;
-    }
-#endif
     case WM_DESTROY: {
       PostQuitMessage(0);
       break;
@@ -144,81 +109,55 @@ LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
   return DefWindowProc(hwnd, message, wparam, lparam);
 }
 
-INT_PTR ApplicationClass::About(HWND hwnd, UINT message, WPARAM wparam,
-                                LPARAM lparam) {
-  UNREFERENCED_PARAMETER(lparam);
-  switch (message) {
-    case WM_INITDIALOG:
-      return (INT_PTR)TRUE;
-    case WM_COMMAND:
-      if (LOWORD(wparam) == IDOK || LOWORD(wparam) == IDCANCEL) {
-        EndDialog(hwnd, LOWORD(wparam));
-        return (INT_PTR)TRUE;
-      }
-      break;
-  }
-  return (INT_PTR)FALSE;
-}
+void ApplicationClass::Initialize(HINSTANCE hinstance, INT command_show) {
+  ATOM atom_res = 0;
+  BOOL bool_res = TRUE;
 
-void ApplicationClass::InitializeWindowClass(HINSTANCE hinstance,
-                                             INT command_show) {
-  UNREFERENCED_PARAMETER(command_show);
-  HRESULT hr = S_OK;
+  hinstance_ = hinstance;
+
   WNDCLASSEX wndclassex;
   wndclassex.cbSize = sizeof(WNDCLASSEX);
   wndclassex.style = CS_HREDRAW | CS_VREDRAW;
   wndclassex.lpfnWndProc = WinProc;
   wndclassex.cbClsExtra = 0;
   wndclassex.cbWndExtra = 0;
-  wndclassex.hInstance = hinstance;
-  wndclassex.hIcon = LoadIcon(hinstance, MAKEINTRESOURCE(IDI_NAIIVE_ICON));
+  wndclassex.hInstance = hinstance_;
+  wndclassex.hIcon = LoadIcon(hinstance_, MAKEINTRESOURCE(IDI_NAIIVE_ICON));
   wndclassex.hCursor = LoadCursor(nullptr, IDC_ARROW);
   wndclassex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-#if NAIIVE_NO_MENU
   wndclassex.lpszMenuName = nullptr;
-#else
-  wndclassex.lpszMenuName = MAKEINTRESOURCE(IDC_NAIIVE_MENU);
-#endif
   wndclassex.lpszClassName = window_class_;
   wndclassex.hIconSm =
-      LoadIcon(hinstance, MAKEINTRESOURCE(IDI_NAIIVE_ICON_SMALL));
-  hr = (RegisterClassEx(&wndclassex) == 0) ? E_FAIL : S_OK;
-  FAILTHROW;
-}
+      LoadIcon(hinstance_, MAKEINTRESOURCE(IDI_NAIIVE_ICON_SMALL));
+  atom_res = RegisterClassEx(&wndclassex);
+  CHECK(atom_res != 0);
 
-void ApplicationClass::ShutdownWindowClass() {
-  auto hinstance = HinstanceFromHwnd(hwnd_);
-  UnregisterClass(window_class_, hinstance);
-}
-
-void ApplicationClass::InitializeWindow(HINSTANCE hinstance, INT command_show) {
-  HRESULT hr = S_OK;
-  DWORD window_style =
-      WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX;
+  DWORD window_style = WS_OVERLAPPEDWINDOW;
+  window_style ^= WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX;
   RECT paint_rect{0, 0, static_cast<LONG>(width_), static_cast<LONG>(height_)};
-  hr = AdjustWindowRect(&paint_rect, window_style, false) ? S_OK : E_FAIL;
-  FAILTHROW;
+  bool_res = AdjustWindowRect(&paint_rect, window_style, false);
+  CHECK(bool_res);
   hwnd_ = CreateWindow(window_class_, app_title_, window_style, 0, 0,
                        paint_rect.right - paint_rect.left,
                        paint_rect.bottom - paint_rect.top, nullptr, nullptr,
-                       hinstance, nullptr);
-  hr = hwnd_ ? S_OK : E_FAIL;
-  FAILTHROW;
+                       hinstance_, nullptr);
+  CHECK(hwnd_ != nullptr);
   ShowWindow(hwnd_, command_show);
-  UpdateWindow(hwnd_);
-#if not NAIIVE_NO_MENU
-  haccel_ = LoadAccelerators(hinstance, MAKEINTRESOURCE(IDC_NAIIVE_ACCEL));
-#endif
 }
 
-void ApplicationClass::ShutdownWindow() {
-  ShowCursor(true);
-#if not NAIIVE_NO_MENU
-  DestroyAcceleratorTable(haccel_);
-  haccel_ = nullptr;
-#endif
-  DestroyWindow(hwnd_);
+void ApplicationClass::Shutdown() {
+  BOOL bool_res = TRUE;
+
+  ShowCursor(TRUE);
+  if (IsWindow(hwnd_)) {
+    bool_res = DestroyWindow(hwnd_);
+    CHECK(bool_res);
+  }
   hwnd_ = nullptr;
+
+  bool_res = UnregisterClass(window_class_, hinstance_);
+  CHECK(bool_res);
+  hinstance_ = nullptr;
 }
 
 ApplicationClass& Application(UINT width, UINT height) {

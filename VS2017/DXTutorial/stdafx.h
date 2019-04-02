@@ -39,9 +39,33 @@ SOFTWARE.
 #include <iostream>
 #include <sstream>
 #include <type_traits>
+#include <unordered_map>
 
 /* 3rdparty libs */
 #include <mmreg.h>
+
+#ifndef NDEBUG
+#include <wm_map.h>
+inline std::string GetWindowMessage(UINT message) {
+  if (window_message_to_name.count(message)) {
+    return window_message_to_name.at(message);
+  }
+  return std::to_string(message);
+}
+inline std::string GetSystemError() {
+  CHAR buffer[256];
+  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR)buffer, 256, NULL);
+  buffer[strlen(buffer) - 2] = 0;
+  return buffer;
+}
+#else
+inline std::string GetWindowMessage(UINT message) {
+  UNREFERENCED_PARAMETER(message);
+}
+inline std::string GetSystemError() {}
+#endif
 
 #ifndef NDEBUG
 namespace noaccess {
@@ -65,11 +89,17 @@ class DebugClass {
     }
   }
 
+  template <class... _Args>
+  void operator()(_Args&&... args) {
+    InnerLog(std::forward<_Args>(args)...);
+  }
+
+ private:
   template <class _Arg, class... _Args>
-  void operator()(_Arg&& arg, _Args&&... args) {
+  void InnerLog(_Arg&& arg, _Args&&... args) {
     if constexpr (sizeof...(args) > 0) {
       ss_ << arg << " ";
-      (*this)(std::forward<_Args>(args)...);
+      InnerLog(std::forward<_Args>(args)...);
     } else {
       ss_ << arg << "\n";
     }
@@ -77,16 +107,15 @@ class DebugClass {
 
   // No space after manipulator
   template <class... _Args>
-  void operator()(ManipulatorType&& arg, _Args&&... args) {
+  void InnerLog(ManipulatorType&& arg, _Args&&... args) {
     if constexpr (sizeof...(args) > 0) {
       ss_ << arg;
-      (*this)(std::forward<_Args>(args)...);
+      InnerLog(std::forward<_Args>(args)...);
     } else {
       ss_ << arg << "\n";
     }
   }
 
- private:
   std::stringstream ss_;
   std::string file_name_;
   int line_number_;
@@ -103,9 +132,11 @@ class DebugClass {
 #define LOG(level)
 #define LOG_IF(level, expression)
 #endif
+#define CHECK(expression) \
+  LOG_IF(LOG_ERROR, !(expression))("Check failed " #expression)
 #define ASSERT(expression) LOG_IF(LOG_ERROR, !(expression))
 #define ASSERT_EQ(a, b) ASSERT((a) == (b))
-// TODO DEPRECATED
+// DEPRECATED
 #define FAILTHROW LOG_IF(LOG_ERROR, FAILED((hr)))
 
 inline HINSTANCE HinstanceFromHwnd(HWND hwnd) {

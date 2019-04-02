@@ -28,13 +28,12 @@ SOFTWARE.
 namespace naiive::core {
 class ApplicationClass {
   friend ApplicationClass& Application(UINT width, UINT height);
-  static constexpr UINT kMaxLoadString = 100;
+  static constexpr UINT kMaxLoad = 100U;
 
  public:
   void Run(HINSTANCE hinstance, INT command_show);
 
  private:
-  ApplicationClass() = delete;
   ApplicationClass(UINT width, UINT height) : width_(width), height_(height) {}
   ~ApplicationClass() {}
   /* No copy, no move */
@@ -47,15 +46,12 @@ class ApplicationClass {
                                LPARAM lparam);
   static LRESULT CALLBACK WinProc(HWND hwnd, UINT message, WPARAM wparam,
                                   LPARAM lparam);
-  static INT_PTR CALLBACK About(HWND hwnd, UINT message, WPARAM wparam,
-                                LPARAM lparam);
-  void InitializeWindowClass(HINSTANCE hinstance, INT command_show);
-  void ShutdownWindowClass();
-  void InitializeWindow(HINSTANCE hinstance, INT command_show);
-  void ShutdownWindow();
+  void Initialize(HINSTANCE hinstance, INT command_show);
+  void Shutdown();
 
-  CHAR app_title_[kMaxLoadString];
-  CHAR window_class_[kMaxLoadString];
+  CHAR app_title_[kMaxLoad];
+  CHAR window_class_[kMaxLoad];
+  HINSTANCE hinstance_ = nullptr;
   HWND hwnd_ = nullptr;
   HACCEL haccel_ = nullptr;
   UINT width_ = 1024U;
