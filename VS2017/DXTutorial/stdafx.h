@@ -70,7 +70,7 @@ inline std::string GetSystemError() {}
 #ifndef NDEBUG
 namespace noaccess {
 class DebugClass {
-  typedef std::ios_base&(__cdecl* ManipulatorType)(std::ios_base&);
+  typedef std::ios_base&(__cdecl ManipulatorType)(std::ios_base&);
 
  public:
   enum class LogLevel : int { LOG_INFO = 0, LOG_WARN = 1, LOG_ERROR = 2 };
@@ -107,9 +107,9 @@ class DebugClass {
 
   // No space after manipulator
   template <class... _Args>
-  void InnerLog(ManipulatorType&& arg, _Args&&... args) {
+  void InnerLog(ManipulatorType* arg, _Args&&... args) {
     if constexpr (sizeof...(args) > 0) {
-      ss_ << arg;
+      ss_ << *arg;
       InnerLog(std::forward<_Args>(args)...);
     } else {
       ss_ << arg << "\n";
