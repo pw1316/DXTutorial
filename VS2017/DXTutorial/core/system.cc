@@ -39,7 +39,7 @@ void SystemClass::CountFrame() {
       ASSERT(SUCCEEDED(hr));
       hr = PdhGetFormattedCounterValue(cpu_hcounter, PDH_FMT_LONG, nullptr,
                                        &cpu_counter_value);
-      CHECK(SUCCEEDED(hr))("Get CPU data failed", std::hex, hr);
+      CHECK(SUCCEEDED(hr))("Get CPU data failed", std::hex, std::uppercase, hr);
       cpu_usage_ = cpu_counter_value.longValue;
     }
   }

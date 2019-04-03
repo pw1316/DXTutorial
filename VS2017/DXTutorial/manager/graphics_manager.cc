@@ -89,6 +89,8 @@ BOOL GraphicsManagerClass::OnUpdate() {
   float blend_factor[4] = {0, 0, 0, 0};
   BeginScene();
   camera_.GetMatrix(view);
+  device_context_->OMSetRenderTargets(1, &render_target_view_,
+                                      depth_stencil_view_);
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
@@ -179,10 +181,10 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
   swap_chain_desc.SampleDesc.Count = 1;    // MSAA off
   swap_chain_desc.SampleDesc.Quality = 0;  // MSAA off
   swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-  swap_chain_desc.BufferCount = 1;  // Single Buffer
+  swap_chain_desc.BufferCount = 2;  // Double Buffer
   swap_chain_desc.OutputWindow = hwnd;
   swap_chain_desc.Windowed = TRUE;
-  swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+  swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
   swap_chain_desc.Flags = 0;  // No Advanced Flags
   D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_1;
   hr = D3D11CreateDeviceAndSwapChain(
@@ -247,10 +249,6 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
       depth_stencil_buffer, &depth_stencil_view_desc, &depth_stencil_view_);
   SafeRelease(&depth_stencil_buffer);
   ASSERT(SUCCEEDED(hr));
-
-  /* RenderTarget */
-  device_context_->OMSetRenderTargets(1, &render_target_view_,
-                                      depth_stencil_view_);
 
   /* DepthStencilState */
   D3D11_DEPTH_STENCIL_DESC depth_stencil_desc;

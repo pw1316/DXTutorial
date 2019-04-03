@@ -401,7 +401,7 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   ASSERT(SUCCEEDED(hr));
   SafeRelease(&blob);
 }
-void naiive::entity::Model3D::ShutdownShader() {
+void Model3D::ShutdownShader() {
   SafeRelease(&pixel_shader_);
   SafeRelease(&input_layout_);
   SafeRelease(&vertex_shader_);
