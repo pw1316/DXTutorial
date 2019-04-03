@@ -121,63 +121,52 @@ BOOL GraphicsManagerClass::OnUpdate() {
   return TRUE;
 }
 
-void GraphicsManagerClass::GetRefreshRate(UINT width, UINT height, UINT& num,
-                                          UINT& den) {
-  HRESULT hr = S_OK;
-  /* Create DX factory */
-  IDXGIFactory* factory;
-  hr = CreateDXGIFactory(IID_PPV_ARGS(&factory));
-  ASSERT(SUCCEEDED(hr));
-  /* Create DX adapter from factory, Release factory */
-  IDXGIAdapter* adapter;
-  hr = factory->EnumAdapters(0, &adapter);
-  SafeRelease(&factory);
-  ASSERT(SUCCEEDED(hr));
-  /* Create DX output from adapter, Release adapter */
-  IDXGIOutput* adapter_output;
-  hr = adapter->EnumOutputs(0, &adapter_output);
-  SafeRelease(&adapter);
-  ASSERT(SUCCEEDED(hr));
-  /* Create DX mode from output, Release output */
-  std::vector<DXGI_MODE_DESC> mode_list;
-  UINT num_modes;
-  hr = adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
-                                          DXGI_ENUM_MODES_INTERLACED,
-                                          &num_modes, nullptr);
-  ASSERT(SUCCEEDED(hr));
-  mode_list.resize(num_modes);
-  hr = adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
-                                          DXGI_ENUM_MODES_INTERLACED,
-                                          &num_modes, &mode_list[0]);
-  SafeRelease(&adapter_output);
-  ASSERT(SUCCEEDED(hr));
-  /* Get Refresh Rate */
-  for (auto&& mode : mode_list) {
-    if (mode.Width == static_cast<UINT>(width) &&
-        mode.Height == static_cast<UINT>(height)) {
-      num = mode.RefreshRate.Numerator;
-      den = mode.RefreshRate.Denominator;
-      break;
-    }
-  }
-}
-
 void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
                                             UINT height) {
   HRESULT hr = S_OK;
-  UINT num = 0U, den = 0U;
-  GetRefreshRate(width, height, num, den);
-  /* Swap Chain */
+
+  IDXGIFactory* dxgi_factory = nullptr;  // To destroy
+  hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgi_factory));
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get \"IDXGIFactory\" failed:", std::hex, std::uppercase, hr);
+
+  IDXGIAdapter* dxgi_adapter = nullptr;  // To destroy
+  hr = dxgi_factory->EnumAdapters(0, &dxgi_adapter);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get \"IDXGIAdapter\" failed:", std::hex, std::uppercase, hr);
+
+  IDXGIOutput* dxgi_output = nullptr;  // To destroy
+  hr = dxgi_adapter->EnumOutputs(0, &dxgi_output);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get \"IDXGIOutput\" failed:", std::hex, std::uppercase, hr);
+
+  UINT num_dxgi_modes = 0U;
+  hr = dxgi_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
+                                       DXGI_ENUM_MODES_INTERLACED,
+                                       &num_dxgi_modes, nullptr);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get mode number failed:", std::hex, std::uppercase, hr);
+  std::vector<DXGI_MODE_DESC> mode_list(num_dxgi_modes);
+  hr = dxgi_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
+                                       DXGI_ENUM_MODES_INTERLACED,
+                                       &num_dxgi_modes, &mode_list[0]);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get \"DXGI_MODE_DESC\" failed:", std::hex, std::uppercase, hr);
+
   DXGI_SWAP_CHAIN_DESC swap_chain_desc;
   ZeroMemory(&swap_chain_desc, sizeof(swap_chain_desc));
-  swap_chain_desc.BufferDesc.Width = width;
-  swap_chain_desc.BufferDesc.Height = height;
-  swap_chain_desc.BufferDesc.RefreshRate.Numerator = num;
-  swap_chain_desc.BufferDesc.RefreshRate.Denominator = den;
-  swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-  swap_chain_desc.BufferDesc.ScanlineOrdering =
-      DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-  swap_chain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+  hr = E_FAIL;
+  for (auto&& mode : mode_list) {
+    if (mode.Width == static_cast<UINT>(width) &&
+        mode.Height == static_cast<UINT>(height)) {
+      swap_chain_desc.BufferDesc = mode;
+      hr = S_OK;
+      break;
+    }
+  }
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("No mode match with width", width, "and height", height);
+
   swap_chain_desc.SampleDesc.Count = 1;    // MSAA off
   swap_chain_desc.SampleDesc.Quality = 0;  // MSAA off
   swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -186,17 +175,27 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
   swap_chain_desc.Windowed = TRUE;
   swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
   swap_chain_desc.Flags = 0;  // No Advanced Flags
+
   D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_1;
   hr = D3D11CreateDeviceAndSwapChain(
       nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG,
-      &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain_,
+      &feature_level, 1U, D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain_,
       &device_, nullptr, &device_context_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get \"ID3D11Device\",\"ID3D11DeviceContext\",\"IDXGISwapChain\" failed:",
+   std::hex, std::uppercase, hr);
+
   hr = device_->QueryInterface(IID_PPV_ARGS(&debug_));
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get \"ID3D11Debug\" failed:", std::hex, std::uppercase, hr);
+
+  SafeRelease(&dxgi_output);
+  SafeRelease(&dxgi_adapter);
+  SafeRelease(&dxgi_factory);
 }
 void GraphicsManagerClass::ShutdownDevice() {
   SafeRelease(&debug_);
+  swap_chain_->SetFullscreenState(FALSE, nullptr);
   SafeRelease(&device_context_);
   SafeRelease(&device_);
   SafeRelease(&swap_chain_);

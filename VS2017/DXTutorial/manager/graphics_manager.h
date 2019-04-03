@@ -100,8 +100,6 @@ class GraphicsManagerClass : public core::IView {
   GraphicsManagerClass()
       : rng_(0), distribution_xy_(-40, 40), distribution_z_(-5, 40) {}
 
-  void GetRefreshRate(UINT width, UINT height, UINT& num, UINT& den);
-
   /* D3D Basic */
   void InitializeDevice(HWND hwnd, UINT width, UINT height);
   void ShutdownDevice();
@@ -124,10 +122,10 @@ class GraphicsManagerClass : public core::IView {
   void EndScene() { swap_chain_->Present(1, 0); }
 
   /* D3D Basic */
-  IDXGISwapChain* swap_chain_ = nullptr;
   ID3D11Device* device_ = nullptr;
   ID3D11DeviceContext* device_context_ = nullptr;
   ID3D11Debug* debug_ = nullptr;
+  IDXGISwapChain* swap_chain_ = nullptr;
 
   /* Output Merger */
   ID3D11RenderTargetView* render_target_view_ = nullptr;
