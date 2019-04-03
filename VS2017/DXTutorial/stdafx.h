@@ -132,12 +132,10 @@ class DebugClass {
 #define LOG(level)
 #define LOG_IF(level, expression)
 #endif
-#define CHECK(expression) \
-  LOG_IF(LOG_ERROR, !(expression))("Check failed " #expression)
-#define ASSERT(expression) LOG_IF(LOG_ERROR, !(expression))
-#define ASSERT_EQ(a, b) ASSERT((a) == (b))
-// DEPRECATED
-#define FAILTHROW LOG_IF(LOG_ERROR, FAILED((hr)))
+#define CHECK(expression) LOG_IF(LOG_WARN, !(expression))
+#define ASSERT(expression) \
+  LOG_IF(LOG_ERROR, !(expression))("Assertion failed " #expression)
+#define ASSERT_MESSAGE(expression) LOG_IF(LOG_ERROR, !(expression))
 
 inline HINSTANCE HinstanceFromHwnd(HWND hwnd) {
   return reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hwnd, GWLP_HINSTANCE));

@@ -32,26 +32,26 @@ void InputManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   height_ = height;
   hr = DirectInput8Create(hinstance, DIRECTINPUT_VERSION, IID_IDirectInput8,
                           (void**)&dinput_, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = dinput_->CreateDevice(GUID_SysKeyboard, &keyboard_device_, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = keyboard_device_->SetDataFormat(&c_dfDIKeyboard);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = keyboard_device_->SetCooperativeLevel(
       hwnd, DISCL_FOREGROUND | DISCL_EXCLUSIVE);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = keyboard_device_->Acquire();
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   hr = dinput_->CreateDevice(GUID_SysMouse, &mouse_device_, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = mouse_device_->SetDataFormat(&c_dfDIMouse);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = mouse_device_->SetCooperativeLevel(
       hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = mouse_device_->Acquire();
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 }
 
 void InputManagerClass::Shutdown() {

@@ -79,8 +79,8 @@ class FrustumWorld {
   }
 
   BOOL Check(const DirectX::XMFLOAT3& p) {
-    for (auto i : utils::Range(6)) {
-      auto xmres = DirectX::XMPlaneDotCoord(DirectX::XMLoadFloat4(&plane_[i]),
+    for (auto&& plane : plane_) {
+      auto xmres = DirectX::XMPlaneDotCoord(DirectX::XMLoadFloat4(&plane),
                                             DirectX::XMLoadFloat3(&p));
       FLOAT res;
       DirectX::XMStoreFloat(&res, xmres);

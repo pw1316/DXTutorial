@@ -36,10 +36,10 @@ void SystemClass::CountFrame() {
       HRESULT hr = S_OK;
       PDH_FMT_COUNTERVALUE cpu_counter_value;
       hr = PdhCollectQueryData(cpu_hquery_);
-      ASSERT(SUCCEEDED(hr))("Collect CPU data failed", std::hex, hr);
+      ASSERT(SUCCEEDED(hr));
       hr = PdhGetFormattedCounterValue(cpu_hcounter, PDH_FMT_LONG, nullptr,
                                        &cpu_counter_value);
-      LOG_IF(LOG_WARN, FAILED(hr))("Get CPU data failed", std::hex, hr);
+      CHECK(SUCCEEDED(hr))("Get CPU data failed", std::hex, hr);
       cpu_usage_ = cpu_counter_value.longValue;
     }
   }
@@ -52,12 +52,12 @@ SystemClass::SystemClass() {
   current_frame_time_ = last_frame_time_ = start_time_;
 
   hr = PdhOpenQuery(nullptr, 0, &cpu_hquery_);
-  LOG_IF(LOG_WARN, FAILED(hr))("Open PDH query failed");
+  CHECK(SUCCEEDED(hr))("Open PDH query failed");
   if (FAILED(hr)) {
     cpu_readable_ = FALSE;
   } else {
     hr = PdhAddCounter(cpu_hquery_, kCpuQuery, 0, &cpu_hcounter);
-    LOG_IF(LOG_WARN, FAILED(hr))("Add PDH counter failed");
+    CHECK(SUCCEEDED(hr))("Add PDH counter failed");
     if (FAILED(hr)) {
       cpu_readable_ = FALSE;
     }

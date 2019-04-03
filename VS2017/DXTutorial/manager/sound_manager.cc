@@ -32,9 +32,9 @@ void SoundManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   UNREFERENCED_PARAMETER(height);
   HRESULT hr = S_OK;
   hr = DirectSoundCreate8(nullptr, &dsound_, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = dsound_->SetCooperativeLevel(hwnd, DSSCL_PRIORITY);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   DSBUFFERDESC buffer_desc;
   buffer_desc.dwSize = sizeof(DSBUFFERDESC);
@@ -44,7 +44,7 @@ void SoundManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   buffer_desc.lpwfxFormat = NULL;
   buffer_desc.guid3DAlgorithm = GUID_NULL;
   hr = dsound_->CreateSoundBuffer(&buffer_desc, &primary_buffer_, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   WAVEFORMATEX wave_format_ex;
   wave_format_ex.wFormatTag = WAVE_FORMAT_PCM;
@@ -74,13 +74,13 @@ BOOL SoundManagerClass::OnUpdate() {
   // HRESULT hr = S_OK;
 
   // hr = secondary_buffer_->SetCurrentPosition(0);
-  // FAILTHROW;
+  // ASSERT(SUCCEEDED(hr));
 
   // hr = secondary_buffer_->SetVolume(DSBVOLUME_MAX);
-  // FAILTHROW;
+  // ASSERT(SUCCEEDED(hr));
 
   // hr = secondary_buffer_->Play(0, 0, 0);
-  // FAILTHROW;
+  // ASSERT(SUCCEEDED(hr));
   return TRUE;
 }
 
@@ -141,11 +141,11 @@ void SoundManagerClass::LoadWave() {
 
   IDirectSoundBuffer* temp_buffer;
   hr = dsound_->CreateSoundBuffer(&buffer_desc, &temp_buffer, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = temp_buffer->QueryInterface(IID_IDirectSound3DBuffer8,
                                    (void**)&secondary_buffer_);
   SafeRelease(&temp_buffer);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   ifs.seekg(sizeof(WaveHeaderType), std::ios::beg);
   std::vector<UCHAR> wave_data(wave_header.data_size);
@@ -157,10 +157,10 @@ void SoundManagerClass::LoadWave() {
   ULONG buffer_size;
   hr = secondary_buffer_->Lock(0, wave_header.data_size, (void**)&buffer_ptr,
                                &buffer_size, nullptr, nullptr, 0);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   memcpy(buffer_ptr, &wave_data[0], wave_header.data_size);
   hr = secondary_buffer_->Unlock(buffer_ptr, buffer_size, nullptr, 0);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 }
 
 void SoundManagerClass::UnloadWave() { SafeRelease(&secondary_buffer_); }

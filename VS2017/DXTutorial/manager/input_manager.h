@@ -43,7 +43,7 @@ class InputManagerClass : public core::IView {
   virtual BOOL OnUpdate() override;
 
   BOOL IsKeyDown(UINT key) {
-    ASSERT(key < kNumKeys)("Invalid key");
+    ASSERT(key < kNumKeys);
     return keyboard_state_[key] & 0x80;
   }
 

@@ -33,9 +33,9 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
   INT int_res = 0;
 
   int_res = LoadString(hinstance, IDS_APP_TITLE, app_title_, kMaxLoad);
-  LOG_IF(LOG_WARN, !int_res)("Missing app title");
+  CHECK(int_res)("Missing app title");
   int_res = LoadString(hinstance, IDS_WINDOW_CLASS, window_class_, kMaxLoad);
-  ASSERT(int_res)("Missing window class name");
+  ASSERT_MESSAGE(int_res)("Missing window class name");
   Initialize(hinstance, command_show);
   manager::InputManager().Initialize(hwnd_, width_, height_);
   manager::SoundManager().Initialize(hwnd_, width_, height_);
@@ -130,18 +130,18 @@ void ApplicationClass::Initialize(HINSTANCE hinstance, INT command_show) {
   wndclassex.hIconSm =
       LoadIcon(hinstance_, MAKEINTRESOURCE(IDI_NAIIVE_ICON_SMALL));
   atom_res = RegisterClassEx(&wndclassex);
-  CHECK(atom_res != 0);
+  ASSERT(atom_res != 0);
 
   DWORD window_style = WS_OVERLAPPEDWINDOW;
   window_style ^= WS_THICKFRAME ^ WS_MAXIMIZEBOX ^ WS_MINIMIZEBOX;
   RECT paint_rect{0, 0, static_cast<LONG>(width_), static_cast<LONG>(height_)};
   bool_res = AdjustWindowRect(&paint_rect, window_style, false);
-  CHECK(bool_res);
+  ASSERT(bool_res);
   hwnd_ = CreateWindow(window_class_, app_title_, window_style, 0, 0,
                        paint_rect.right - paint_rect.left,
                        paint_rect.bottom - paint_rect.top, nullptr, nullptr,
                        hinstance_, nullptr);
-  CHECK(hwnd_ != nullptr);
+  ASSERT(hwnd_ != nullptr);
   ShowWindow(hwnd_, command_show);
 }
 
@@ -151,12 +151,12 @@ void ApplicationClass::Shutdown() {
   ShowCursor(TRUE);
   if (IsWindow(hwnd_)) {
     bool_res = DestroyWindow(hwnd_);
-    CHECK(bool_res);
+    ASSERT(bool_res);
   }
   hwnd_ = nullptr;
 
   bool_res = UnregisterClass(window_class_, hinstance_);
-  CHECK(bool_res);
+  ASSERT(bool_res);
   hinstance_ = nullptr;
 }
 

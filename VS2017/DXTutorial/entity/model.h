@@ -34,7 +34,6 @@ SOFTWARE.
 
 namespace naiive::entity {
 class Model3D {
- private:
   struct VBType {
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT2 uv;
@@ -66,7 +65,6 @@ class Model3D {
   };
 
  public:
-  Model3D() = delete;
   explicit Model3D(const std::string path)
       : name_(path),
         translate_(0.0f, 0.0f, 0.0f),

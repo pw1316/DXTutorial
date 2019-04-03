@@ -32,12 +32,10 @@ SOFTWARE.
 
 namespace naiive::entity {
 void Font::Initialize(ID3D11Device* device) {
-  HRESULT hr = S_OK;
   std::ifstream font_meta("Res/font_meta.txt");
-  hr = font_meta ? S_OK : E_FAIL;
-  FAILTHROW;
+  ASSERT(font_meta);
 
-  for (int i = 0; i < 95; ++i) {
+  for (UINT i = 0; i < kNumChar; ++i) {
     int dummy;
     font_meta >> dummy;
     font_meta >> font_[i].uv_left;
@@ -62,54 +60,55 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
   D3D11_SUBRESOURCE_DATA sub_data;
   D3D11_MAPPED_SUBRESOURCE mapped{};
 
-  UINT character_number = static_cast<UINT>(text.size());
-  UINT vertex_number = 0U;
-  std::vector<VBType> vertices(character_number * 6);
-  std::vector<ULONG> indices(character_number * 6);
+  UINT num_character = static_cast<UINT>(text.size());
+  UINT num_vertex = 0U;
+  std::vector<VBType> vertices(num_character * 6);
+  std::vector<ULONG> indices(num_character * 6);
   FLOAT x = -1.0f / proj._11 + pos.x;
   FLOAT y = 1.0f / proj._22 - pos.y;
   for (auto&& letter : text) {
+    ASSERT(letter > 0);
     if (letter == ' ') {
       x += font_[0].size;
     } else if (letter == '\n') {
       x = -1.0f / proj._11 + pos.x;
       y -= 16.0f;
-    } else {
-      INT index = letter - 32;
-      vertices[vertex_number + 0].pos = {x, y, 1.0f};
-      vertices[vertex_number + 0].uv = {font_[index].uv_left, 0.0f};
-      indices[vertex_number + 0] = vertex_number + 0U;
+    } else if (letter > kStartChar && letter != 127) {
+      UINT index = letter - kStartChar;
+      vertices[num_vertex + 0].pos = {x, y, 1.0f};
+      vertices[num_vertex + 0].uv = {font_[index].uv_left, 0.0f};
+      indices[num_vertex + 0] = num_vertex + 0U;
 
-      vertices[vertex_number + 1].pos = {x + font_[index].size, y - 16, 1.0f};
-      vertices[vertex_number + 1].uv = {font_[index].uv_right, 1.0f};
-      indices[vertex_number + 1] = vertex_number + 1;
+      vertices[num_vertex + 1].pos = {x + font_[index].size, y - 16, 1.0f};
+      vertices[num_vertex + 1].uv = {font_[index].uv_right, 1.0f};
+      indices[num_vertex + 1] = num_vertex + 1;
 
-      vertices[vertex_number + 2].pos = {x, y - 16, 1.0f};
-      vertices[vertex_number + 2].uv = {font_[index].uv_left, 1.0f};
-      indices[vertex_number + 2] = vertex_number + 2;
+      vertices[num_vertex + 2].pos = {x, y - 16, 1.0f};
+      vertices[num_vertex + 2].uv = {font_[index].uv_left, 1.0f};
+      indices[num_vertex + 2] = num_vertex + 2;
 
-      vertices[vertex_number + 3].pos = {x, y, 1.0f};
-      vertices[vertex_number + 3].uv = {font_[index].uv_left, 0.0f};
-      indices[vertex_number + 3] = vertex_number + 3;
+      vertices[num_vertex + 3].pos = {x, y, 1.0f};
+      vertices[num_vertex + 3].uv = {font_[index].uv_left, 0.0f};
+      indices[num_vertex + 3] = num_vertex + 3;
 
-      vertices[vertex_number + 4].pos = {x + font_[index].size, y, 1.0f};
-      vertices[vertex_number + 4].uv = {font_[index].uv_right, 0.0f};
-      indices[vertex_number + 4] = vertex_number + 4;
+      vertices[num_vertex + 4].pos = {x + font_[index].size, y, 1.0f};
+      vertices[num_vertex + 4].uv = {font_[index].uv_right, 0.0f};
+      indices[num_vertex + 4] = num_vertex + 4;
 
-      vertices[vertex_number + 5].pos = {x + font_[index].size, y - 16, 1.0f};
-      vertices[vertex_number + 5].uv = {font_[index].uv_right, 1.0f};
-      indices[vertex_number + 5] = vertex_number + 5;
+      vertices[num_vertex + 5].pos = {x + font_[index].size, y - 16, 1.0f};
+      vertices[num_vertex + 5].uv = {font_[index].uv_right, 1.0f};
+      indices[num_vertex + 5] = num_vertex + 5;
       x += font_[index].size + 1.0f;
-      vertex_number += 6;
+      num_vertex += 6;
     }
   }
-  vertices.resize(vertex_number);
-  indices.resize(vertex_number);
+  vertices.resize(num_vertex);
+  indices.resize(num_vertex);
 
   SafeRelease(&vertex_buffer_);
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_IMMUTABLE;
-  buffer_desc.ByteWidth = sizeof(VBType) * vertex_number;
+  buffer_desc.ByteWidth = sizeof(VBType) * num_vertex;
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
   buffer_desc.CPUAccessFlags = 0;
   buffer_desc.MiscFlags = 0;
@@ -119,12 +118,12 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
   sub_data.SysMemPitch = 0;
   sub_data.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &sub_data, &vertex_buffer_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   SafeRelease(&index_buffer_);
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_IMMUTABLE;
-  buffer_desc.ByteWidth = sizeof(ULONG) * vertex_number;
+  buffer_desc.ByteWidth = sizeof(ULONG) * num_vertex;
   buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
   buffer_desc.CPUAccessFlags = 0;
   buffer_desc.MiscFlags = 0;
@@ -134,7 +133,7 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
   sub_data.SysMemPitch = 0;
   sub_data.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &sub_data, &index_buffer_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   context->Map(const_buffer_0_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
@@ -161,7 +160,7 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
   context->PSSetSamplers(0, 1, &sampler_state_);
   context->PSSetShader(pixel_shader_, nullptr, 0);
 
-  context->DrawIndexed(vertex_number, 0, 0);
+  context->DrawIndexed(num_vertex, 0, 0);
 }
 
 void Font::InitializeBuffer(ID3D11Device* device) {
@@ -184,12 +183,12 @@ void Font::InitializeBuffer(ID3D11Device* device) {
   buffer_desc.MiscFlags = 0;
   buffer_desc.StructureByteStride = 0;
   hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_0_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   /* =====Texture===== */
   hr = DirectX::CreateDDSTextureFromFile(device, L"Res/font.dds", nullptr,
                                          &shader_resource_font_texture_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   /* =====SamplerState===== */
   sample_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -206,7 +205,7 @@ void Font::InitializeBuffer(ID3D11Device* device) {
   sample_desc.MinLOD = 0;
   sample_desc.MaxLOD = D3D11_FLOAT32_MAX;
   hr = device->CreateSamplerState(&sample_desc, &sampler_state_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 }
 void Font::ShutdownBuffer() {
   SafeRelease(&sampler_state_);
@@ -229,11 +228,11 @@ void Font::InitializeShader(ID3D11Device* device) {
   SafeRelease(&blob);
   hr = D3DCompileFromFile(L"res/font_vs.hlsl", nullptr, nullptr, "main",
                           "vs_5_0", shader_flag, 0, &blob, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = device->CreateVertexShader(blob->GetBufferPointer(),
                                   blob->GetBufferSize(), nullptr,
                                   &vertex_shader_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
@@ -253,15 +252,15 @@ void Font::InitializeShader(ID3D11Device* device) {
   hr =
       device->CreateInputLayout(layout, layout_number, blob->GetBufferPointer(),
                                 blob->GetBufferSize(), &input_layout_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   SafeRelease(&blob);
   hr = D3DCompileFromFile(L"res/font_ps.hlsl", nullptr, nullptr, "main",
                           "ps_5_0", shader_flag, 0, &blob, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = device->CreatePixelShader(
       blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixel_shader_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   SafeRelease(&blob);
 }
 void Font::ShutdownShader() {

@@ -125,30 +125,30 @@ void GraphicsManagerClass::GetRefreshRate(UINT width, UINT height, UINT& num,
   /* Create DX factory */
   IDXGIFactory* factory;
   hr = CreateDXGIFactory(IID_PPV_ARGS(&factory));
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   /* Create DX adapter from factory, Release factory */
   IDXGIAdapter* adapter;
   hr = factory->EnumAdapters(0, &adapter);
   SafeRelease(&factory);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   /* Create DX output from adapter, Release adapter */
   IDXGIOutput* adapter_output;
   hr = adapter->EnumOutputs(0, &adapter_output);
   SafeRelease(&adapter);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   /* Create DX mode from output, Release output */
   std::vector<DXGI_MODE_DESC> mode_list;
   UINT num_modes;
   hr = adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
                                           DXGI_ENUM_MODES_INTERLACED,
                                           &num_modes, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   mode_list.resize(num_modes);
   hr = adapter_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
                                           DXGI_ENUM_MODES_INTERLACED,
                                           &num_modes, &mode_list[0]);
   SafeRelease(&adapter_output);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   /* Get Refresh Rate */
   for (auto&& mode : mode_list) {
     if (mode.Width == static_cast<UINT>(width) &&
@@ -189,9 +189,9 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
       nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG,
       &feature_level, 1, D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain_,
       &device_, nullptr, &device_context_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = device_->QueryInterface(IID_PPV_ARGS(&debug_));
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 }
 void GraphicsManagerClass::ShutdownDevice() {
   SafeRelease(&debug_);
@@ -203,7 +203,7 @@ void GraphicsManagerClass::ShutdownDevice() {
 void GraphicsManagerClass::DebugDevice() {
   OutputDebugString("=====A=====\n");
   auto hr = debug_->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-  ASSERT(SUCCEEDED(hr))(hr);
+  ASSERT(SUCCEEDED(hr));
   OutputDebugString("=====B=====\n");
 }
 
@@ -214,11 +214,11 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
   /* Create RTV */
   ID3D11Texture2D* back_buffer;
   hr = swap_chain_->GetBuffer(0, IID_PPV_ARGS(&back_buffer));
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = device_->CreateRenderTargetView(back_buffer, nullptr,
                                        &render_target_view_);
   SafeRelease(&back_buffer);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   /* Create DSV */
   ID3D11Texture2D* depth_stencil_buffer = nullptr;
@@ -237,7 +237,7 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
   depth_stencil_buffer_desc.MiscFlags = 0;
   hr = device_->CreateTexture2D(&depth_stencil_buffer_desc, NULL,
                                 &depth_stencil_buffer);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
   ZeroMemory(&depth_stencil_view_desc, sizeof(depth_stencil_view_desc));
   depth_stencil_view_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -246,7 +246,7 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
   hr = device_->CreateDepthStencilView(
       depth_stencil_buffer, &depth_stencil_view_desc, &depth_stencil_view_);
   SafeRelease(&depth_stencil_buffer);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   /* RenderTarget */
   device_context_->OMSetRenderTargets(1, &render_target_view_,
@@ -273,7 +273,7 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
   depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
   hr = device_->CreateDepthStencilState(&depth_stencil_desc,
                                         &depth_stencil_state_z_on_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   ZeroMemory(&depth_stencil_desc, sizeof(depth_stencil_desc));
   depth_stencil_desc.DepthEnable = FALSE;
@@ -294,7 +294,7 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
   depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
   hr = device_->CreateDepthStencilState(&depth_stencil_desc,
                                         &depth_stencil_state_z_off_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
 
   /* Blend State */
@@ -311,10 +311,10 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
   blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
   blend_desc.RenderTarget[0].RenderTargetWriteMask = 0x0F;
   hr = device_->CreateBlendState(&blend_desc, &blend_state_alpha_on_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   blend_desc.RenderTarget[0].BlendEnable = FALSE;
   hr = device_->CreateBlendState(&blend_desc, &blend_state_alpha_off_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 }
 void GraphicsManagerClass::ShutdownOM() {
   SafeRelease(&blend_state_alpha_off_);
@@ -344,7 +344,7 @@ void GraphicsManagerClass::InitializeRasterizer(HWND hwnd, UINT width,
   resterizer_desc.MultisampleEnable = FALSE;
   resterizer_desc.AntialiasedLineEnable = FALSE;
   hr = device_->CreateRasterizerState(&resterizer_desc, &rasterizer_state_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   device_context_->RSSetState(rasterizer_state_);
 
   /* ViewPort */

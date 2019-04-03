@@ -52,7 +52,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
                      const DirectX::XMFLOAT4X4& proj,
                      const DirectX::XMFLOAT4& camera_pos,
                      const DirectX::XMFLOAT3& dir) {
-  D3D11_MAPPED_SUBRESOURCE mapped{};
+  HRESULT hr = S_OK;
 
   auto xmworld = DirectX::XMMatrixRotationRollPitchYaw(
       rotation_pyr_.x, rotation_pyr_.y, rotation_pyr_.z);
@@ -67,8 +67,8 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
 #if NAIIVE_FRUSTUM_CULL
   FrustumWorld frustum(matrix_view_proj);
   BOOL visible = FALSE;
-  for (auto i : utils::Range(8)) {
-    auto cnr = aabb_.Corner(i);
+  for (auto&& i : utils::Range(8)) {
+    auto&& cnr = aabb_.Corner(i);
     auto xmcnr =
         DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&cnr), xmworld);
     DirectX::XMStoreFloat3(&cnr, xmcnr);
@@ -81,10 +81,13 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
     return FALSE;
   }
 #endif
-  context->Map(const_buffer_transform_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+
+  D3D11_MAPPED_SUBRESOURCE mapped;
+  hr = context->Map(const_buffer_transform_, 0, D3D11_MAP_WRITE_DISCARD, 0,
+                    &mapped);
+  ASSERT(SUCCEEDED(hr));
   {
     auto rawdata = (CBTransformType*)mapped.pData;
-
     DirectX::XMStoreFloat4x4(&rawdata->world,
                              DirectX::XMMatrixTranspose(xmworld));
     DirectX::XMStoreFloat4x4(&rawdata->view,
@@ -94,8 +97,9 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
   }
   context->Unmap(const_buffer_transform_, 0);
 
-  context->Map(const_buffer_camera_light_, 0, D3D11_MAP_WRITE_DISCARD, 0,
-               &mapped);
+  hr = context->Map(const_buffer_camera_light_, 0, D3D11_MAP_WRITE_DISCARD, 0,
+                    &mapped);
+  ASSERT(SUCCEEDED(hr));
   {
     auto rawdata = (CBCameraLightType*)mapped.pData;
     rawdata->camera_pos = camera_pos;
@@ -104,7 +108,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
   context->Unmap(const_buffer_camera_light_, 0);
 
   UINT stride = sizeof(VBType);
-  UINT offset = 0;
+  UINT offset = 0U;
   context->IASetVertexBuffers(0, 1, &vertex_buffer_, &stride, &offset);
   context->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
   context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -125,14 +129,13 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
 }
 
 void Model3D::InitializeBuffer(ID3D11Device* device) {
+  BOOL bool_res = FALSE;
   HRESULT hr = S_OK;
 
   TinyObj obj;
-  hr = tinyobj::LoadObj(&obj.attr, &obj.shapes, &obj.materials, nullptr,
-                        nullptr, (name_ + ".obj").c_str(), "res/", true)
-           ? S_OK
-           : E_FAIL;
-  FAILTHROW;
+  bool_res = tinyobj::LoadObj(&obj.attr, &obj.shapes, &obj.materials, nullptr,
+                              nullptr, (name_ + ".obj").c_str(), "res/", true);
+  ASSERT(bool_res);
 
   D3D11_BUFFER_DESC buffer_desc;
   D3D11_SUBRESOURCE_DATA sub_data;
@@ -142,9 +145,9 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   vertex_number_ = static_cast<UINT>(obj.shapes[0].mesh.indices.size());
   std::vector<VBType> vertices(vertex_number_);
   std::vector<ULONG> indices(vertex_number_);
-  for (std::remove_const<decltype(vertex_number_)>::type triId = 0;
-       triId < vertex_number_ / 3; ++triId) {
+  for (UINT triId = 0; triId < vertex_number_ / 3; ++triId) {
     for (UINT j = 0; j < 3; ++j) {
+      // RH order to LH order
       auto vi = obj.shapes[0].mesh.indices[3 * triId + 2 - j].vertex_index;
       auto ti = obj.shapes[0].mesh.indices[3 * triId + 2 - j].texcoord_index;
       auto ni = obj.shapes[0].mesh.indices[3 * triId + 2 - j].normal_index;
@@ -152,14 +155,14 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
       auto y = obj.attr.vertices[3 * vi + 1];
       auto z = obj.attr.vertices[3 * vi + 2];
       aabb_.Add({x, y, -z});
-      vertices[3 * triId + j].pos = {x, y, -z};
+      vertices[3 * triId + j].pos = {x, y, -z};  // Reverse z in position
       x = obj.attr.texcoords[2 * ti + 0];
       y = obj.attr.texcoords[2 * ti + 1];
-      vertices[3 * triId + j].uv = {x, 1.0f - y};
+      vertices[3 * triId + j].uv = {x, 1.0f - y};  // Invert v in texture
       x = obj.attr.normals[3 * ni + 0];
       y = obj.attr.normals[3 * ni + 1];
       z = obj.attr.normals[3 * ni + 2];
-      vertices[3 * triId + j].normal = {x, y, -z};
+      vertices[3 * triId + j].normal = {x, y, -z};  // Reverse z in normal
       indices[3 * triId + j] = 3 * triId + j;
     }
     /* Calculate T and B */
@@ -216,7 +219,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   sub_data.SysMemPitch = 0;
   sub_data.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &sub_data, &vertex_buffer_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.ByteWidth = sizeof(ULONG) * vertex_number_;
@@ -230,7 +233,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   sub_data.SysMemPitch = 0;
   sub_data.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &sub_data, &index_buffer_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   /* =====CB===== */
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
@@ -241,7 +244,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   buffer_desc.MiscFlags = 0;
   buffer_desc.StructureByteStride = 0;
   hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_transform_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.ByteWidth = sizeof(CBCameraLightType);
@@ -251,7 +254,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   buffer_desc.MiscFlags = 0;
   buffer_desc.StructureByteStride = 0;
   hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_camera_light_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.ByteWidth = sizeof(CBMaterialType);
@@ -272,28 +275,30 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   sub_data.SysMemPitch = 0;
   sub_data.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &sub_data, &const_buffer_material_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   /* =====Texture=====*/
   auto texture_name = name_ + "_stone.dds";
   WCHAR texture_name_l[128] = {0};
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
-  DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
-                                    &shader_resource_texture_[0]);
-  
+  hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
+                                         &shader_resource_texture_[0]);
+  CHECK(SUCCEEDED(hr))("Texture [stone] missing");
+
   texture_name = name_ + "_stone_bump.dds";
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
-  DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
-                                    &shader_resource_texture_[1]);
-  
+  hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
+                                         &shader_resource_texture_[1]);
+  CHECK(SUCCEEDED(hr))("Texture [stone_bump] missing");
+
   texture_name = name_ + "_dirt.dds";
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
-  DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
-                                    &shader_resource_texture_[2]);
-  FAILTHROW;
+  hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
+                                         &shader_resource_texture_[2]);
+  CHECK(SUCCEEDED(hr))("Texture [dirt] missing");
 
   /* =====SamplerState===== */
   sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -310,7 +315,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   sampler_desc.MinLOD = 0;
   sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
   hr = device->CreateSamplerState(&sampler_desc, &sampler_state_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 }
 void Model3D::ShutdownBuffer() {
   SafeRelease(&sampler_state_);
@@ -337,11 +342,11 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   SafeRelease(&blob);
   hr = D3DCompileFromFile(L"res/sphere_vs.hlsl", nullptr, nullptr, "main",
                           "vs_5_0", shader_flag, 0, &blob, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = device->CreateVertexShader(blob->GetBufferPointer(),
                                   blob->GetBufferSize(), nullptr,
                                   &vertex_shader_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
@@ -385,15 +390,15 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   layout[4].InstanceDataStepRate = 0;
   hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
                                  blob->GetBufferSize(), &input_layout_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
 
   SafeRelease(&blob);
   hr = D3DCompileFromFile(L"res/sphere_ps.hlsl", nullptr, nullptr, "main",
                           "ps_5_0", shader_flag, 0, &blob, nullptr);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   hr = device->CreatePixelShader(
       blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixel_shader_);
-  FAILTHROW;
+  ASSERT(SUCCEEDED(hr));
   SafeRelease(&blob);
 }
 void naiive::entity::Model3D::ShutdownShader() {

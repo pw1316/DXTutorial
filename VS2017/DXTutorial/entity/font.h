@@ -30,7 +30,6 @@ SOFTWARE.
 
 namespace naiive::entity {
 class Font {
- private:
   struct FontType {
     FLOAT uv_left, uv_right;
     UINT size;
@@ -43,6 +42,8 @@ class Font {
     DirectX::XMFLOAT4X4 matrix_proj;
     DirectX::XMFLOAT4 font_color;
   };
+  static constexpr UINT kStartChar = 32U;
+  static constexpr UINT kNumChar = 95U;
 
  public:
   Font() = default;
@@ -63,7 +64,7 @@ class Font {
   void InitializeShader(ID3D11Device* device);
   void ShutdownShader();
 
-  FontType font_[95];
+  FontType font_[kNumChar];
 
   /* Resources */
   ID3D11Buffer* vertex_buffer_ = nullptr;
