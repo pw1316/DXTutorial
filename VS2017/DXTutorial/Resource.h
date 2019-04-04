@@ -2,15 +2,10 @@
 // Microsoft Visual C++ generated include file.
 // Used by DXTutorial.rc
 //
-#define IDC_NAIIVE_ACCEL                2
 #define IDS_APP_TITLE                   101
 #define IDS_WINDOW_CLASS                102
-#define IDD_NAIIVE_ABOUT                103
-#define IDM_ABOUT                       104
-#define IDM_EXIT                        105
 #define IDI_NAIIVE_ICON                 107
 #define IDI_NAIIVE_ICON_SMALL           108
-#define IDC_NAIIVE_MENU                 109
 #define IDR_MAINFRAME                   128
 #define IDC_STATIC                      -1
 

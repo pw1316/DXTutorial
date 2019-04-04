@@ -53,7 +53,6 @@ class ApplicationClass {
   CHAR window_class_[kMaxLoad];
   HINSTANCE hinstance_ = nullptr;
   HWND hwnd_ = nullptr;
-  HACCEL haccel_ = nullptr;
   UINT width_ = 1024U;
   UINT height_ = 768U;
 };

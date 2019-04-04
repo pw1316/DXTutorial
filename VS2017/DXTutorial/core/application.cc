@@ -43,17 +43,15 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
 
   MSG msg;
   ZeroMemory(&msg, sizeof(MSG));
-  while (TRUE) {
-    BOOL is_quit = FALSE;
+  BOOL is_quit = FALSE;
+  while (!is_quit) {
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-      if (msg.message == WM_QUIT) {
-        is_quit = TRUE;
-        break;
-      }
       TranslateMessage(&msg);
       DispatchMessage(&msg);
+      if (msg.message == WM_QUIT) {
+        is_quit = TRUE;
+      }
     }
-    if (is_quit) break;
     /* Input */
     if (!manager::InputManager().OnUpdate()) {
       break;
@@ -123,7 +121,7 @@ void ApplicationClass::Initialize(HINSTANCE hinstance, INT command_show) {
   wndclassex.cbWndExtra = 0;
   wndclassex.hInstance = hinstance_;
   wndclassex.hIcon = LoadIcon(hinstance_, MAKEINTRESOURCE(IDI_NAIIVE_ICON));
-  wndclassex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+  wndclassex.hCursor = nullptr;
   wndclassex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
   wndclassex.lpszMenuName = nullptr;
   wndclassex.lpszClassName = window_class_;
@@ -143,6 +141,7 @@ void ApplicationClass::Initialize(HINSTANCE hinstance, INT command_show) {
                        hinstance_, nullptr);
   ASSERT(hwnd_ != nullptr);
   ShowWindow(hwnd_, command_show);
+  UpdateWindow(hwnd_);
 }
 
 void ApplicationClass::Shutdown() {
