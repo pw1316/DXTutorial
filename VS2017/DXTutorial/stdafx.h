@@ -27,6 +27,7 @@ SOFTWARE.
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+#define _CRTDBG_MAP_ALLOC
 #define DIRECTINPUT_VERSION 0x0800
 
 /* Windows Header Files: */
@@ -34,6 +35,8 @@ SOFTWARE.
 
 /* C libs */
 #include <assert.h>
+#include <crtdbg.h>
+#include <stdlib.h>
 
 /* C++ libs */
 #include <iostream>
@@ -44,7 +47,7 @@ SOFTWARE.
 /* 3rdparty libs */
 #include <mmreg.h>
 
-#ifndef NDEBUG
+#ifdef _DEBUG
 #include <wm_map.h>
 inline std::string GetWindowMessage(UINT message) {
   if (window_message_to_name.count(message)) {
@@ -67,7 +70,7 @@ inline std::string GetWindowMessage(UINT message) {
 inline std::string GetSystemError() {}
 #endif
 
-#ifndef NDEBUG
+#ifdef _DEBUG
 namespace noaccess {
 class DebugClass {
   typedef std::ios_base&(__cdecl ManipulatorType)(std::ios_base&);
@@ -79,7 +82,10 @@ class DebugClass {
         line_number_(line_number),
         log_level_(log_level) {}
   ~DebugClass() {
+    HANDLE handle = GetStdHandle(STD_ERROR_HANDLE);
     std::stringstream ss;
+    WORD color[3] = {8, 14, 12};
+    SetConsoleTextAttribute(handle, color[static_cast<int>(log_level_)]);
     ss << "IWE"[static_cast<int>(log_level_)] << " " << file_name_ << ":"
        << line_number_ << "] " << ss_.str();
     std::cout << ss.str();
@@ -142,10 +148,26 @@ inline HINSTANCE HinstanceFromHwnd(HWND hwnd) {
 }
 
 template <class COM>
-inline void SafeRelease(COM** pp_com) {
+inline UINT GetReferenceCount(COM* p_com) {
+  UINT ref_count = 0;
+  if (p_com != nullptr) {
+    p_com->AddRef();
+    ref_count = p_com->Release();
+    LOG(LOG_INFO)
+    (typeid(COM).name(), "Refcount:", ref_count);
+  }
+  return ref_count;
+}
+
+template <class COM>
+inline void SafeRelease_(const char* file_name, int line_number, COM** pp_com) {
   if (*pp_com != nullptr) {
-    (*pp_com)->Release();
+    UINT ref_count = (*pp_com)->Release();
+    CHECK(ref_count == 0)("Release", typeid(COM).name());
+    CHECK(ref_count == 0)("  At", file_name, line_number);
+    CHECK(ref_count == 0)("  Refcount", ref_count);
     (*pp_com) = nullptr;
   }
 }
+#define SafeRelease(pp_com) SafeRelease_(__FILE__, __LINE__, (pp_com));
 #endif  // !__STDAFX_H__

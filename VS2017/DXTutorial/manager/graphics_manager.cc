@@ -194,11 +194,11 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
   SafeRelease(&dxgi_factory);
 }
 void GraphicsManagerClass::ShutdownDevice() {
-  SafeRelease(&debug_);
   swap_chain_->SetFullscreenState(FALSE, nullptr);
-  SafeRelease(&device_context_);
-  SafeRelease(&device_);
   SafeRelease(&swap_chain_);
+  SafeRelease(&device_context_);
+  SafeRelease(&debug_);
+  SafeRelease(&device_);
 }
 
 void GraphicsManagerClass::DebugDevice() {

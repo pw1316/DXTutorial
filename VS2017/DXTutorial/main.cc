@@ -30,6 +30,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hinstance,
   UNREFERENCED_PARAMETER(previous_hinstance);
   UNREFERENCED_PARAMETER(command_line);
 
+  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
   auto&& sys = naiive::core::System();
   LOG(LOG_INFO)("System setup done at", sys.GameTime());
   auto&& app = naiive::core::Application(1024, 768);
