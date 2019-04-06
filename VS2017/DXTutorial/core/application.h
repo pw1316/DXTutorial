@@ -42,8 +42,6 @@ class ApplicationClass {
   ApplicationClass& operator=(const ApplicationClass& rhs) = delete;
   ApplicationClass& operator=(ApplicationClass&& rhs) = delete;
 
-  void CALLBACK MessageHandler(HWND hwnd, UINT message, WPARAM wparam,
-                               LPARAM lparam);
   static LRESULT CALLBACK WinProc(HWND hwnd, UINT message, WPARAM wparam,
                                   LPARAM lparam);
   void Initialize(HINSTANCE hinstance, INT command_show);

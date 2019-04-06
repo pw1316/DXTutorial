@@ -26,6 +26,8 @@ SOFTWARE.
 #include <sstream>
 #include <string>
 
+#include <wrl.h>
+
 #include <core/system.h>
 #include <entity/font.h>
 #include <entity/model.h>
@@ -125,20 +127,42 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
                                             UINT height) {
   HRESULT hr = S_OK;
 
-  IDXGIFactory* dxgi_factory = nullptr;  // To destroy
-  hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgi_factory));
+  D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_1;
+  UINT flags = 0U;
+#ifdef _DEBUG
+  flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+  hr = D3D11CreateDevice(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, flags,
+                         &feature_level, 1U, D3D11_SDK_VERSION, &device_,
+                         nullptr, &device_context_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get \"IDXGIFactory\" failed:", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 device failed:", std::hex, std::uppercase, hr);
 
-  IDXGIAdapter* dxgi_adapter = nullptr;  // To destroy
-  hr = dxgi_factory->EnumAdapters(0, &dxgi_adapter);
+  hr = device_->QueryInterface(IID_PPV_ARGS(&debug_));
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get \"IDXGIAdapter\" failed:", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 debug failed:", std::hex, std::uppercase, hr);
 
-  IDXGIOutput* dxgi_output = nullptr;  // To destroy
-  hr = dxgi_adapter->EnumOutputs(0, &dxgi_output);
+  using Microsoft::WRL::ComPtr;
+  ComPtr<IDXGIDevice> dxgi_device;
+  hr = device_->QueryInterface(dxgi_device.ReleaseAndGetAddressOf());
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get \"IDXGIOutput\" failed:", std::hex, std::uppercase, hr);
+  ("Get DXGI device failed:", std::hex, std::uppercase, hr);
+
+  ComPtr<IDXGIAdapter> dxgi_adapter;
+  hr = dxgi_device->GetAdapter(dxgi_adapter.ReleaseAndGetAddressOf());
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DXGI adapter failed:", std::hex, std::uppercase, hr);
+
+  ComPtr<IDXGIFactory> dxgi_factory;
+  hr = dxgi_adapter->GetParent(
+      IID_PPV_ARGS(dxgi_factory.ReleaseAndGetAddressOf()));
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DXGI factory failed:", std::hex, std::uppercase, hr);
+
+  ComPtr<IDXGIOutput> dxgi_output;
+  hr = dxgi_adapter->EnumOutputs(0, dxgi_output.ReleaseAndGetAddressOf());
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DXGI output failed:", std::hex, std::uppercase, hr);
 
   UINT num_dxgi_modes = 0U;
   hr = dxgi_output->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
@@ -151,7 +175,7 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
                                        DXGI_ENUM_MODES_INTERLACED,
                                        &num_dxgi_modes, &mode_list[0]);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get \"DXGI_MODE_DESC\" failed:", std::hex, std::uppercase, hr);
+  ("Get DXGI mode description failed:", std::hex, std::uppercase, hr);
 
   DXGI_SWAP_CHAIN_DESC swap_chain_desc;
   ZeroMemory(&swap_chain_desc, sizeof(swap_chain_desc));
@@ -175,23 +199,9 @@ void GraphicsManagerClass::InitializeDevice(HWND hwnd, UINT width,
   swap_chain_desc.Windowed = TRUE;
   swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
   swap_chain_desc.Flags = 0;  // No Advanced Flags
-
-  D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_1;
-  hr = D3D11CreateDeviceAndSwapChain(
-      nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, D3D11_CREATE_DEVICE_DEBUG,
-      &feature_level, 1U, D3D11_SDK_VERSION, &swap_chain_desc, &swap_chain_,
-      &device_, nullptr, &device_context_);
+  hr = dxgi_factory->CreateSwapChain(device_, &swap_chain_desc, &swap_chain_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get \"ID3D11Device\",\"ID3D11DeviceContext\",\"IDXGISwapChain\" failed:",
-   std::hex, std::uppercase, hr);
-
-  hr = device_->QueryInterface(IID_PPV_ARGS(&debug_));
-  ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get \"ID3D11Debug\" failed:", std::hex, std::uppercase, hr);
-
-  SafeRelease(&dxgi_output);
-  SafeRelease(&dxgi_adapter);
-  SafeRelease(&dxgi_factory);
+  ("Get DXGI swap chain failed:", std::hex, std::uppercase, hr);
 }
 void GraphicsManagerClass::ShutdownDevice() {
   swap_chain_->SetFullscreenState(FALSE, nullptr);

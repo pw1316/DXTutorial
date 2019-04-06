@@ -72,35 +72,15 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
   Shutdown();
 }
 
-void ApplicationClass::MessageHandler(HWND hwnd, UINT message, WPARAM wparam,
-                                      LPARAM lparam) {
-  manager::GraphicsManager().MessageHandler(hwnd, message, wparam, lparam);
-}
-
 LRESULT ApplicationClass::WinProc(HWND hwnd, UINT message, WPARAM wparam,
                                   LPARAM lparam) {
   switch (message) {
-    case WM_SYSCOMMAND: {
-      switch (wparam & 0xFFF0) {
-        case SC_MOVE:
-        case SC_KEYMENU:
-        case SC_MOUSEMENU: {
-          return 0;
-        }
-        default:
-          break;
-      }
-      break;
-    }
-    case WM_NCRBUTTONDOWN: {
-      return 0;
-    }
     case WM_DESTROY: {
       PostQuitMessage(0);
       break;
     }
     default: {
-      Application().MessageHandler(hwnd, message, wparam, lparam);
+      manager::GraphicsManager().MessageHandler(hwnd, message, wparam, lparam);
       break;
     }
   }
