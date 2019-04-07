@@ -31,6 +31,7 @@ SOFTWARE.
 #include <core/system.h>
 #include <entity/font.h>
 #include <entity/model.h>
+#include <entity/render_to_texture.h>
 #include <manager/input_manager.h>
 
 namespace naiive::manager {
@@ -69,9 +70,14 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   gui_ = new naiive::entity::Font;
   gui_->Initialize(device_);
 
+  render_to_texture_.reset(new entity::RenderToTexture);
+  render_to_texture_->Initialize(device_, width, height);
+
   light_.dir = DirectX::XMFLOAT3(1.0f, 0.0f, 1.0f);
 }
 void GraphicsManagerClass::Shutdown() {
+  render_to_texture_->Shutdown();
+
   if (gui_) {
     gui_->Shutdown();
     delete gui_;
@@ -88,11 +94,13 @@ void GraphicsManagerClass::Shutdown() {
 }
 BOOL GraphicsManagerClass::OnUpdate() {
   DirectX::XMFLOAT4X4 view;
-  float blend_factor[4] = {0, 0, 0, 0};
-  BeginScene();
   camera_.GetMatrix(view);
-  device_context_->OMSetRenderTargets(1, &render_target_view_,
-                                      depth_stencil_view_);
+  float blend_factor[4] = {0, 0, 0, 0};
+
+  // To texture
+  auto rtv = render_to_texture_->render_target_view();
+  BeginScene(rtv, depth_stencil_view_);
+  device_context_->OMSetRenderTargets(1, &rtv, depth_stencil_view_);
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
@@ -106,6 +114,21 @@ BOOL GraphicsManagerClass::OnUpdate() {
       ++frustum_visible_models;
     }
   }
+
+  // To scene
+  BeginScene(render_target_view_, depth_stencil_view_);
+  device_context_->OMSetRenderTargets(1, &render_target_view_,
+                                      depth_stencil_view_);
+  device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
+  device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
+                                   0xFFFFFFFF);
+  for (auto&& pos : model_dup_) {
+    model_->MoveTo(pos);
+    model_->Render(device_context_, view, matrix_perspective_, camera_.GetPos(),
+                   light_.dir);
+  }
+
+  // GUI
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_off_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_on_, blend_factor,
                                    0xFFFFFFFF);
@@ -119,6 +142,12 @@ BOOL GraphicsManagerClass::OnUpdate() {
   ss << "Frustum Culling: " << frustum_visible_models << "/" << total_models
      << "\n";
   gui_->Render(device_, device_context_, ss.str(), {0, 1}, matrix_orthogonal_);
+
+  // Texture
+  device_context_->OMSetDepthStencilState(depth_stencil_state_z_off_, 1);
+  device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
+                                   0xFFFFFFFF);
+  render_to_texture_->Render(device_context_, {0, 100}, matrix_orthogonal_);
   EndScene();
   return TRUE;
 }

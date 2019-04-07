@@ -35,6 +35,7 @@ SOFTWARE.
 namespace naiive::entity {
 class Model3D;
 class Font;
+class RenderToTexture;
 }  // namespace naiive::entity
 
 namespace naiive::manager {
@@ -113,11 +114,10 @@ class GraphicsManagerClass : public core::IView {
   void InitializeRasterizer(HWND hwnd, UINT width, UINT height);
   void ShutdownRasterizer();
 
-  void BeginScene() {
+  void BeginScene(ID3D11RenderTargetView* rtv, ID3D11DepthStencilView* dsv) {
     float color[] = {0.0f, 0.0f, 0.0f, 0.0f};
-    device_context_->ClearRenderTargetView(render_target_view_, color);
-    device_context_->ClearDepthStencilView(depth_stencil_view_,
-                                           D3D11_CLEAR_DEPTH, 1.0f, 0);
+    device_context_->ClearRenderTargetView(rtv, color);
+    device_context_->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
   }
   void EndScene() { swap_chain_->Present(1, 0); }
 
@@ -151,6 +151,7 @@ class GraphicsManagerClass : public core::IView {
   naiive::entity::Model3D* model_ = nullptr;
   std::vector<DirectX::XMFLOAT3> model_dup_;
   naiive::entity::Font* gui_ = nullptr;
+  std::shared_ptr<entity::RenderToTexture> render_to_texture_;
 };
 
 GraphicsManagerClass& GraphicsManager();

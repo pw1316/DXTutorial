@@ -103,6 +103,7 @@
     <ClInclude Include="entity\font.h" />
     <ClInclude Include="entity\frustum.h" />
     <ClInclude Include="entity\model.h" />
+    <ClInclude Include="entity\render_to_texture.h" />
     <ClInclude Include="Manager\graphics_manager.h" />
     <ClInclude Include="Manager\input_manager.h" />
     <ClInclude Include="Manager\sound_manager.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="directx\DDSTextureLoader.cpp" />
     <ClCompile Include="entity\font.cc" />
     <ClCompile Include="entity\model.cc" />
+    <ClCompile Include="entity\render_to_texture.cc" />
     <ClCompile Include="main.cc" />
     <ClCompile Include="Manager\graphics_manager.cc" />
     <ClCompile Include="Manager\input_manager.cc" />
@@ -149,6 +151,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="res\sphere_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="res\tex_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="res\tex_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

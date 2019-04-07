@@ -78,6 +78,9 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="entity\render_to_texture.h">
+      <Filter>entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
@@ -109,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="main.cc" />
     <ClCompile Include="stdafx.cc" />
+    <ClCompile Include="entity\render_to_texture.cc">
+      <Filter>entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DXTutorial.rc">
@@ -134,6 +140,12 @@
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="res\sphere_vs.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="res\tex_vs.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="res\tex_ps.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>
