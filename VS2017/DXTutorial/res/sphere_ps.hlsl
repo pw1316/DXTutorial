@@ -33,7 +33,11 @@ cbuffer consts0 : register(b0) {
 
 cbuffer consts1 : register(b1) {
   float4 CameraPos;
-  float3 LightDir;
+  float4 light_dir;
+  float fog_start;
+  float fog_end;
+  float fog_intensity;
+  float padding;
 };
 
 struct PixelIn {
@@ -49,14 +53,18 @@ float4 main(PixelIn pin) : SV_TARGET {
   float4 color1 = shaderTexture[0].Sample(SampleType, pin.uv);
   float4 color2 = shaderTexture[2].Sample(SampleType, pin.uv);
   float4 color = 2 * pow(abs(color1), 2.2) * pow(abs(color2), 2.2);
+  float dist = length(CameraPos.xyz - pin.pos_world);
   float3 view = normalize(CameraPos.xyz - pin.pos_world);
-  float3 ld = normalize(LightDir);
+  float3 ld = normalize(light_dir.xyz);
   float3 normal = normalize(pin.normal);
   float4 bump = shaderTexture[1].Sample(SampleType, pin.uv) * 2.0 - 1.0;
   normal =
       normalize(bump.x * pin.tangent + bump.y * pin.binormal + bump.z * normal);
   color = color * (Ka + Kd * saturate(dot(normal, -ld))) +
           Ks * pow(saturate(dot(normalize(view - ld), normal)), Ns);
+  // float fog = pow(1.0 / 2.71828, max(0, dist - fog_start));
+  float fog = (fog_end - dist) / (fog_end - fog_start);
+  color = color * fog + (1 - fog) * fog_intensity;
   color = pow(abs(color), 1.0 / 2.2);
   return color;
 }

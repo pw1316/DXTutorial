@@ -26,8 +26,6 @@ SOFTWARE.
 #include <algorithm>
 #include <limits>
 
-#include <DirectXMath.h>
-
 namespace naiive::entity {
 class BoundingBox3D {
  public:

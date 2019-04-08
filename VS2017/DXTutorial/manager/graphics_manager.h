@@ -26,10 +26,6 @@ SOFTWARE.
 #include <random>
 #include <vector>
 
-#include <DirectXMath.h>
-#include <d3d11_4.h>
-#include <dxgi1_6.h>
-
 #include <core/iview.h>
 
 namespace naiive::entity {
@@ -88,7 +84,7 @@ class GraphicsManagerClass : public core::IView {
     DirectX::XMFLOAT4X4 matrix_view_{};
   };
   struct Light {
-    DirectX::XMFLOAT3 dir{};
+    DirectX::XMFLOAT4 dir{};
   };
 
  public:
@@ -115,7 +111,7 @@ class GraphicsManagerClass : public core::IView {
   void ShutdownRasterizer();
 
   void BeginScene(ID3D11RenderTargetView* rtv, ID3D11DepthStencilView* dsv) {
-    float color[] = {0.0f, 0.0f, 0.0f, 0.0f};
+    float color[] = {0.5f, 0.5f, 0.5f, 1.0f};
     device_context_->ClearRenderTargetView(rtv, color);
     device_context_->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
   }

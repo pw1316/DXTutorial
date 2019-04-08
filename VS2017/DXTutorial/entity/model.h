@@ -26,9 +26,6 @@ SOFTWARE.
 #include <string>
 #include <vector>
 
-#include <DirectXMath.h>
-#include <d3d11_4.h>
-
 #include <3rdparty/include/tiny_obj_loader.h>
 #include <entity/bounding_box.h>
 
@@ -48,8 +45,8 @@ class Model3D {
   };
   struct CBCameraLightType {
     DirectX::XMFLOAT4 camera_pos;
-    DirectX::XMFLOAT3 light_dir;
-    float padding;
+    DirectX::XMFLOAT4 light_dir;
+    DirectX::XMFLOAT4 fog;
   };
   struct CBMaterialType {
     DirectX::XMFLOAT4 ka;
@@ -76,7 +73,7 @@ class Model3D {
   BOOL Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view,
               const DirectX::XMFLOAT4X4& proj,
               const DirectX::XMFLOAT4& camera_pos,
-              const DirectX::XMFLOAT3& dir);
+              const DirectX::XMFLOAT4& dir);
   void MoveTo(const DirectX::XMFLOAT3& translate) { translate_ = translate; }
 
  private:

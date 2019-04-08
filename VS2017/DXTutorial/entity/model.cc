@@ -27,7 +27,6 @@ SOFTWARE.
 #include <vector>
 
 #include <DirectX/DDSTextureLoader.h>
-#include <d3dcompiler.h>
 
 #include <entity/frustum.h>
 #include <utils/range.h>
@@ -51,7 +50,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
                      const DirectX::XMFLOAT4X4& view,
                      const DirectX::XMFLOAT4X4& proj,
                      const DirectX::XMFLOAT4& camera_pos,
-                     const DirectX::XMFLOAT3& dir) {
+                     const DirectX::XMFLOAT4& dir) {
   HRESULT hr = S_OK;
 
   auto xmworld = DirectX::XMMatrixRotationRollPitchYaw(
@@ -104,6 +103,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
     auto rawdata = (CBCameraLightType*)mapped.pData;
     rawdata->camera_pos = camera_pos;
     rawdata->light_dir = dir;
+    rawdata->fog = {0, 100, 0.5f, 0.0f};
   }
   context->Unmap(const_buffer_camera_light_, 0);
 

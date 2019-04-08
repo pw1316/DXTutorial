@@ -45,6 +45,10 @@ SOFTWARE.
 #include <unordered_map>
 
 /* 3rdparty libs */
+#include <DirectXMath.h>
+#include <d3d11_4.h>
+#include <d3dcompiler.h>
+#include <dxgi1_6.h>
 #include <mmreg.h>
 
 #ifdef _DEBUG
@@ -162,8 +166,16 @@ inline UINT GetReferenceCount(COM* p_com) {
 template <class COM>
 inline void SafeRelease_(const char* file_name, int line_number, COM** pp_com) {
   if (*pp_com != nullptr) {
+    (*pp_com)->Release();
+    (*pp_com) = nullptr;
+  }
+}
+
+inline void SafeRelease_(const char* file_name, int line_number,
+                         ID3D11Device** pp_com) {
+  if (*pp_com != nullptr) {
     UINT ref_count = (*pp_com)->Release();
-    CHECK(ref_count == 0)("Release", typeid(COM).name());
+    CHECK(ref_count == 0)("Release ID3D11Device");
     CHECK(ref_count == 0)("  At", file_name, line_number);
     CHECK(ref_count == 0)("  Refcount", ref_count);
     (*pp_com) = nullptr;

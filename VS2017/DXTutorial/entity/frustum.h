@@ -23,8 +23,6 @@ SOFTWARE.
 
 #ifndef __ENTITY_FRUSTUM__
 #define __ENTITY_FRUSTUM__
-#include <DirectXMath.h>
-
 #include <utils/range.h>
 
 namespace naiive::entity {

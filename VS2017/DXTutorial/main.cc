@@ -35,5 +35,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hinstance,
   LOG(LOG_INFO)("System setup done at", sys.GameTime());
   auto&& app = naiive::core::Application(1024, 768);
   app.Run(hinstance, command_show);
+  LOG(LOG_INFO)("Press ENTER to close this window . . .");
+  std::getchar();
   return 0;
 }

@@ -101,4 +101,12 @@ Bump map:
 
 ## Tut 23 Fog
 
-TODO
+Add a fog factor $\lambda$, Blend fog with the scene
+
+1. Linear Fog: $\lambda=(f-d)/(f-n)$
+2. Exponential Fog: $\lambda=(\frac{1}{e})^{d}$
+3. Exponential Fog 2: $\lambda=(\frac{1}{e})^{d^2}$
+
+Where $f$ and $n$ are the far plane and the near plane, $d$ is the distance from camera, $e$ is the base of natural logarithm.
+
+And finally the blend function is: $c=\lambda c+(1-\lambda)i$, where $c$ is texture color and $i$ is fog intensity.

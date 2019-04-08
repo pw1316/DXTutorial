@@ -28,8 +28,12 @@ cbuffer consts0 : register(b0) {
 };
 
 cbuffer consts1 : register(b1) {
-  float4 CameraPos;
-  float3 LightDir;
+  float4 camera_pos;
+  float4 light_dir;
+  float fog_start;
+  float fog_end;
+  float fog_intensity;
+  float padding;
 };
 
 struct VertexIn {

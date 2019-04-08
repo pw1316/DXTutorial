@@ -23,8 +23,6 @@ SOFTWARE.
 
 #include "render_to_texture.h"
 
-#include <d3dcompiler.h>
-
 namespace naiive::entity {
 void RenderToTexture::Initialize(ID3D11Device* device, UINT width,
                                  UINT height) {

@@ -25,9 +25,6 @@ SOFTWARE.
 #define __ENTITY_FONT__
 #include <string>
 
-#include <DirectXMath.h>
-#include <d3d11_4.h>
-
 namespace naiive::entity {
 class Font {
   struct FontType {

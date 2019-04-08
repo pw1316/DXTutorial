@@ -26,8 +26,6 @@ SOFTWARE.
 #include <fstream>
 #include <vector>
 
-#include <d3dcompiler.h>
-
 #include <DirectX/DDSTextureLoader.h>
 
 namespace naiive::entity {

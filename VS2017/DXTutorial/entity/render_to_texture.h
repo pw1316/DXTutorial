@@ -23,8 +23,6 @@ SOFTWARE.
 
 #ifndef __ENTITY_RENDER_TO_TEXTURE__
 #define __ENTITY_RENDER_TO_TEXTURE__
-#include <DirectXMath.h>
-#include <d3d11_4.h>
 
 namespace naiive::entity {
 class RenderToTexture {
