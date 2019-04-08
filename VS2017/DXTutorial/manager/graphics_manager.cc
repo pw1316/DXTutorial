@@ -31,7 +31,7 @@ SOFTWARE.
 #include <core/system.h>
 #include <entity/font.h>
 #include <entity/model.h>
-#include <entity/render_to_texture.h>
+#include <entity/mirror.h>
 #include <manager/input_manager.h>
 
 namespace naiive::manager {

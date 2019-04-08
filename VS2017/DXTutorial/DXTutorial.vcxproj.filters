@@ -78,7 +78,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="entity\render_to_texture.h">
+    <ClInclude Include="entity\mirror.h">
       <Filter>entity</Filter>
     </ClInclude>
   </ItemGroup>
@@ -112,7 +112,7 @@
     </ClCompile>
     <ClCompile Include="main.cc" />
     <ClCompile Include="stdafx.cc" />
-    <ClCompile Include="entity\render_to_texture.cc">
+    <ClCompile Include="entity\mirror.cc">
       <Filter>entity</Filter>
     </ClCompile>
   </ItemGroup>

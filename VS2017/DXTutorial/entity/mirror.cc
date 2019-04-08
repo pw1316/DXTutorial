@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-#include "render_to_texture.h"
+#include "mirror.h"
 
 namespace naiive::entity {
 void RenderToTexture::Initialize(ID3D11Device* device, UINT width,
