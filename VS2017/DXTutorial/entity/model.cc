@@ -283,8 +283,10 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   WCHAR texture_name_l[128] = {0};
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
-  hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
-                                         &shader_resource_texture_[0]);
+  hr = DirectX::CreateDDSTextureFromFileEx(
+      device, nullptr, texture_name_l, 0, D3D11_USAGE_DEFAULT,
+      D3D11_BIND_SHADER_RESOURCE, 0, 0, TRUE, nullptr,
+      &shader_resource_texture_[0]);
   CHECK(SUCCEEDED(hr))("Texture [stone] missing");
 
   texture_name = name_ + "_stone_bump.dds";
@@ -297,8 +299,10 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   texture_name = name_ + "_dirt.dds";
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
-  hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
-                                         &shader_resource_texture_[2]);
+  hr = DirectX::CreateDDSTextureFromFileEx(
+      device, nullptr, texture_name_l, 0, D3D11_USAGE_DEFAULT,
+      D3D11_BIND_SHADER_RESOURCE, 0, 0, TRUE, nullptr,
+      &shader_resource_texture_[2]);
   CHECK(SUCCEEDED(hr))("Texture [dirt] missing");
 
   /* =====SamplerState===== */

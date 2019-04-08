@@ -66,6 +66,8 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
     pos.y = distribution_xy_(rng_);
     pos.z = distribution_z_(rng_);
   }
+  std::sort(model_dup_.begin(), model_dup_.end(),
+            [](auto&& lhs, auto&& rhs) { return lhs.z > rhs.z; });
 
   gui_ = new naiive::entity::Font;
   gui_->Initialize(device_);
@@ -258,7 +260,12 @@ void GraphicsManagerClass::InitializeOM(HWND hwnd, UINT width, UINT height) {
   ID3D11Texture2D* back_buffer;
   hr = swap_chain_->GetBuffer(0, IID_PPV_ARGS(&back_buffer));
   ASSERT(SUCCEEDED(hr));
-  hr = device_->CreateRenderTargetView(back_buffer, nullptr,
+  D3D11_RENDER_TARGET_VIEW_DESC render_target_view_desc;
+  ZeroMemory(&render_target_view_desc, sizeof(render_target_view_desc));
+  render_target_view_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+  render_target_view_desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+  render_target_view_desc.Texture2D.MipSlice = 0;
+  hr = device_->CreateRenderTargetView(back_buffer, &render_target_view_desc,
                                        &render_target_view_);
   SafeRelease(&back_buffer);
   ASSERT(SUCCEEDED(hr));

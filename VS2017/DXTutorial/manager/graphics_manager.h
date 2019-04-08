@@ -111,8 +111,8 @@ class GraphicsManagerClass : public core::IView {
   void ShutdownRasterizer();
 
   void BeginScene(ID3D11RenderTargetView* rtv, ID3D11DepthStencilView* dsv) {
-    // gamma 0.733 -> linear 0.5
-    float color[] = {0.733f, 0.733f, 0.733f, 1.0f};
+    // RTV is sRGB, so we can use linear value here
+    float color[] = {0.5f, 0.5f, 0.5f, 1.0f};
     device_context_->ClearRenderTargetView(rtv, color);
     device_context_->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
   }
