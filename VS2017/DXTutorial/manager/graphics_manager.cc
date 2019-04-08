@@ -30,8 +30,8 @@ SOFTWARE.
 
 #include <core/system.h>
 #include <entity/font.h>
-#include <entity/model.h>
 #include <entity/mirror.h>
+#include <entity/model.h>
 #include <manager/input_manager.h>
 
 namespace naiive::manager {
@@ -56,14 +56,14 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
                            DirectX::XMMatrixOrthographicLH(
                                (float)width, (float)height, 0.1f, 1000.0f));
 
-  camera_.SetPos(0.0f, 2.0f, -10.0f);
+  camera_.SetPos(0.0f, 5.0f, -10.0f);
 
   model_ = new naiive::entity::Model3D("res/sphere");
   model_->Initialize(device_);
   model_dup_.resize(1000);
   for (auto&& pos : model_dup_) {
-    pos.x = distribution_xy_(rng_);
-    pos.y = distribution_xy_(rng_);
+    pos.x = distribution_x_(rng_);
+    pos.y = distribution_y_(rng_);
     pos.z = distribution_z_(rng_);
   }
   std::sort(model_dup_.begin(), model_dup_.end(),
@@ -72,8 +72,8 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   gui_ = new naiive::entity::Font;
   gui_->Initialize(device_);
 
-  render_to_texture_.reset(new entity::RenderToTexture);
-  render_to_texture_->Initialize(device_, width, height);
+  mirror_.reset(new entity::Mirror);
+  mirror_->Initialize(device_, width, height);
 
   DirectX::XMFLOAT4 float4(1.0f, 0.0f, 1.0f, 0.0f);
   DirectX::XMVECTOR xmfloat4 = DirectX::XMLoadFloat4(&float4);
@@ -81,7 +81,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   DirectX::XMStoreFloat4(&light_.dir, xmfloat4);
 }
 void GraphicsManagerClass::Shutdown() {
-  render_to_texture_->Shutdown();
+  mirror_->Shutdown();
 
   if (gui_) {
     gui_->Shutdown();
@@ -100,21 +100,22 @@ void GraphicsManagerClass::Shutdown() {
 BOOL GraphicsManagerClass::OnUpdate() {
   DirectX::XMFLOAT4X4 view;
   camera_.GetMatrix(view);
+  DirectX::XMFLOAT4X4 reflect_view;
+  camera_.GetReflectMatrix(0.0f, reflect_view);
   float blend_factor[4] = {0, 0, 0, 0};
 
   // To texture
-  auto rtv = render_to_texture_->render_target_view();
+  auto rtv = mirror_->render_target_view();
   BeginScene(rtv, depth_stencil_view_);
   device_context_->OMSetRenderTargets(1, &rtv, depth_stencil_view_);
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
-
   ULONG total_models = static_cast<ULONG>(model_dup_.size());
   ULONG frustum_visible_models = 0UL;
   for (auto&& pos : model_dup_) {
     model_->MoveTo(pos);
-    if (model_->Render(device_context_, view, matrix_perspective_,
+    if (model_->Render(device_context_, reflect_view, matrix_perspective_,
                        camera_.GetPos(), light_.dir)) {
       ++frustum_visible_models;
     }
@@ -133,6 +134,9 @@ BOOL GraphicsManagerClass::OnUpdate() {
                    light_.dir);
   }
 
+  // Mirror
+  mirror_->Render(device_context_, view, matrix_perspective_, reflect_view);
+
   // GUI
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_off_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_on_, blend_factor,
@@ -147,12 +151,6 @@ BOOL GraphicsManagerClass::OnUpdate() {
   ss << "Frustum Culling: " << frustum_visible_models << "/" << total_models
      << "\n";
   gui_->Render(device_, device_context_, ss.str(), {0, 1}, matrix_orthogonal_);
-
-  // Texture
-  device_context_->OMSetDepthStencilState(depth_stencil_state_z_off_, 1);
-  device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
-                                   0xFFFFFFFF);
-  render_to_texture_->Render(device_context_, {0, 100}, matrix_orthogonal_);
   EndScene();
   return TRUE;
 }

@@ -24,8 +24,7 @@ SOFTWARE.
 #include "mirror.h"
 
 namespace naiive::entity {
-void RenderToTexture::Initialize(ID3D11Device* device, UINT width,
-                                 UINT height) {
+void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   HRESULT hr = S_OK;
 
   D3D11_TEXTURE2D_DESC texture2d_desc;
@@ -55,8 +54,6 @@ void RenderToTexture::Initialize(ID3D11Device* device, UINT width,
   ASSERT_MESSAGE(SUCCEEDED(hr))
   ("Get DirectX 11 shader resource view failed", std::hex, std::uppercase, hr);
 
-  ULONG indices[] = {0, 1, 2, 3, 4, 5};
-
   D3D11_BUFFER_DESC buffer_desc;
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -80,6 +77,7 @@ void RenderToTexture::Initialize(ID3D11Device* device, UINT width,
   ASSERT_MESSAGE(SUCCEEDED(hr))
   ("Get DirectX 11 vertex buffer failed", std::hex, std::uppercase, hr);
 
+  ULONG indices[] = {0, 1, 2, 3, 4, 5};
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_IMMUTABLE;
   buffer_desc.ByteWidth = sizeof(ULONG) * 6;
@@ -117,7 +115,7 @@ void RenderToTexture::Initialize(ID3D11Device* device, UINT width,
   InitializeShader(device);
 }
 
-void RenderToTexture::Shutdown() {
+void Mirror::Shutdown() {
   ShutdownShader();
   SafeRelease(&sampler_state_);
   SafeRelease(&index_buffer_);
@@ -129,38 +127,44 @@ void RenderToTexture::Shutdown() {
   SafeRelease(&back_buffer_);
 }
 
-void RenderToTexture::Render(ID3D11DeviceContext* context,
-                             const DirectX::XMFLOAT2& pos,
-                             DirectX::XMFLOAT4X4 proj) {
+void Mirror::Render(ID3D11DeviceContext* context,
+                    const DirectX::XMFLOAT4X4& view,
+                    const DirectX::XMFLOAT4X4& proj,
+                    const DirectX::XMFLOAT4X4& view_reflect) {
   HRESULT hr = S_OK;
-
-  FLOAT x = -1.0f / proj._11 + pos.x;
-  FLOAT y = 1.0f / proj._22 - pos.y;
 
   D3D11_MAPPED_SUBRESOURCE mapped;
   context->Map(const_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
     auto rawdata = (CB0Type*)mapped.pData;
-    auto temp = DirectX::XMLoadFloat4x4(&proj);
-    temp = DirectX::XMMatrixTranspose(temp);
+    auto temp = DirectX::XMMatrixIdentity();
+    DirectX::XMStoreFloat4x4(&rawdata->matrix_world, temp);
+
+    temp = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&view));
+    DirectX::XMStoreFloat4x4(&rawdata->matrix_view, temp);
+
+    temp = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&proj));
     DirectX::XMStoreFloat4x4(&rawdata->matrix_proj, temp);
+
+    temp = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&view_reflect));
+    DirectX::XMStoreFloat4x4(&rawdata->matrix_reflect_view, temp);
   }
   context->Unmap(const_buffer_, 0);
 
   context->Map(vertex_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
     auto rawdata = (VBType*)mapped.pData;
-    rawdata[0].pos = {x, y, 1.0f};
+    rawdata[0].pos = {-20, 0, 40};
     rawdata[0].uv = {0.0f, 0.0f};
-    rawdata[1].pos = {x + kWidth, y - kHeight, 1.0f};
+    rawdata[1].pos = {20, 0, -10};
     rawdata[1].uv = {1.0f, 1.0f};
-    rawdata[2].pos = {x, y - kHeight, 1.0f};
+    rawdata[2].pos = {-20, 0, -10};
     rawdata[2].uv = {0.0f, 1.0f};
-    rawdata[3].pos = {x, y, 1.0f};
+    rawdata[3].pos = {-20, 0, 40};
     rawdata[3].uv = {0.0f, 0.0f};
-    rawdata[4].pos = {x + kWidth, y, 1.0f};
+    rawdata[4].pos = {20, 0, 40};
     rawdata[4].uv = {1.0f, 0.0f};
-    rawdata[5].pos = {x + kWidth, y - kHeight, 1.0f};
+    rawdata[5].pos = {20, 0, -10};
     rawdata[5].uv = {1.0f, 1.0f};
   }
   context->Unmap(vertex_buffer_, 0);
@@ -175,7 +179,6 @@ void RenderToTexture::Render(ID3D11DeviceContext* context,
   context->VSSetConstantBuffers(0, 1, &const_buffer_);
   context->VSSetShader(vertex_shader_, nullptr, 0);
 
-  context->PSSetConstantBuffers(0, 1, &const_buffer_);
   context->PSSetShaderResources(0, 1, &shader_resource_view_);
   context->PSSetSamplers(0, 1, &sampler_state_);
   context->PSSetShader(pixel_shader_, nullptr, 0);
@@ -184,18 +187,15 @@ void RenderToTexture::Render(ID3D11DeviceContext* context,
   context->PSSetShaderResources(0, 1, &kDummyShaderResourceView);
 }
 
-void RenderToTexture::InitializeShader(ID3D11Device* device) {
+void Mirror::InitializeShader(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   ID3D10Blob* blob = nullptr;
-  const UINT layout_number = 2;
-  D3D11_INPUT_ELEMENT_DESC layout[layout_number];
-
   UINT shader_flag = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
                      D3DCOMPILE_SKIP_OPTIMIZATION;
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"res/tex_vs.hlsl", nullptr, nullptr, "main",
+  hr = D3DCompileFromFile(L"res/mirror_vs.hlsl", nullptr, nullptr, "main",
                           "vs_5_0", shader_flag, 0, &blob, nullptr);
   ASSERT(SUCCEEDED(hr));
   hr = device->CreateVertexShader(blob->GetBufferPointer(),
@@ -203,6 +203,8 @@ void RenderToTexture::InitializeShader(ID3D11Device* device) {
                                   &vertex_shader_);
   ASSERT(SUCCEEDED(hr));
 
+  const UINT kNumLayout = 2;
+  D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
   layout[0].SemanticIndex = 0;
@@ -211,6 +213,7 @@ void RenderToTexture::InitializeShader(ID3D11Device* device) {
   layout[0].AlignedByteOffset = 0;
   layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[0].InstanceDataStepRate = 0;
+
   layout[1].SemanticName = "TEXCOORD";
   layout[1].SemanticIndex = 0;
   layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
@@ -218,13 +221,12 @@ void RenderToTexture::InitializeShader(ID3D11Device* device) {
   layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
   layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[1].InstanceDataStepRate = 0;
-  hr =
-      device->CreateInputLayout(layout, layout_number, blob->GetBufferPointer(),
-                                blob->GetBufferSize(), &input_layout_);
+  hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
+                                 blob->GetBufferSize(), &input_layout_);
   ASSERT(SUCCEEDED(hr));
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"res/tex_ps.hlsl", nullptr, nullptr, "main",
+  hr = D3DCompileFromFile(L"res/mirror_ps.hlsl", nullptr, nullptr, "main",
                           "ps_5_0", shader_flag, 0, &blob, nullptr);
   ASSERT(SUCCEEDED(hr));
   hr = device->CreatePixelShader(
@@ -232,7 +234,7 @@ void RenderToTexture::InitializeShader(ID3D11Device* device) {
   ASSERT(SUCCEEDED(hr));
   SafeRelease(&blob);
 }
-void RenderToTexture::ShutdownShader() {
+void Mirror::ShutdownShader() {
   SafeRelease(&pixel_shader_);
   SafeRelease(&input_layout_);
   SafeRelease(&vertex_shader_);

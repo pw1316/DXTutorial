@@ -47,7 +47,7 @@ class Model3D {
     DirectX::XMFLOAT4 camera_pos;
     DirectX::XMFLOAT4 light_dir;
     DirectX::XMFLOAT4 fog;
-	DirectX::XMFLOAT4 clip_plane;
+    DirectX::XMFLOAT4 clip_plane;
   };
   struct CBMaterialType {
     DirectX::XMFLOAT4 ka;

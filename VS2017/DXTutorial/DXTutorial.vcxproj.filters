@@ -142,10 +142,10 @@
     <FxCompile Include="res\sphere_vs.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
-    <FxCompile Include="res\tex_vs.hlsl">
+    <FxCompile Include="res\mirror_vs.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
-    <FxCompile Include="res\tex_ps.hlsl">
+    <FxCompile Include="res\mirror_ps.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

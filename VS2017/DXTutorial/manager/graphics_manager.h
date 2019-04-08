@@ -31,7 +31,7 @@ SOFTWARE.
 namespace naiive::entity {
 class Model3D;
 class Font;
-class RenderToTexture;
+class Mirror;
 }  // namespace naiive::entity
 
 namespace naiive::manager {
@@ -76,6 +76,21 @@ class GraphicsManagerClass : public core::IView {
       }
       m = matrix_view_;
     }
+    // xz plane reflection
+    void GetReflectMatrix(FLOAT y, DirectX::XMFLOAT4X4& m) const {
+      DirectX::XMFLOAT3 pos_raw(x_, -y_ + 2.0f * y, z_);
+      DirectX::XMFLOAT3 up_raw(0.0f, 1.0f, 0.0f);
+      DirectX::XMFLOAT3 look_at_raw(0.0f, 0.0f, 1.0f);
+      auto rot_matrix =
+          DirectX::XMMatrixRotationRollPitchYaw(-rot_x_, rot_y_, -rot_z_);
+      auto pos = DirectX::XMLoadFloat3(&pos_raw);
+      auto look_at = DirectX::XMVector3TransformCoord(
+          DirectX::XMLoadFloat3(&look_at_raw), rot_matrix);
+      auto up = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&up_raw),
+                                                 rot_matrix);
+      look_at = DirectX::XMVectorAdd(pos, look_at);
+      DirectX::XMStoreFloat4x4(&m, DirectX::XMMatrixLookAtLH(pos, look_at, up));
+    }
 
    private:
     BOOL dirty_ = true;
@@ -95,7 +110,10 @@ class GraphicsManagerClass : public core::IView {
 
  private:
   GraphicsManagerClass()
-      : rng_(0), distribution_xy_(-40, 40), distribution_z_(-5, 40) {}
+      : rng_(0),
+        distribution_x_(-40, 40),
+        distribution_y_(0, 40),
+        distribution_z_(-5, 40) {}
 
   /* D3D Basic */
   void InitializeDevice(HWND hwnd, UINT width, UINT height);
@@ -140,7 +158,8 @@ class GraphicsManagerClass : public core::IView {
 
   /* RNG */
   std::mt19937 rng_;
-  std::uniform_real_distribution<FLOAT> distribution_xy_;
+  std::uniform_real_distribution<FLOAT> distribution_x_;
+  std::uniform_real_distribution<FLOAT> distribution_y_;
   std::uniform_real_distribution<FLOAT> distribution_z_;
 
   Camera camera_;
@@ -148,7 +167,7 @@ class GraphicsManagerClass : public core::IView {
   naiive::entity::Model3D* model_ = nullptr;
   std::vector<DirectX::XMFLOAT3> model_dup_;
   naiive::entity::Font* gui_ = nullptr;
-  std::shared_ptr<entity::RenderToTexture> render_to_texture_;
+  std::shared_ptr<entity::Mirror> mirror_;
 };
 
 GraphicsManagerClass& GraphicsManager();

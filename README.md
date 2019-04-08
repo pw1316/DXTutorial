@@ -123,3 +123,12 @@ DirectX 11 sematics:
 Plane equation $dot(p-p_0, n)=0$, to homogeneous space $dot(\begin{bmatrix}p&1\end{bmatrix},\begin{bmatrix}n,-dot(n,p_0)\end{bmatrix})=0$
 
 When a point is on the side that n points, clip value $v=dot(\begin{bmatrix}p&1\end{bmatrix},\begin{bmatrix}n,-dot(n,p_0)\end{bmatrix})\geq 0$. So $v$ will be calculated for each vertex in the vertex shader.
+
+## Tut 27 Reflection
+
+Plane mirror
+
+1. Mirror plane and camera position -> image camera position
+2. View from image camera, render the scene to an texture
+3. Render the whole scene with out the mirror to RTV as usual
+4. Render the mirror, for each rasterized pixel, find its projection space coordinate in image camera view, sample from the texture in 2. to get real color image color in the mirror. Since light path is reversible, every pixel of the mirror that can be seen in the real camera can be seen in the image camera, so all of them can be sampled.

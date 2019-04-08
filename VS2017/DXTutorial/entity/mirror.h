@@ -21,17 +21,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-#ifndef __ENTITY_RENDER_TO_TEXTURE__
-#define __ENTITY_RENDER_TO_TEXTURE__
+#ifndef __ENTITY_MIRROR__
+#define __ENTITY_MIRROR__
 
 namespace naiive::entity {
-class RenderToTexture {
+class Mirror {
   struct VBType {
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT2 uv;
   };
   struct CB0Type {
+    DirectX::XMFLOAT4X4 matrix_world;
+    DirectX::XMFLOAT4X4 matrix_view;
     DirectX::XMFLOAT4X4 matrix_proj;
+    DirectX::XMFLOAT4X4 matrix_reflect_view;
   };
   static constexpr ID3D11ShaderResourceView* kDummyShaderResourceView = nullptr;
   static constexpr UINT kWidth = 256;
@@ -40,8 +43,9 @@ class RenderToTexture {
  public:
   void Initialize(ID3D11Device* device, UINT width, UINT height);
   void Shutdown();
-  void Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT2& pos,
-              DirectX::XMFLOAT4X4 proj);
+  void Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view,
+              const DirectX::XMFLOAT4X4& proj,
+              const DirectX::XMFLOAT4X4& view_reflect);
 
   ID3D11RenderTargetView* render_target_view() { return render_target_view_; }
   ID3D11ShaderResourceView* shader_resource_view() {

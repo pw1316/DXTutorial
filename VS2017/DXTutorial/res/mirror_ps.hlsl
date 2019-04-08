@@ -21,21 +21,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-cbuffer consts0 : register(b0) { matrix MatrixProj; };
+Texture2D reflect_texture : register(t0);
+SamplerState reflect_texture_sampler;
 
-struct VertexIn {
-  float4 pos : POSITION;
-  float2 uv : TEXCOORD0;
-};
-
-struct VertexOut {
+struct PixelIn {
   float4 pos : SV_POSITION;
   float2 uv : TEXCOORD0;
+  float4 pos_reflect : TEXCOORD1;
 };
 
-VertexOut main(VertexIn vin) {
-  VertexOut vout;
-  vout.pos = mul(vin.pos, MatrixProj);
-  vout.uv = vin.uv;
-  return vout;
+float4 main(PixelIn pin) : SV_TARGET {
+  float2 uv;
+  uv.x = pin.pos_reflect.x / pin.pos_reflect.w / 2.0f + 0.5f;
+  uv.y = -pin.pos_reflect.y / pin.pos_reflect.w / 2.0f + 0.5f;
+  float4 color = reflect_texture.Sample(reflect_texture_sampler, uv);
+  color = 0.5f * color + 0.5f * float4(1.0f, 1.0f, 1.0f, 1.0f);
+  return color;
 }

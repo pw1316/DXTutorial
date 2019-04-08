@@ -21,22 +21,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-Texture2D shaderTexture : register(t0);
-SamplerState SampleType;
+cbuffer consts0 : register(b0) {
+  matrix matrix_world;
+  matrix matrix_view;
+  matrix matrix_proj;
+  matrix matrix_reflect_view;
+};
 
-cbuffer consts0 : register(b0) { matrix MatrixProj; };
-
-struct PixelIn {
-  float4 pos : SV_POSITION;
+struct VertexIn {
+  float4 pos : POSITION;
   float2 uv : TEXCOORD0;
 };
 
-float4 main(PixelIn pin) : SV_TARGET {
-  float4 pout;
-  pout = shaderTexture.Sample(SampleType, pin.uv);
-  float temp = pout.r;
-  pout.r = pout.g;
-  pout.g = pout.b;
-  pout.b = temp;
-  return pout;
+struct VertexOut {
+  float4 pos : SV_POSITION;
+  float2 uv : TEXCOORD0;
+  float4 pos_reflect : TEXCOORD1;
+};
+
+VertexOut main(VertexIn vin) {
+  float4 pos_world = mul(vin.pos, matrix_world);
+  VertexOut vout;
+  vout.pos = mul(pos_world, matrix_view);
+  vout.pos = mul(vout.pos, matrix_proj);
+  vout.uv = vin.uv;
+  vout.pos_reflect = mul(pos_world, matrix_reflect_view);
+  vout.pos_reflect = mul(vout.pos_reflect, matrix_proj);
+  return vout;
 }
