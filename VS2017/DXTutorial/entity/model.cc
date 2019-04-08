@@ -103,7 +103,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
     auto rawdata = (CBCameraLightType*)mapped.pData;
     rawdata->camera_pos = camera_pos;
     rawdata->light_dir = dir;
-    rawdata->fog = {0, 60, 0.5f, 0.0f};
+    rawdata->fog = {0, 50, 0.5f, 0.0f};
     rawdata->clip_plane = {-1, 0, 0, 0};
   }
   context->Unmap(const_buffer_camera_light_, 0);
