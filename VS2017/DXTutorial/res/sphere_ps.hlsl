@@ -67,5 +67,6 @@ float4 main(PixelIn pin) : SV_TARGET {
   // float fog = pow(1.0 / 2.71828, max(0, dist - fog_start));
   float fog = saturate((fog_end - dist) / (fog_end - fog_start));
   color = color * fog + (1 - fog) * fog_intensity;
+  color.a = 0.9;
   return color;
 }
