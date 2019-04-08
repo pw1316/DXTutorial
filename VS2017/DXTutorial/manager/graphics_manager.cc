@@ -73,7 +73,10 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   render_to_texture_.reset(new entity::RenderToTexture);
   render_to_texture_->Initialize(device_, width, height);
 
-  light_.dir = DirectX::XMFLOAT4(1.0f, 0.0f, 1.0f, 0.0f);
+  DirectX::XMFLOAT4 float4(1.0f, 0.0f, 1.0f, 0.0f);
+  DirectX::XMVECTOR xmfloat4 = DirectX::XMLoadFloat4(&float4);
+  xmfloat4 = DirectX::XMVector4Normalize(xmfloat4);
+  DirectX::XMStoreFloat4(&light_.dir, xmfloat4);
 }
 void GraphicsManagerClass::Shutdown() {
   render_to_texture_->Shutdown();

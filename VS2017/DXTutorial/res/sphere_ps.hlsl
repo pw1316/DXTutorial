@@ -43,27 +43,29 @@ cbuffer consts1 : register(b1) {
 struct PixelIn {
   float4 pos : SV_POSITION;
   float2 uv : TEXCOORD0;
-  float3 normal : NORMAL;
-  float3 tangent : TANGENT;
-  float3 binormal : BINORMAL;
-  float3 pos_world : TEXCOORD1;
+  float4 normal : NORMAL;
+  float4 tangent : TANGENT;
+  float4 binormal : BINORMAL;
+  float4 pos_world : TEXCOORD1;
+  float clip_value : SV_ClipDistance0;
 };
 
 float4 main(PixelIn pin) : SV_TARGET {
   float4 color1 = shaderTexture[0].Sample(SampleType, pin.uv);
   float4 color2 = shaderTexture[2].Sample(SampleType, pin.uv);
   float4 color = 2 * pow(abs(color1), 2.2) * pow(abs(color2), 2.2);
-  float dist = length(CameraPos.xyz - pin.pos_world);
-  float3 view = normalize(CameraPos.xyz - pin.pos_world);
-  float3 ld = normalize(light_dir.xyz);
-  float3 normal = normalize(pin.normal);
+  float dist = length(CameraPos - pin.pos_world);
+  float4 view = normalize(CameraPos - pin.pos_world);
+  float4 normal = normalize(pin.normal);
+  float4 tangent = normalize(pin.tangent);
+  float4 binormal = normalize(pin.binormal);
+
   float4 bump = shaderTexture[1].Sample(SampleType, pin.uv) * 2.0 - 1.0;
-  normal =
-      normalize(bump.x * pin.tangent + bump.y * pin.binormal + bump.z * normal);
-  color = color * (Ka + Kd * saturate(dot(normal, -ld))) +
-          Ks * pow(saturate(dot(normalize(view - ld), normal)), Ns);
+  normal = normalize(bump.x * tangent + bump.y * binormal + bump.z * normal);
+  color = color * (Ka + Kd * saturate(dot(normal, -light_dir))) +
+          Ks * pow(saturate(dot(normalize(view - light_dir), normal)), Ns);
   // float fog = pow(1.0 / 2.71828, max(0, dist - fog_start));
-  float fog = (fog_end - dist) / (fog_end - fog_start);
+  float fog = saturate((fog_end - dist) / (fog_end - fog_start));
   color = color * fog + (1 - fog) * fog_intensity;
   color = pow(abs(color), 1.0 / 2.2);
   return color;

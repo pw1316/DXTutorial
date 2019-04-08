@@ -103,7 +103,8 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
     auto rawdata = (CBCameraLightType*)mapped.pData;
     rawdata->camera_pos = camera_pos;
     rawdata->light_dir = dir;
-    rawdata->fog = {0, 100, 0.5f, 0.0f};
+    rawdata->fog = {0, 60, 0.5f, 0.0f};
+    rawdata->clip_plane = {-1, 0, 0, 0};
   }
   context->Unmap(const_buffer_camera_light_, 0);
 
@@ -155,14 +156,14 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
       auto y = obj.attr.vertices[3 * vi + 1];
       auto z = obj.attr.vertices[3 * vi + 2];
       aabb_.Add({x, y, -z});
-      vertices[3 * triId + j].pos = {x, y, -z};  // Reverse z in position
+      vertices[3 * triId + j].pos = {x, y, -z, 1.0f};  // Reverse z in position
       x = obj.attr.texcoords[2 * ti + 0];
       y = obj.attr.texcoords[2 * ti + 1];
       vertices[3 * triId + j].uv = {x, 1.0f - y};  // Invert v in texture
       x = obj.attr.normals[3 * ni + 0];
       y = obj.attr.normals[3 * ni + 1];
       z = obj.attr.normals[3 * ni + 2];
-      vertices[3 * triId + j].normal = {x, y, -z};  // Reverse z in normal
+      vertices[3 * triId + j].normal = {x, y, -z, 0.0f};  // Reverse z in normal
       indices[3 * triId + j] = 3 * triId + j;
     }
     /* Calculate T and B */
@@ -181,9 +182,9 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
     DirectX::XMFLOAT3X3 rhs = {dx1, dy1, dz1, dx2, dy2, dz2, 0, 0, 0};
     auto xmresult =
         coef * DirectX::XMLoadFloat3x3(&lhs) * DirectX::XMLoadFloat3x3(&rhs);
-    DirectX::XMStoreFloat3(&vertices[3 * triId].tangent,
+    DirectX::XMStoreFloat4(&vertices[3 * triId].tangent,
                            DirectX::XMVector3Normalize(xmresult.r[0]));
-    DirectX::XMStoreFloat3(&vertices[3 * triId].binormal,
+    DirectX::XMStoreFloat4(&vertices[3 * triId].binormal,
                            DirectX::XMVector3Normalize(xmresult.r[1]));
 
     vertices[3 * triId + 1].tangent = vertices[3 * triId].tangent;
@@ -351,7 +352,7 @@ void Model3D::InitializeShader(ID3D11Device* device) {
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
   layout[0].SemanticIndex = 0;
-  layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
   layout[0].InputSlot = 0;
   layout[0].AlignedByteOffset = 0;
   layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -367,7 +368,7 @@ void Model3D::InitializeShader(ID3D11Device* device) {
 
   layout[2].SemanticName = "NORMAL";
   layout[2].SemanticIndex = 0;
-  layout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
   layout[2].InputSlot = 0;
   layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
   layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -375,7 +376,7 @@ void Model3D::InitializeShader(ID3D11Device* device) {
 
   layout[3].SemanticName = "TANGENT";
   layout[3].SemanticIndex = 0;
-  layout[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
   layout[3].InputSlot = 0;
   layout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
   layout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -383,7 +384,7 @@ void Model3D::InitializeShader(ID3D11Device* device) {
 
   layout[4].SemanticName = "BINORMAL";
   layout[4].SemanticIndex = 0;
-  layout[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
   layout[4].InputSlot = 0;
   layout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
   layout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;

@@ -22,9 +22,9 @@ SOFTWARE.
 ==============================================================================*/
 
 cbuffer consts0 : register(b0) {
-  matrix MatrixWorld;
-  matrix MatrixView;
-  matrix MatrixProj;
+  matrix matrix_world;
+  matrix matrix_view;
+  matrix matrix_proj;
 };
 
 cbuffer consts1 : register(b1) {
@@ -34,36 +34,38 @@ cbuffer consts1 : register(b1) {
   float fog_end;
   float fog_intensity;
   float padding;
+  float4 clip_plane;
 };
 
 struct VertexIn {
   float4 pos : POSITION;
   float2 uv : TEXCOORD0;
-  float3 normal : NORMAL;
-  float3 tangent : TANGENT;
-  float3 binormal : BINORMAL;
+  float4 normal : NORMAL;
+  float4 tangent : TANGENT;
+  float4 binormal : BINORMAL;
 };
 
 struct VertexOut {
   float4 pos : SV_POSITION;
   float2 uv : TEXCOORD0;
-  float3 normal : NORMAL;
-  float3 tangent : TANGENT;
-  float3 binormal : BINORMAL;
-  float3 pos_world : TEXCOORD1;
+  float4 normal : NORMAL;
+  float4 tangent : TANGENT;
+  float4 binormal : BINORMAL;
+  float4 pos_world : TEXCOORD1;
+  float clip_value : SV_ClipDistance0;
 };
 
 VertexOut main(VertexIn vin) {
   VertexOut vout;
-  vin.pos.w = 1;
   float4 pos;
-  pos = mul(vin.pos, MatrixWorld);
-  vout.pos_world = pos.xyz;
-  pos = mul(pos, MatrixView);
-  vout.pos = mul(pos, MatrixProj);
+  pos = mul(vin.pos, matrix_world);
+  vout.pos_world = pos;
+  pos = mul(pos, matrix_view);
+  vout.pos = mul(pos, matrix_proj);
   vout.uv = vin.uv;
-  vout.normal = normalize(mul(vin.normal, (float3x3)MatrixWorld));
-  vout.tangent = normalize(mul(vin.tangent, (float3x3)MatrixWorld));
-  vout.binormal = normalize(mul(vin.binormal, (float3x3)MatrixWorld));
+  vout.normal = normalize(mul(vin.normal, matrix_world));
+  vout.tangent = normalize(mul(vin.tangent, matrix_world));
+  vout.binormal = normalize(mul(vin.binormal, matrix_world));
+  vout.clip_value = 1;  // dot(clip_plane, vout.pos_world);
   return vout;
 }

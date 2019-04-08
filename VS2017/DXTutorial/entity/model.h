@@ -32,11 +32,11 @@ SOFTWARE.
 namespace naiive::entity {
 class Model3D {
   struct VBType {
-    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT4 pos;
     DirectX::XMFLOAT2 uv;
-    DirectX::XMFLOAT3 normal;
-    DirectX::XMFLOAT3 tangent;
-    DirectX::XMFLOAT3 binormal;
+    DirectX::XMFLOAT4 normal;
+    DirectX::XMFLOAT4 tangent;
+    DirectX::XMFLOAT4 binormal;
   };
   struct CBTransformType {
     DirectX::XMFLOAT4X4 world;
@@ -47,6 +47,7 @@ class Model3D {
     DirectX::XMFLOAT4 camera_pos;
     DirectX::XMFLOAT4 light_dir;
     DirectX::XMFLOAT4 fog;
+	DirectX::XMFLOAT4 clip_plane;
   };
   struct CBMaterialType {
     DirectX::XMFLOAT4 ka;

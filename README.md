@@ -110,3 +110,16 @@ Add a fog factor $\lambda$, Blend fog with the scene
 Where $f$ and $n$ are the far plane and the near plane, $d$ is the distance from camera, $e$ is the base of natural logarithm.
 
 And finally the blend function is: $c=\lambda c+(1-\lambda)i$, where $c$ is texture color and $i$ is fog intensity.
+
+## Tut 24 Clip Plane
+
+Addtion to frustum clipping, clip on arbitrary plane.
+
+DirectX 11 sematics:
+
+- **SV_CullDistance\[n\]**: Primitives with this value less than 0 for all vertices will be discarded.
+- **SV_ClipDistance\[n\]**: Pixels with this value less than 0 in a primitive will not be rasterized.
+
+Plane equation $dot(p-p_0, n)=0$, to homogeneous space $dot(\begin{bmatrix}p&1\end{bmatrix},\begin{bmatrix}n,-dot(n,p_0)\end{bmatrix})=0$
+
+When a point is on the side that n points, clip value $v=dot(\begin{bmatrix}p&1\end{bmatrix},\begin{bmatrix}n,-dot(n,p_0)\end{bmatrix})\geq 0$. So $v$ will be calculated for each vertex in the vertex shader.
