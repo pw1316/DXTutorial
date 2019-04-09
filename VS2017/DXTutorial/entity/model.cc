@@ -125,7 +125,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
   context->PSSetSamplers(0, 1, &sampler_state_);
   context->PSSetShader(pixel_shader_, nullptr, 0);
 
-  context->DrawIndexed(vertex_number_, 0, 0);
+  context->DrawIndexed(mesh_->index_number(), 0, 0);
   return TRUE;
 }
 
@@ -133,83 +133,53 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   BOOL bool_res = FALSE;
   HRESULT hr = S_OK;
 
-  TinyObj obj;
-  bool_res = tinyobj::LoadObj(&obj.attr, &obj.shapes, &obj.materials, nullptr,
-                              nullptr, (name_ + ".obj").c_str(), "res/", true);
-  ASSERT(bool_res);
-
   D3D11_BUFFER_DESC buffer_desc;
   D3D11_SUBRESOURCE_DATA sub_data;
   D3D11_SAMPLER_DESC sampler_desc;
 
   /* =====VB & IB===== */
-  vertex_number_ = static_cast<UINT>(obj.shapes[0].mesh.indices.size());
-  std::vector<VBType> vertices(vertex_number_);
-  std::vector<ULONG> indices(vertex_number_);
-  for (UINT triId = 0; triId < vertex_number_ / 3; ++triId) {
-    for (UINT j = 0; j < 3; ++j) {
-      // RH order to LH order
-      auto vi = obj.shapes[0].mesh.indices[3 * triId + 2 - j].vertex_index;
-      auto ti = obj.shapes[0].mesh.indices[3 * triId + 2 - j].texcoord_index;
-      auto ni = obj.shapes[0].mesh.indices[3 * triId + 2 - j].normal_index;
-      auto x = obj.attr.vertices[3 * vi + 0];
-      auto y = obj.attr.vertices[3 * vi + 1];
-      auto z = obj.attr.vertices[3 * vi + 2];
-      aabb_.Add({x, y, -z});
-      vertices[3 * triId + j].pos = {x, y, -z, 1.0f};  // Reverse z in position
-      x = obj.attr.texcoords[2 * ti + 0];
-      y = obj.attr.texcoords[2 * ti + 1];
-      vertices[3 * triId + j].uv = {x, 1.0f - y};  // Invert v in texture
-      x = obj.attr.normals[3 * ni + 0];
-      y = obj.attr.normals[3 * ni + 1];
-      z = obj.attr.normals[3 * ni + 2];
-      vertices[3 * triId + j].normal = {x, y, -z, 0.0f};  // Reverse z in normal
-      indices[3 * triId + j] = 3 * triId + j;
+  auto index_number = mesh_->index_number();
+  std::vector<VBType> vertices(index_number);
+  std::vector<ULONG> indices(index_number);
+  for (UINT tri_id = 0; tri_id < index_number / 3; ++tri_id) {
+    for (UINT v_id = 0; v_id < 3; ++v_id) {
+      vertices[3 * tri_id + v_id].pos = mesh_->vertex(tri_id, v_id);
+      aabb_.Add(vertices[3 * tri_id + v_id].pos.x,
+                vertices[3 * tri_id + v_id].pos.y,
+                vertices[3 * tri_id + v_id].pos.z);
+      vertices[3 * tri_id + v_id].uv = mesh_->texcoord(tri_id, v_id);
+      vertices[3 * tri_id + v_id].normal = mesh_->normal(tri_id, v_id);
+      indices[3 * tri_id + v_id] = 3 * tri_id + v_id;
     }
     /* Calculate T and B */
-    FLOAT du1 = vertices[3 * triId + 1].uv.x - vertices[3 * triId].uv.x;
-    FLOAT dv1 = vertices[3 * triId + 1].uv.y - vertices[3 * triId].uv.y;
-    FLOAT du2 = vertices[3 * triId + 2].uv.x - vertices[3 * triId].uv.x;
-    FLOAT dv2 = vertices[3 * triId + 2].uv.y - vertices[3 * triId].uv.y;
-    FLOAT dx1 = vertices[3 * triId + 1].pos.x - vertices[3 * triId].pos.x;
-    FLOAT dy1 = vertices[3 * triId + 1].pos.y - vertices[3 * triId].pos.y;
-    FLOAT dz1 = vertices[3 * triId + 1].pos.z - vertices[3 * triId].pos.z;
-    FLOAT dx2 = vertices[3 * triId + 2].pos.x - vertices[3 * triId].pos.x;
-    FLOAT dy2 = vertices[3 * triId + 2].pos.y - vertices[3 * triId].pos.y;
-    FLOAT dz2 = vertices[3 * triId + 2].pos.z - vertices[3 * triId].pos.z;
+    FLOAT du1 = vertices[3 * tri_id + 1].uv.x - vertices[3 * tri_id].uv.x;
+    FLOAT dv1 = vertices[3 * tri_id + 1].uv.y - vertices[3 * tri_id].uv.y;
+    FLOAT du2 = vertices[3 * tri_id + 2].uv.x - vertices[3 * tri_id].uv.x;
+    FLOAT dv2 = vertices[3 * tri_id + 2].uv.y - vertices[3 * tri_id].uv.y;
+    FLOAT dx1 = vertices[3 * tri_id + 1].pos.x - vertices[3 * tri_id].pos.x;
+    FLOAT dy1 = vertices[3 * tri_id + 1].pos.y - vertices[3 * tri_id].pos.y;
+    FLOAT dz1 = vertices[3 * tri_id + 1].pos.z - vertices[3 * tri_id].pos.z;
+    FLOAT dx2 = vertices[3 * tri_id + 2].pos.x - vertices[3 * tri_id].pos.x;
+    FLOAT dy2 = vertices[3 * tri_id + 2].pos.y - vertices[3 * tri_id].pos.y;
+    FLOAT dz2 = vertices[3 * tri_id + 2].pos.z - vertices[3 * tri_id].pos.z;
     FLOAT coef = 1.0f / (du1 * dv2 - du2 * dv1);
     DirectX::XMFLOAT3X3 lhs = {dv2, -dv1, 0, -du2, du1, 0, 0, 0, 0};
     DirectX::XMFLOAT3X3 rhs = {dx1, dy1, dz1, dx2, dy2, dz2, 0, 0, 0};
     auto xmresult =
         coef * DirectX::XMLoadFloat3x3(&lhs) * DirectX::XMLoadFloat3x3(&rhs);
-    DirectX::XMStoreFloat4(&vertices[3 * triId].tangent,
+    DirectX::XMStoreFloat4(&vertices[3 * tri_id].tangent,
                            DirectX::XMVector3Normalize(xmresult.r[0]));
-    DirectX::XMStoreFloat4(&vertices[3 * triId].binormal,
+    DirectX::XMStoreFloat4(&vertices[3 * tri_id].binormal,
                            DirectX::XMVector3Normalize(xmresult.r[1]));
 
-    vertices[3 * triId + 1].tangent = vertices[3 * triId].tangent;
-    vertices[3 * triId + 1].binormal = vertices[3 * triId].binormal;
-    vertices[3 * triId + 2].tangent = vertices[3 * triId].tangent;
-    vertices[3 * triId + 2].binormal = vertices[3 * triId].binormal;
+    vertices[3 * tri_id + 1].tangent = vertices[3 * tri_id].tangent;
+    vertices[3 * tri_id + 1].binormal = vertices[3 * tri_id].binormal;
+    vertices[3 * tri_id + 2].tangent = vertices[3 * tri_id].tangent;
+    vertices[3 * tri_id + 2].binormal = vertices[3 * tri_id].binormal;
   }
-  // vertex_number_ = 3;
-  // std::vector<VBType> vertices(vertex_number_);
-  // std::vector<ULONG> indices(vertex_number_);
-  // vertices[0].pos = DirectX::XMFLOAT3(-1.0f, 1.0f, 0.0f);
-  // vertices[0].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
-  // vertices[0].uv = DirectX::XMFLOAT2(0.0f, 0.0f);
-  // indices[0] = 0;
-  // vertices[1].pos = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);
-  // vertices[1].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
-  // vertices[1].uv = DirectX::XMFLOAT2(1.0f, 0.0f);
-  // indices[1] = 1;
-  // vertices[2].pos = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);
-  // vertices[2].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
-  // vertices[2].uv = DirectX::XMFLOAT2(1.0f, 1.0f);
-  // indices[2] = 2;
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-  buffer_desc.ByteWidth = sizeof(VBType) * vertex_number_;
+  buffer_desc.ByteWidth = sizeof(VBType) * index_number;
   buffer_desc.Usage = D3D11_USAGE_DEFAULT;
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
   buffer_desc.CPUAccessFlags = 0;
@@ -223,7 +193,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   ASSERT(SUCCEEDED(hr));
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-  buffer_desc.ByteWidth = sizeof(ULONG) * vertex_number_;
+  buffer_desc.ByteWidth = sizeof(ULONG) * index_number;
   buffer_desc.Usage = D3D11_USAGE_DEFAULT;
   buffer_desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
   buffer_desc.CPUAccessFlags = 0;
@@ -266,11 +236,11 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   buffer_desc.StructureByteStride = 0;
   CBMaterialType material;
   material.ka = DirectX::XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
-  material.kd = DirectX::XMFLOAT4(obj.materials[0].diffuse);
+  material.kd = DirectX::XMFLOAT4(mesh_->material().diffuse);
   material.kd.w = 1.0f;
-  material.ks = DirectX::XMFLOAT4(obj.materials[0].specular);
+  material.ks = DirectX::XMFLOAT4(mesh_->material().specular);
   material.ks.w = 1.0f;
-  material.ns = obj.materials[0].shininess;
+  material.ns = mesh_->material().shininess;
   ZeroMemory(&sub_data, sizeof(sub_data));
   sub_data.pSysMem = &material;
   sub_data.SysMemPitch = 0;
@@ -279,7 +249,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   ASSERT(SUCCEEDED(hr));
 
   /* =====Texture=====*/
-  auto texture_name = name_ + "_stone.dds";
+  auto texture_name = mesh_->get_path() + "_stone.dds";
   WCHAR texture_name_l[128] = {0};
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
@@ -289,14 +259,14 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
       &shader_resource_texture_[0]);
   CHECK(SUCCEEDED(hr))("Texture [stone] missing");
 
-  texture_name = name_ + "_stone_bump.dds";
+  texture_name = mesh_->get_path() + "_stone_bump.dds";
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
   hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
                                          &shader_resource_texture_[1]);
   CHECK(SUCCEEDED(hr))("Texture [stone_bump] missing");
 
-  texture_name = name_ + "_dirt.dds";
+  texture_name = mesh_->get_path() + "_dirt.dds";
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
   hr = DirectX::CreateDDSTextureFromFileEx(

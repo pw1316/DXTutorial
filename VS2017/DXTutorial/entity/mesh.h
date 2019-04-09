@@ -29,9 +29,41 @@ SOFTWARE.
 
 namespace naiive::entity {
 // tinyobjloader wrapper
+// The wrapper automatically convert OpenGL mesh to DirectX mesh. So:
+// The mesh must have Right-handed coordinate system
+// Texture coordinate must have OpenGL style
 class Mesh {
  public:
   explicit Mesh(const std::string& raw_path);
+  const std::string& get_path() { return path_; }
+  DirectX::XMFLOAT4 vertex(UINT triangle, UINT index) {
+    auto vi = shapes_[0].mesh.indices[3 * triangle + 2 - index].vertex_index;
+    auto x = attribute_.vertices[3 * vi];
+    auto y = attribute_.vertices[3 * vi + 1];
+    auto z = -attribute_.vertices[3 * vi + 2];
+    return {x, y, z, 1.0f};
+  }
+  DirectX::XMFLOAT2 texcoord(UINT triangle, UINT index) {
+    auto ti = shapes_[0].mesh.indices[3 * triangle + 2 - index].texcoord_index;
+    auto x = attribute_.texcoords[2 * ti];
+    auto y = attribute_.texcoords[2 * ti + 1];
+    return {x, 1.0f - y};
+  }
+  DirectX::XMFLOAT4 normal(UINT triangle, UINT index) {
+    auto ni = shapes_[0].mesh.indices[3 * triangle + 2 - index].normal_index;
+    auto x = attribute_.normals[3 * ni];
+    auto y = attribute_.normals[3 * ni + 1];
+    auto z = -attribute_.normals[3 * ni + 2];
+    DirectX::XMFLOAT4 temp{x, y, z, 0.0f};
+    DirectX::XMVECTOR xmtemp =
+        DirectX::XMVector3Normalize(DirectX::XMLoadFloat4(&temp));
+    DirectX::XMStoreFloat4(&temp, xmtemp);
+    return temp;
+  }
+  UINT index_number() const {
+    return static_cast<UINT>(shapes_[0].mesh.indices.size());
+  }
+  const tinyobj::material_t& material() const { return materials_[0]; }
 
  private:
   std::string path_;

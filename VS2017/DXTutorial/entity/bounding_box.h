@@ -76,6 +76,15 @@ class BoundingBox3D {
     return diag.x * diag.y * diag.z;
   }
 
+  void Add(FLOAT x, FLOAT y, FLOAT z) {
+    min_.x = std::min(min_.x, x);
+    min_.y = std::min(min_.y, y);
+    min_.z = std::min(min_.z, z);
+    max_.x = std::max(max_.x, x);
+    max_.y = std::max(max_.y, y);
+    max_.z = std::max(max_.z, z);
+  }
+
   void Add(const DirectX::XMFLOAT3& rhs) {
     min_.x = std::min(min_.x, rhs.x);
     min_.y = std::min(min_.y, rhs.y);
