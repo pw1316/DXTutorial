@@ -25,6 +25,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="entity\shader">
+      <UniqueIdentifier>{6f0691eb-05af-456c-b361-cee4b4f63e5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\application.h">
@@ -84,11 +87,11 @@
     <ClInclude Include="entity\mesh.h">
       <Filter>entity</Filter>
     </ClInclude>
-    <ClInclude Include="entity\shader.h">
-      <Filter>entity</Filter>
-    </ClInclude>
     <ClInclude Include="manager\shader_manager.h">
       <Filter>manager</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\shader\shader.h">
+      <Filter>entity\shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -127,11 +130,11 @@
     <ClCompile Include="entity\mesh.cc">
       <Filter>entity</Filter>
     </ClCompile>
-    <ClCompile Include="entity\shader.cc">
-      <Filter>entity</Filter>
-    </ClCompile>
     <ClCompile Include="manager\shader_manager.cc">
       <Filter>manager</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\shader\shader.cc">
+      <Filter>entity\shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
