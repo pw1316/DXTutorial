@@ -38,12 +38,23 @@ class Shader {
   };
 
  public:
-  explicit Shader(const std::string& raw_path) {}
+  explicit Shader(const std::string& raw_path) : path_(raw_path) {}
+  void Initialize(ID3D11Device* device);
+  void Shutdown();
+  BOOL Render(ID3D11DeviceContext* context);
   HRESULT STDMETHODCALLTYPE CreateVertexBufferAndIndexBuffer(
       ID3D11Device* device, const Mesh& mesh, ID3D11Buffer** pp_vertex_buffer,
       ID3D11Buffer** pp_index_buffer, UINT* p_stride);
 
  private:
+  std::string path_;
+
+  // Shader
+  ID3D11VertexShader* vertex_shader_ = nullptr;
+  ID3D11PixelShader* pixel_shader_ = nullptr;
+  ID3D11InputLayout* input_layout_ = nullptr;
+
+  // Shader Resource
 };
 }  // namespace naiive::entity
 #endif

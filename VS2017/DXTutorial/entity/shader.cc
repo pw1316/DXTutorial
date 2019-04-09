@@ -1,6 +1,96 @@
 #include "shader.h"
 
 namespace naiive::entity {
+void Shader::Initialize(ID3D11Device* device) {
+  const UINT kNumLayout = 5;
+  const UINT kShaderFlag = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
+                           D3DCOMPILE_SKIP_OPTIMIZATION;
+  HRESULT hr = S_OK;
+  ID3D10Blob* blob = nullptr;
+
+  std::string shader_name = path_ + "_vs.hlsl";
+  WCHAR shader_name_l[128] = {0};
+  MultiByteToWideChar(CP_UTF8, 0, shader_name.c_str(),
+                      (int)(shader_name.size() + 1), shader_name_l, 128);
+  hr = D3DCompileFromFile(shader_name_l, nullptr, nullptr, "main", "vs_5_0",
+                          kShaderFlag, 0, &blob, nullptr);
+  ASSERT(SUCCEEDED(hr));
+  hr = device->CreateVertexShader(blob->GetBufferPointer(),
+                                  blob->GetBufferSize(), nullptr,
+                                  &vertex_shader_);
+  ASSERT(SUCCEEDED(hr));
+
+  D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
+  ZeroMemory(layout, sizeof(layout));
+  layout[0].SemanticName = "POSITION";
+  layout[0].SemanticIndex = 0;
+  layout[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[0].InputSlot = 0;
+  layout[0].AlignedByteOffset = 0;
+  layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[0].InstanceDataStepRate = 0;
+
+  layout[1].SemanticName = "TEXCOORD";
+  layout[1].SemanticIndex = 0;
+  layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+  layout[1].InputSlot = 0;
+  layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[1].InstanceDataStepRate = 0;
+
+  layout[2].SemanticName = "NORMAL";
+  layout[2].SemanticIndex = 0;
+  layout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[2].InputSlot = 0;
+  layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[2].InstanceDataStepRate = 0;
+
+  layout[3].SemanticName = "TANGENT";
+  layout[3].SemanticIndex = 0;
+  layout[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[3].InputSlot = 0;
+  layout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[3].InstanceDataStepRate = 0;
+
+  layout[4].SemanticName = "BINORMAL";
+  layout[4].SemanticIndex = 0;
+  layout[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[4].InputSlot = 0;
+  layout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[4].InstanceDataStepRate = 0;
+  hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
+                                 blob->GetBufferSize(), &input_layout_);
+  ASSERT(SUCCEEDED(hr));
+
+  SafeRelease(&blob);
+  shader_name = path_ + "_ps.hlsl";
+  MultiByteToWideChar(CP_UTF8, 0, shader_name.c_str(),
+                      (int)(shader_name.size() + 1), shader_name_l, 128);
+  hr = D3DCompileFromFile(shader_name_l, nullptr, nullptr, "main", "ps_5_0",
+                          kShaderFlag, 0, &blob, nullptr);
+  ASSERT(SUCCEEDED(hr));
+  hr = device->CreatePixelShader(
+      blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixel_shader_);
+  ASSERT(SUCCEEDED(hr));
+  SafeRelease(&blob);
+}
+
+void Shader::Shutdown() {
+  SafeRelease(&pixel_shader_);
+  SafeRelease(&input_layout_);
+  SafeRelease(&vertex_shader_);
+}
+
+BOOL Shader::Render(ID3D11DeviceContext* context) {
+  context->IASetInputLayout(input_layout_);
+  context->VSSetShader(vertex_shader_, nullptr, 0);
+  context->PSSetShader(pixel_shader_, nullptr, 0);
+  return TRUE;
+}
+
 HRESULT STDMETHODCALLTYPE Shader::CreateVertexBufferAndIndexBuffer(
     ID3D11Device* device, const Mesh& mesh, ID3D11Buffer** pp_vertex_buffer,
     ID3D11Buffer** pp_index_buffer, UINT* p_stride) {
@@ -75,8 +165,7 @@ HRESULT STDMETHODCALLTYPE Shader::CreateVertexBufferAndIndexBuffer(
     hr = device->CreateBuffer(&buffer_desc, &sub_data, pp_index_buffer);
   }
 
-  if (p_stride)
-  {
+  if (p_stride) {
     *p_stride = sizeof(VBType);
   }
   return hr;
