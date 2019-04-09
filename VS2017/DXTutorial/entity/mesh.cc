@@ -25,6 +25,8 @@ SOFTWARE.
 
 #include <filesystem>
 
+#include <DirectX/DDSTextureLoader.h>
+
 namespace naiive::entity {
 Mesh::Mesh(const std::string& raw_path) : path_(raw_path) {
   std::filesystem::path path(".");
@@ -42,5 +44,29 @@ Mesh::Mesh(const std::string& raw_path) : path_(raw_path) {
   if (!obj_error.empty()) {
     LOG(LOG_ERROR)(obj_error);
   }
+}
+
+void Mesh::Initialize(ID3D11Device* device) {
+  HRESULT hr = S_OK;
+  auto texture_name = path_ + "_diffuse.dds";
+  WCHAR texture_name_l[128] = {0};
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  hr = DirectX::CreateDDSTextureFromFileEx(
+      device, nullptr, texture_name_l, 0, D3D11_USAGE_DEFAULT,
+      D3D11_BIND_SHADER_RESOURCE, 0, 0, TRUE, nullptr, &diffuse_map_);
+  CHECK(SUCCEEDED(hr))("Texture diffuse missing");
+
+  texture_name = path_ + "_bump.dds";
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
+                                         &normal_map_);
+  CHECK(SUCCEEDED(hr))("Texture [stone_bump] missing");
+}
+
+void Mesh::Shutdown() {
+  SafeRelease(&normal_map_);
+  SafeRelease(&diffuse_map_);
 }
 }  // namespace naiive::entity

@@ -132,3 +132,20 @@ Plane mirror
 2. View from image camera, render the scene to an texture
 3. Render the whole scene with out the mirror to RTV as usual
 4. Render the mirror, for each rasterized pixel, find its projection space coordinate in image camera view, sample from the texture in 2. to get real color image color in the mirror. Since light path is reversible, every pixel of the mirror that can be seen in the real camera can be seen in the image camera, so all of them can be sampled.
+
+## Tut 28 Fade(Not implemented here)
+
+- Fade render:
+  1. Render the scene to a texture
+  2. Map the texture to back buffer, multipled by a fade coef
+- Normal render:
+  1. Render the scene to back buffer
+
+Start with face coef valued 0, do a fade render. Then accumulate fade coef over time. When done(fade coef goes 1), return to normal render.
+
+## Tut 29 Water
+
+- Fresnel water surface:
+  - Reflection texture
+  - Refraction texture
+- Bump map to simulate waves

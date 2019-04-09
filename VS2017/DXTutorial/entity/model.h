@@ -32,25 +32,6 @@ SOFTWARE.
 
 namespace naiive::entity {
 class Model3D {
-  struct CBTransformType {
-    DirectX::XMFLOAT4X4 world;
-    DirectX::XMFLOAT4X4 view;
-    DirectX::XMFLOAT4X4 proj;
-  };
-  struct CBCameraLightType {
-    DirectX::XMFLOAT4 camera_pos;
-    DirectX::XMFLOAT4 light_dir;
-    DirectX::XMFLOAT4 fog;
-    DirectX::XMFLOAT4 clip_plane;
-  };
-  struct CBMaterialType {
-    DirectX::XMFLOAT4 ka;
-    DirectX::XMFLOAT4 kd;
-    DirectX::XMFLOAT4 ks;
-    float ns;
-    DirectX::XMFLOAT3 padding;
-  };
-
  public:
   explicit Model3D(const std::string& mesh_path, const std::string& shader_path)
       : mesh_(new Mesh(mesh_path)),
@@ -68,12 +49,10 @@ class Model3D {
   void MoveTo(const DirectX::XMFLOAT3& translate) { translate_ = translate; }
 
  private:
-  /* Resources */
-  void InitializeBuffer(ID3D11Device* device);
-  void ShutdownBuffer();
-
   std::shared_ptr<Mesh> mesh_;
   std::shared_ptr<Shader> shader_;
+  BoundingBox3D aabb_;
+
   /* Transform */
   DirectX::XMFLOAT3 translate_;
   DirectX::XMFLOAT3 rotation_pyr_;
@@ -82,14 +61,6 @@ class Model3D {
   UINT stride_ = 0U;
   ID3D11Buffer* vertex_buffer_ = nullptr;
   ID3D11Buffer* index_buffer_ = nullptr;
-
-  ID3D11Buffer* const_buffer_transform_ = nullptr;
-  ID3D11Buffer* const_buffer_camera_light_ = nullptr;
-  ID3D11Buffer* const_buffer_material_ = nullptr;
-  ID3D11ShaderResourceView* shader_resource_texture_[3] = {nullptr, nullptr,
-                                                           nullptr};
-  ID3D11SamplerState* sampler_state_ = nullptr;
-  BoundingBox3D aabb_;
 };
 }  // namespace naiive::entity
 #endif

@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
-Texture2D shaderTexture[3] : register(t0);
+Texture2D shaderTexture[2] : register(t0);
 SamplerState SampleType;
 
 cbuffer consts0 : register(b0) {
@@ -51,9 +51,9 @@ struct PixelIn {
 };
 
 float4 main(PixelIn pin) : SV_TARGET {
-  float4 color1 = shaderTexture[0].Sample(SampleType, pin.uv);
-  float4 color2 = shaderTexture[2].Sample(SampleType, pin.uv);
-  float4 color = 2 * color1 * color2;
+  float4 color = shaderTexture[0].Sample(SampleType, pin.uv);
+  // float4 color2 = shaderTexture[2].Sample(SampleType, pin.uv);
+  // float4 color = 2 * color1 * color2;
   float dist = length(CameraPos - pin.pos_world);
   float4 view = normalize(CameraPos - pin.pos_world);
   float4 normal = normalize(pin.normal);

@@ -25,28 +25,62 @@ SOFTWARE.
 #define __ENTITY_SHADER__
 #include <string>
 
+#include <3rdparty/include/tiny_obj_loader.h>
+
 #include <entity/mesh.h>
 
 namespace naiive::entity {
 class Shader {
-  struct VBType {
+  struct VertexType {
     DirectX::XMFLOAT4 pos;
     DirectX::XMFLOAT2 uv;
     DirectX::XMFLOAT4 normal;
     DirectX::XMFLOAT4 tangent;
     DirectX::XMFLOAT4 binormal;
   };
+  struct CBTransformType {
+    DirectX::XMFLOAT4X4 world;
+    DirectX::XMFLOAT4X4 view;
+    DirectX::XMFLOAT4X4 proj;
+  };
+  struct CBAuxType {
+    DirectX::XMFLOAT4 camera_pos;
+    DirectX::XMFLOAT4 light_dir;
+    DirectX::XMFLOAT4 fog;
+    DirectX::XMFLOAT4 clip_plane;
+  };
+  struct CBMaterialType {
+    DirectX::XMFLOAT4 ka;
+    DirectX::XMFLOAT4 kd;
+    DirectX::XMFLOAT4 ks;
+    float ns;
+    DirectX::XMFLOAT3 padding;
+  };
 
  public:
   explicit Shader(const std::string& raw_path) : path_(raw_path) {}
   void Initialize(ID3D11Device* device);
   void Shutdown();
+
+  void PreRender(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& world,
+                 const DirectX::XMFLOAT4X4& view,
+                 const DirectX::XMFLOAT4X4& proj,
+                 const DirectX::XMFLOAT4& camera_pos,
+                 const DirectX::XMFLOAT4& dir,
+                 const tinyobj::material_t& material,
+                 ID3D11ShaderResourceView* diffuse_map,
+                 ID3D11ShaderResourceView* normal_map);
+
   BOOL Render(ID3D11DeviceContext* context);
   HRESULT STDMETHODCALLTYPE CreateVertexBufferAndIndexBuffer(
       ID3D11Device* device, const Mesh& mesh, ID3D11Buffer** pp_vertex_buffer,
       ID3D11Buffer** pp_index_buffer, UINT* p_stride);
 
  private:
+  void InitializeShader(ID3D11Device* device);
+  void ShutdownShader();
+  void InitializeResource(ID3D11Device* device);
+  void ShutdownResource();
   std::string path_;
 
   // Shader
@@ -55,6 +89,10 @@ class Shader {
   ID3D11InputLayout* input_layout_ = nullptr;
 
   // Shader Resource
+  ID3D11Buffer* const_buffer_transform_ = nullptr;
+  ID3D11Buffer* const_buffer_aux_ = nullptr;
+  ID3D11Buffer* const_buffer_material_ = nullptr;
+  ID3D11SamplerState* sampler_state_ = nullptr;
 };
 }  // namespace naiive::entity
 #endif
