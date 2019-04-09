@@ -58,7 +58,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
 
   camera_.SetPos(0.0f, 5.0f, -10.0f);
 
-  model_ = new naiive::entity::Model3D("res/sphere");
+  model_.reset(new entity::Model3D("res/sphere", "res/sphere"));
   model_->Initialize(device_);
   model_dup_.resize(1000);
   for (auto&& pos : model_dup_) {
@@ -88,11 +88,7 @@ void GraphicsManagerClass::Shutdown() {
     delete gui_;
     gui_ = nullptr;
   }
-  if (model_) {
-    model_->Shutdown();
-    delete model_;
-    model_ = nullptr;
-  }
+  model_->Shutdown();
   ShutdownRasterizer();
   ShutdownOM();
   ShutdownDevice();
