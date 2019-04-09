@@ -81,6 +81,9 @@
     <ClInclude Include="entity\mirror.h">
       <Filter>entity</Filter>
     </ClInclude>
+    <ClInclude Include="entity\mesh.h">
+      <Filter>entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
@@ -113,6 +116,9 @@
     <ClCompile Include="main.cc" />
     <ClCompile Include="stdafx.cc" />
     <ClCompile Include="entity\mirror.cc">
+      <Filter>entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\mesh.cc">
       <Filter>entity</Filter>
     </ClCompile>
   </ItemGroup>
