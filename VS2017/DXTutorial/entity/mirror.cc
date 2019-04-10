@@ -195,7 +195,7 @@ void Mirror::InitializeShader(ID3D11Device* device) {
                      D3DCOMPILE_SKIP_OPTIMIZATION;
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"res/mirror_vs.hlsl", nullptr, nullptr, "main",
+  hr = D3DCompileFromFile(L"res/water_vs.hlsl", nullptr, nullptr, "main",
                           "vs_5_0", shader_flag, 0, &blob, nullptr);
   ASSERT(SUCCEEDED(hr));
   hr = device->CreateVertexShader(blob->GetBufferPointer(),
@@ -226,7 +226,7 @@ void Mirror::InitializeShader(ID3D11Device* device) {
   ASSERT(SUCCEEDED(hr));
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"res/mirror_ps.hlsl", nullptr, nullptr, "main",
+  hr = D3DCompileFromFile(L"res/water_ps.hlsl", nullptr, nullptr, "main",
                           "ps_5_0", shader_flag, 0, &blob, nullptr);
   ASSERT(SUCCEEDED(hr));
   hr = device->CreatePixelShader(

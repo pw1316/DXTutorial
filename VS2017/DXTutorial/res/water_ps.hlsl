@@ -22,19 +22,24 @@ SOFTWARE.
 ==============================================================================*/
 
 Texture2D reflect_texture : register(t0);
-SamplerState reflect_texture_sampler;
+Texture2D refract_texture : register(t1);
+SamplerState texture_sampler;
 
 struct PixelIn {
   float4 pos : SV_POSITION;
   float2 uv : TEXCOORD0;
   float4 pos_reflect : TEXCOORD1;
+  float4 pos_refract : TEXCOORD2;
 };
 
 float4 main(PixelIn pin) : SV_TARGET {
   float2 uv;
   uv.x = pin.pos_reflect.x / pin.pos_reflect.w / 2.0f + 0.5f;
   uv.y = -pin.pos_reflect.y / pin.pos_reflect.w / 2.0f + 0.5f;
-  float4 color = reflect_texture.Sample(reflect_texture_sampler, uv);
-  color = 0.5f * color + 0.5f * float4(1.0f, 1.0f, 1.0f, 1.0f);
+  float4 color_reflect = reflect_texture.Sample(texture_sampler, uv);
+  uv.x = pin.pos_refract.x / pin.pos_refract.w / 2.0f + 0.5f;
+  uv.y = -pin.pos_refract.y / pin.pos_refract.w / 2.0f + 0.5f;
+  float4 color_refract = refract_texture.Sample(texture_sampler, uv);
+  float4 color = 0.5f * color_reflect + 0.5f * color_refract;
   return color;
 }
