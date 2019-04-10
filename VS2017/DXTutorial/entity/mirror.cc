@@ -28,6 +28,7 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   HRESULT hr = S_OK;
 
   D3D11_TEXTURE2D_DESC texture2d_desc;
+  // reflect buffer
   ZeroMemory(&texture2d_desc, sizeof(texture2d_desc));
   texture2d_desc.Width = width;
   texture2d_desc.Height = height;
@@ -41,18 +42,28 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
       D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
   texture2d_desc.CPUAccessFlags = 0;
   texture2d_desc.MiscFlags = 0;
-  hr = device->CreateTexture2D(&texture2d_desc, nullptr, &back_buffer_);
+  hr = device->CreateTexture2D(&texture2d_desc, nullptr, &texture_reflect_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 texture failed", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 Texture2D failed", STD_HEX(hr));
+  hr = device->CreateRenderTargetView(texture_reflect_, nullptr, &rtv_reflect_);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DirectX 11 RTV failed", STD_HEX(hr));
+  hr = device->CreateShaderResourceView(texture_reflect_, nullptr,
+                                        &srv_reflect_);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DirectX 11 SRV failed", STD_HEX(hr));
 
-  hr = device->CreateRenderTargetView(back_buffer_, nullptr,
-                                      &render_target_view_);
+  // refract buffer
+  hr = device->CreateTexture2D(&texture2d_desc, nullptr, &texture_refract_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 render target view failed", std::hex, std::uppercase, hr);
-  hr = device->CreateShaderResourceView(back_buffer_, nullptr,
-                                        &shader_resource_view_);
+  ("Get DirectX 11 Texture2D failed", STD_HEX(hr));
+  hr = device->CreateRenderTargetView(texture_refract_, nullptr, &rtv_refract_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 shader resource view failed", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 RTV failed", STD_HEX(hr));
+  hr = device->CreateShaderResourceView(texture_refract_, nullptr,
+                                        &srv_refract_);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DirectX 11 SRV failed", STD_HEX(hr));
 
   D3D11_BUFFER_DESC buffer_desc;
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
@@ -64,7 +75,7 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   buffer_desc.StructureByteStride = 0;
   hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 const buffer failed", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 CB failed", STD_HEX(hr));
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -75,7 +86,7 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   buffer_desc.StructureByteStride = 0;
   hr = device->CreateBuffer(&buffer_desc, nullptr, &vertex_buffer_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 vertex buffer failed", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 VB failed", STD_HEX(hr));
 
   ULONG indices[] = {0, 1, 2, 3, 4, 5};
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
@@ -92,7 +103,7 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   subdata.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &subdata, &index_buffer_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 index buffer failed", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 IB failed", STD_HEX(hr));
 
   D3D11_SAMPLER_DESC sampler_desc;
   sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -110,7 +121,7 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
   hr = device->CreateSamplerState(&sampler_desc, &sampler_state_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 sampler state failed", std::hex, std::uppercase, hr);
+  ("Get DirectX 11 SamplerState failed", STD_HEX(hr));
 
   InitializeShader(device);
 }
@@ -122,9 +133,12 @@ void Mirror::Shutdown() {
   SafeRelease(&vertex_buffer_);
   SafeRelease(&const_buffer_);
 
-  SafeRelease(&shader_resource_view_);
-  SafeRelease(&render_target_view_);
-  SafeRelease(&back_buffer_);
+  SafeRelease(&srv_refract_);
+  SafeRelease(&rtv_refract_);
+  SafeRelease(&texture_refract_);
+  SafeRelease(&srv_reflect_);
+  SafeRelease(&rtv_reflect_);
+  SafeRelease(&texture_reflect_);
 }
 
 void Mirror::Render(ID3D11DeviceContext* context,
@@ -179,12 +193,14 @@ void Mirror::Render(ID3D11DeviceContext* context,
   context->VSSetConstantBuffers(0, 1, &const_buffer_);
   context->VSSetShader(vertex_shader_, nullptr, 0);
 
-  context->PSSetShaderResources(0, 1, &shader_resource_view_);
+  context->PSSetShaderResources(0, 1, &srv_reflect_);
+  context->PSSetShaderResources(1, 1, &srv_refract_);
   context->PSSetSamplers(0, 1, &sampler_state_);
   context->PSSetShader(pixel_shader_, nullptr, 0);
 
   context->DrawIndexed(6, 0, 0);
   context->PSSetShaderResources(0, 1, &kDummyShaderResourceView);
+  context->PSSetShaderResources(1, 1, &kDummyShaderResourceView);
 }
 
 void Mirror::InitializeShader(ID3D11Device* device) {

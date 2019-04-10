@@ -47,18 +47,20 @@ class Mirror {
               const DirectX::XMFLOAT4X4& proj,
               const DirectX::XMFLOAT4X4& view_reflect);
 
-  ID3D11RenderTargetView* render_target_view() { return render_target_view_; }
-  ID3D11ShaderResourceView* shader_resource_view() {
-    return shader_resource_view_;
-  }
+  ID3D11RenderTargetView* rtv_reflect() { return rtv_reflect_; }
+  ID3D11RenderTargetView* rtv_refract() { return rtv_refract_; }
 
  private:
   void InitializeShader(ID3D11Device* device);
   void ShutdownShader();
 
-  ID3D11RenderTargetView* render_target_view_ = nullptr;
-  ID3D11ShaderResourceView* shader_resource_view_ = nullptr;
-  ID3D11Texture2D* back_buffer_ = nullptr;
+  ID3D11RenderTargetView* rtv_reflect_ = nullptr;
+  ID3D11ShaderResourceView* srv_reflect_ = nullptr;
+  ID3D11Texture2D* texture_reflect_ = nullptr;
+
+  ID3D11RenderTargetView* rtv_refract_ = nullptr;
+  ID3D11ShaderResourceView* srv_refract_ = nullptr;
+  ID3D11Texture2D* texture_refract_ = nullptr;
 
   ID3D11Buffer* const_buffer_ = nullptr;
   ID3D11Buffer* vertex_buffer_ = nullptr;

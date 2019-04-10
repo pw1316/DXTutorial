@@ -104,8 +104,8 @@ BOOL GraphicsManagerClass::OnUpdate() {
   camera_.GetReflectMatrix(0.0f, reflect_view);
   float blend_factor[4] = {0, 0, 0, 0};
 
-  // To texture
-  auto rtv = mirror_->render_target_view();
+  // Reflect texture
+  auto rtv = mirror_->rtv_reflect();
   BeginScene(rtv, depth_stencil_view_);
   device_context_->OMSetRenderTargets(1, &rtv, depth_stencil_view_);
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
