@@ -31,8 +31,9 @@ SOFTWARE.
 #include <entity/frustum.h>
 #include <utils/range.h>
 
+// TODO fix
 #ifndef NAIIVE_FRUSTUM_CULL
-#define NAIIVE_FRUSTUM_CULL 1
+#define NAIIVE_FRUSTUM_CULL 0
 #endif
 
 namespace naiive::entity {
