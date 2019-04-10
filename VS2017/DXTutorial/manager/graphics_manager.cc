@@ -110,15 +110,26 @@ BOOL GraphicsManagerClass::OnUpdate() {
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
   ULONG total_models = static_cast<ULONG>(model_dup_.size());
-  ULONG frustum_visible_models = 0UL;
   for (auto&& pos : model_dup_) {
     model_->MoveTo(pos);
-    if (model_->Render(device_context_, reflect_view, matrix_perspective_,
-                       camera_.GetPos(), light_.dir,
-                       {kNearPlane, kFarPlane, fog_intensity, 0.0f},
-                       {0, 0, -1, kFarPlane})) {
-      ++frustum_visible_models;
-    }
+    model_->Render(device_context_, reflect_view, matrix_perspective_,
+                   camera_.GetPos(), light_.dir,
+                   {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                   {0, 0, -1, kFarPlane});
+  }
+
+  // Refract texture
+  rtv = mirror_->rtv_refract();
+  BeginScene(rtv, depth_stencil_view_);
+  device_context_->OMSetRenderTargets(1, &rtv, depth_stencil_view_);
+  device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
+  device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
+                                   0xFFFFFFFF);
+  for (auto&& pos : model_dup_) {
+    model_->MoveTo(pos);
+    model_->Render(device_context_, view, matrix_perspective_, camera_.GetPos(),
+                   light_.dir, {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                   {0, 0, -1, kFarPlane});
   }
 
   // To scene
@@ -128,11 +139,15 @@ BOOL GraphicsManagerClass::OnUpdate() {
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
+  ULONG frustum_visible_models = 0UL;
   for (auto&& pos : model_dup_) {
     model_->MoveTo(pos);
-    model_->Render(device_context_, view, matrix_perspective_, camera_.GetPos(),
-                   light_.dir, {kNearPlane, kFarPlane, fog_intensity, 0.0f},
-                   {0, 0, -1, kFarPlane});
+    if (model_->Render(device_context_, view, matrix_perspective_,
+                       camera_.GetPos(), light_.dir,
+                       {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                       {0, 0, -1, kFarPlane})) {
+      ++frustum_visible_models;
+    }
   }
 
   // Mirror
