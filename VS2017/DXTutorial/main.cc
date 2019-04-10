@@ -36,6 +36,9 @@ int APIENTRY WinMain(_In_ HINSTANCE hinstance,
   auto&& app = naiive::core::Application(1024, 768);
   app.Run(hinstance, command_show);
   LOG(LOG_INFO)("Press ENTER to close this window . . .");
+#ifdef _DEBUG
   std::getchar();
+  FreeConsole();
+#endif;
   return 0;
 }
