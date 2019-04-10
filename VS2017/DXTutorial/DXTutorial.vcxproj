@@ -114,7 +114,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="utils\lru_cache.h" />
     <ClInclude Include="utils\range.h" />
     <ClInclude Include="utils\slide_average.h" />
   </ItemGroup>

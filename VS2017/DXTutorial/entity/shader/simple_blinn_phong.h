@@ -26,10 +26,14 @@ SOFTWARE.
 #include <string>
 
 #include <3rdparty/include/tiny_obj_loader.h>
+
 #include <entity/mesh.h>
 
 namespace naiive::entity {
 class ShaderSimpleBlinnPhong {
+  friend ShaderSimpleBlinnPhong& GetSimpleBlinnPhong(
+      ID3D11Device* device, const std::string& raw_path);
+
   struct VertexType {
     DirectX::XMFLOAT4 pos;
     DirectX::XMFLOAT2 uv;
@@ -45,32 +49,33 @@ class ShaderSimpleBlinnPhong {
   struct CBAuxType {
     DirectX::XMFLOAT4 camera_pos;
     DirectX::XMFLOAT4 light_dir;
+    DirectX::XMFLOAT4 fog;
+    DirectX::XMFLOAT4 clip_plane;
   };
   struct CBMaterialType {
     DirectX::XMFLOAT4 ka;
     DirectX::XMFLOAT4 kd;
     DirectX::XMFLOAT4 ks;
-    DirectX::XMFLOAT4 ns;
+    float ns;
+    DirectX::XMFLOAT3 padding;
   };
 
  public:
-  ShaderSimpleBlinnPhong(ID3D11Device* device, const std::string& raw_path)
-      : path_(raw_path) {
-    InitializeShader(device);
-    InitializeResource(device);
-  }
-  ~ShaderSimpleBlinnPhong() {
-    ShutdownResource();
-    ShutdownShader();
-  }
+  explicit ShaderSimpleBlinnPhong(const std::string& raw_path)
+      : path_(raw_path) {}
+  void Initialize(ID3D11Device* device);
+  void Shutdown();
 
-  BOOL Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& world,
-              const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj,
-              const DirectX::XMFLOAT4& camera_pos,
-              const DirectX::XMFLOAT4& light_dir,
-              const tinyobj::material_t& material,
-              ID3D11ShaderResourceView* diffuse_map,
-              ID3D11ShaderResourceView* normal_map);
+  void PreRender(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& world,
+                 const DirectX::XMFLOAT4X4& view,
+                 const DirectX::XMFLOAT4X4& proj,
+                 const DirectX::XMFLOAT4& camera_pos,
+                 const DirectX::XMFLOAT4& dir,
+                 const tinyobj::material_t& material,
+                 ID3D11ShaderResourceView* diffuse_map,
+                 ID3D11ShaderResourceView* normal_map);
+
+  BOOL Render(ID3D11DeviceContext* context);
   HRESULT STDMETHODCALLTYPE CreateVertexBufferAndIndexBuffer(
       ID3D11Device* device, const Mesh& mesh, ID3D11Buffer** pp_vertex_buffer,
       ID3D11Buffer** pp_index_buffer, UINT* p_stride);
@@ -80,7 +85,6 @@ class ShaderSimpleBlinnPhong {
   void ShutdownShader();
   void InitializeResource(ID3D11Device* device);
   void ShutdownResource();
-
   std::string path_;
 
   // Shader
@@ -94,5 +98,8 @@ class ShaderSimpleBlinnPhong {
   ID3D11Buffer* const_buffer_material_ = nullptr;
   ID3D11SamplerState* sampler_state_ = nullptr;
 };
+
+ShaderSimpleBlinnPhong& GetSimpleBlinnPhong(ID3D11Device* device,
+                                            const std::string& raw_path);
 }  // namespace naiive::entity
 #endif
