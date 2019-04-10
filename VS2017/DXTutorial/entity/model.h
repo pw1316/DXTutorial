@@ -72,6 +72,10 @@ class Model3D {
   void InitializeBuffer(ID3D11Device* device);
   void ShutdownBuffer();
 
+  /* Shader */
+  void InitializeShader(ID3D11Device* device);
+  void ShutdownShader();
+
   std::shared_ptr<Mesh> mesh_;
   std::shared_ptr<Shader> shader_;
   /* Transform */
@@ -90,6 +94,11 @@ class Model3D {
                                                            nullptr};
   ID3D11SamplerState* sampler_state_ = nullptr;
   BoundingBox3D aabb_;
+
+  /* Shader */
+  ID3D11VertexShader* vertex_shader_ = nullptr;
+  ID3D11PixelShader* pixel_shader_ = nullptr;
+  ID3D11InputLayout* input_layout_ = nullptr;
 };
 }  // namespace naiive::entity
 #endif

@@ -38,11 +38,11 @@ SOFTWARE.
 namespace naiive::entity {
 void Model3D::Initialize(ID3D11Device* device) {
   InitializeBuffer(device);
-  shader_->Initialize(device);
+  InitializeShader(device);
 }
 
 void Model3D::Shutdown() {
-  shader_->Shutdown();
+  ShutdownShader();
   ShutdownBuffer();
 }
 
@@ -112,16 +112,17 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
   context->IASetVertexBuffers(0, 1, &vertex_buffer_, &stride_, &offset);
   context->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
   context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+  context->IASetInputLayout(input_layout_);
 
   context->VSSetConstantBuffers(0, 1, &const_buffer_transform_);
   context->VSSetConstantBuffers(1, 1, &const_buffer_camera_light_);
+  context->VSSetShader(vertex_shader_, nullptr, 0);
 
   context->PSSetConstantBuffers(0, 1, &const_buffer_material_);
   context->PSSetConstantBuffers(1, 1, &const_buffer_camera_light_);
   context->PSSetShaderResources(0, 3, shader_resource_texture_);
   context->PSSetSamplers(0, 1, &sampler_state_);
-
-  shader_->Render(context);
+  context->PSSetShader(pixel_shader_, nullptr, 0);
 
   context->DrawIndexed(mesh_->index_number(), 0, 0);
   return TRUE;
@@ -244,5 +245,83 @@ void Model3D::ShutdownBuffer() {
   SafeRelease(&const_buffer_transform_);
   SafeRelease(&index_buffer_);
   SafeRelease(&vertex_buffer_);
+}
+
+void Model3D::InitializeShader(ID3D11Device* device) {
+  HRESULT hr = S_OK;
+
+  ID3D10Blob* blob = nullptr;
+  const UINT kNumLayout = 5;
+  D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
+
+  UINT shader_flag = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
+                     D3DCOMPILE_SKIP_OPTIMIZATION;
+
+  SafeRelease(&blob);
+  hr = D3DCompileFromFile(L"res/sphere_vs.hlsl", nullptr, nullptr, "main",
+                          "vs_5_0", shader_flag, 0, &blob, nullptr);
+  ASSERT(SUCCEEDED(hr));
+  hr = device->CreateVertexShader(blob->GetBufferPointer(),
+                                  blob->GetBufferSize(), nullptr,
+                                  &vertex_shader_);
+  ASSERT(SUCCEEDED(hr));
+
+  ZeroMemory(layout, sizeof(layout));
+  layout[0].SemanticName = "POSITION";
+  layout[0].SemanticIndex = 0;
+  layout[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[0].InputSlot = 0;
+  layout[0].AlignedByteOffset = 0;
+  layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[0].InstanceDataStepRate = 0;
+
+  layout[1].SemanticName = "TEXCOORD";
+  layout[1].SemanticIndex = 0;
+  layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+  layout[1].InputSlot = 0;
+  layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[1].InstanceDataStepRate = 0;
+
+  layout[2].SemanticName = "NORMAL";
+  layout[2].SemanticIndex = 0;
+  layout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[2].InputSlot = 0;
+  layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[2].InstanceDataStepRate = 0;
+
+  layout[3].SemanticName = "TANGENT";
+  layout[3].SemanticIndex = 0;
+  layout[3].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[3].InputSlot = 0;
+  layout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[3].InstanceDataStepRate = 0;
+
+  layout[4].SemanticName = "BINORMAL";
+  layout[4].SemanticIndex = 0;
+  layout[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+  layout[4].InputSlot = 0;
+  layout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[4].InstanceDataStepRate = 0;
+  hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
+                                 blob->GetBufferSize(), &input_layout_);
+  ASSERT(SUCCEEDED(hr));
+
+  SafeRelease(&blob);
+  hr = D3DCompileFromFile(L"res/sphere_ps.hlsl", nullptr, nullptr, "main",
+                          "ps_5_0", shader_flag, 0, &blob, nullptr);
+  ASSERT(SUCCEEDED(hr));
+  hr = device->CreatePixelShader(
+      blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixel_shader_);
+  ASSERT(SUCCEEDED(hr));
+  SafeRelease(&blob);
+}
+void Model3D::ShutdownShader() {
+  SafeRelease(&pixel_shader_);
+  SafeRelease(&input_layout_);
+  SafeRelease(&vertex_shader_);
 }
 }  // namespace naiive::entity
