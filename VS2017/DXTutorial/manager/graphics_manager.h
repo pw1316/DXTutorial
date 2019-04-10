@@ -137,7 +137,13 @@ class GraphicsManagerClass : public core::IView {
     device_context_->ClearRenderTargetView(rtv, color);
     device_context_->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
   }
-  void EndScene() { swap_chain_->Present(1, 0); }
+  void EndScene() {
+#ifdef _DEBUG
+    swap_chain_->Present(0, 0);
+#else
+    swap_chain_->Present(1, 0);
+#endif
+  }
 
   /* D3D Basic */
   ID3D11Device* device_ = nullptr;
