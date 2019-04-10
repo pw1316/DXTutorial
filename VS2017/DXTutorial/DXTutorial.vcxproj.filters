@@ -96,6 +96,9 @@
     <ClInclude Include="entity\shader\simple_blinn_phong.h">
       <Filter>entity\shader</Filter>
     </ClInclude>
+    <ClInclude Include="utils\lru_cache.h">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
