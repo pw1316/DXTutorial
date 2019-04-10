@@ -46,8 +46,8 @@ class Model3D {
   struct CBCameraLightType {
     DirectX::XMFLOAT4 camera_pos;
     DirectX::XMFLOAT4 light_dir;
-    DirectX::XMFLOAT4 fog;
-    DirectX::XMFLOAT4 clip_plane;
+    DirectX::XMFLOAT4 fog;         // start, end, intensity, pad
+    DirectX::XMFLOAT4 clip_plane;  // nx, ny, nz, -dot(n,p0)
   };
   struct CBMaterialType {
     DirectX::XMFLOAT4 ka;
@@ -74,7 +74,8 @@ class Model3D {
   BOOL Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view,
               const DirectX::XMFLOAT4X4& proj,
               const DirectX::XMFLOAT4& camera_pos,
-              const DirectX::XMFLOAT4& dir);
+              const DirectX::XMFLOAT4& light_dir, const DirectX::XMFLOAT4& fog,
+              const DirectX::XMFLOAT4& clip_plane);
   void MoveTo(const DirectX::XMFLOAT3& translate) { translate_ = translate; }
 
  private:

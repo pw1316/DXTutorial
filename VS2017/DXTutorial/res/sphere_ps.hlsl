@@ -21,6 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ==============================================================================*/
 
+#define INV_E 0.36787944117144232159552377016146f
+
 Texture2D shaderTexture[3] : register(t0);
 SamplerState SampleType;
 
@@ -64,9 +66,8 @@ float4 main(PixelIn pin) : SV_TARGET {
   normal = normalize(bump.x * tangent + bump.y * binormal + bump.z * normal);
   color = color * (Ka + Kd * saturate(dot(normal, -light_dir))) +
           Ks * pow(saturate(dot(normalize(view - light_dir), normal)), Ns);
-  // float fog = pow(1.0 / 2.71828, max(0, dist - fog_start));
-  float fog = saturate((fog_end - dist) / (fog_end - fog_start));
+  float fog = pow(INV_E, max(0, dist - fog_start) * fog_intensity * 0.1);
+  // float fog = saturate((fog_end - dist) / (fog_end - fog_start));
   color = color * fog + (1 - fog) * fog_intensity;
-  color.a = 0.9;
   return color;
 }

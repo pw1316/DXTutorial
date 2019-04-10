@@ -37,6 +37,9 @@ class Mirror;
 namespace naiive::manager {
 class GraphicsManagerClass : public core::IView {
   friend GraphicsManagerClass& GraphicsManager();
+  static constexpr FLOAT kNearPlane = 0.1f;
+  static constexpr FLOAT kFarPlane = 1000.f;
+  static constexpr FLOAT kFovY = DirectX::XM_PI / 3.0f;
   class Camera {
    public:
     void SetPos(FLOAT xx, FLOAT yy, FLOAT zz) {
@@ -130,7 +133,7 @@ class GraphicsManagerClass : public core::IView {
 
   void BeginScene(ID3D11RenderTargetView* rtv, ID3D11DepthStencilView* dsv) {
     // RTV is sRGB, so we can use linear value here
-    float color[] = {0.5f, 0.5f, 0.5f, 1.0f};
+    float color[] = {fog_intensity, fog_intensity, fog_intensity, 1.0f};
     device_context_->ClearRenderTargetView(rtv, color);
     device_context_->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
   }
@@ -168,6 +171,7 @@ class GraphicsManagerClass : public core::IView {
   std::vector<DirectX::XMFLOAT3> model_dup_;
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;
+  FLOAT fog_intensity = 0.1f;
 };
 
 GraphicsManagerClass& GraphicsManager();

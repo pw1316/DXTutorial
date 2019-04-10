@@ -50,7 +50,9 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
                      const DirectX::XMFLOAT4X4& view,
                      const DirectX::XMFLOAT4X4& proj,
                      const DirectX::XMFLOAT4& camera_pos,
-                     const DirectX::XMFLOAT4& dir) {
+                     const DirectX::XMFLOAT4& light_dir,
+                     const DirectX::XMFLOAT4& fog,
+                     const DirectX::XMFLOAT4& clip_plane) {
   HRESULT hr = S_OK;
 
   auto xmworld = DirectX::XMMatrixRotationRollPitchYaw(
@@ -102,9 +104,9 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
   {
     auto rawdata = (CBCameraLightType*)mapped.pData;
     rawdata->camera_pos = camera_pos;
-    rawdata->light_dir = dir;
-    rawdata->fog = {0, 50, 0.5f, 0.0f};
-    rawdata->clip_plane = {-1, 0, 0, 0};
+    rawdata->light_dir = light_dir;
+    rawdata->fog = fog;
+    rawdata->clip_plane = clip_plane;
   }
   context->Unmap(const_buffer_camera_light_, 0);
 

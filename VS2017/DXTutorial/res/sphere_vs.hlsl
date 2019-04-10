@@ -66,6 +66,6 @@ VertexOut main(VertexIn vin) {
   vout.normal = normalize(mul(vin.normal, matrix_world));
   vout.tangent = normalize(mul(vin.tangent, matrix_world));
   vout.binormal = normalize(mul(vin.binormal, matrix_world));
-  vout.clip_value = 1;  // dot(clip_plane, vout.pos_world);
+  vout.clip_value = dot(clip_plane, vout.pos_world);
   return vout;
 }

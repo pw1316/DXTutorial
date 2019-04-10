@@ -45,16 +45,14 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   /* Create RasterizerState */
   InitializeRasterizer(hwnd, width, height);
 
-  float fov, aspect;
-  fov = (float)DirectX::XM_PI / 3.0f;
-  aspect = (float)width / (float)height;
+  FLOAT aspect = 1.0f * width / height;
   DirectX::XMStoreFloat4x4(
       &matrix_perspective_,
-      DirectX::XMMatrixPerspectiveFovLH(fov, aspect, 0.1f, 1000.0f));
+      DirectX::XMMatrixPerspectiveFovLH(kFovY, aspect, kNearPlane, kFarPlane));
 
-  DirectX::XMStoreFloat4x4(&matrix_orthogonal_,
-                           DirectX::XMMatrixOrthographicLH(
-                               (float)width, (float)height, 0.1f, 1000.0f));
+  DirectX::XMStoreFloat4x4(&matrix_orthogonal_, DirectX::XMMatrixOrthographicLH(
+                                                    (float)width, (float)height,
+                                                    kNearPlane, kFarPlane));
 
   camera_.SetPos(0.0f, 5.0f, -10.0f);
 
@@ -116,7 +114,9 @@ BOOL GraphicsManagerClass::OnUpdate() {
   for (auto&& pos : model_dup_) {
     model_->MoveTo(pos);
     if (model_->Render(device_context_, reflect_view, matrix_perspective_,
-                       camera_.GetPos(), light_.dir)) {
+                       camera_.GetPos(), light_.dir,
+                       {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                       {0, 0, -1, kFarPlane})) {
       ++frustum_visible_models;
     }
   }
@@ -131,7 +131,8 @@ BOOL GraphicsManagerClass::OnUpdate() {
   for (auto&& pos : model_dup_) {
     model_->MoveTo(pos);
     model_->Render(device_context_, view, matrix_perspective_, camera_.GetPos(),
-                   light_.dir);
+                   light_.dir, {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                   {0, 0, -1, kFarPlane});
   }
 
   // Mirror
