@@ -67,6 +67,9 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   std::sort(model_dup_.begin(), model_dup_.end(),
             [](auto&& lhs, auto&& rhs) { return lhs.z > rhs.z; });
 
+  pool_model_.reset(new entity::Model3D("res/pool"));
+  pool_model_->Initialize(device_);
+
   gui_ = new naiive::entity::Font;
   gui_->Initialize(device_);
 
@@ -86,6 +89,7 @@ void GraphicsManagerClass::Shutdown() {
     delete gui_;
     gui_ = nullptr;
   }
+  pool_model_->Shutdown();
   if (model_) {
     model_->Shutdown();
     delete model_;
@@ -125,12 +129,9 @@ BOOL GraphicsManagerClass::OnUpdate() {
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
-  for (auto&& pos : model_dup_) {
-    model_->MoveTo(pos);
-    model_->Render(device_context_, view, matrix_perspective_, camera_.GetPos(),
-                   light_.dir, {kNearPlane, kFarPlane, fog_intensity, 0.0f},
-                   {0, 0, -1, kFarPlane});
-  }
+  pool_model_->Render(
+      device_context_, view, matrix_perspective_, camera_.GetPos(), light_.dir,
+      {kNearPlane, kFarPlane, fog_intensity, 0.0f}, {0, 0, -1, kFarPlane});
 
   // To scene
   BeginScene(render_target_view_, depth_stencil_view_);
@@ -149,6 +150,9 @@ BOOL GraphicsManagerClass::OnUpdate() {
       ++frustum_visible_models;
     }
   }
+  pool_model_->Render(
+      device_context_, view, matrix_perspective_, camera_.GetPos(), light_.dir,
+      {kNearPlane, kFarPlane, fog_intensity, 0.0f}, {0, 0, -1, kFarPlane});
 
   // Mirror
   mirror_->Render(device_context_, view, matrix_perspective_, reflect_view);

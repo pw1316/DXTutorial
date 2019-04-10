@@ -169,9 +169,10 @@ class GraphicsManagerClass : public core::IView {
   Light light_;
   naiive::entity::Model3D* model_ = nullptr;
   std::vector<DirectX::XMFLOAT3> model_dup_;
+  std::shared_ptr<entity::Model3D> pool_model_;
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;
-  FLOAT fog_intensity = 0.1f;
+  FLOAT fog_intensity = 0.0f;
 };
 
 GraphicsManagerClass& GraphicsManager();

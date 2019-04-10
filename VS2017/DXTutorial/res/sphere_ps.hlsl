@@ -55,7 +55,12 @@ struct PixelIn {
 float4 main(PixelIn pin) : SV_TARGET {
   float4 color1 = shaderTexture[0].Sample(SampleType, pin.uv);
   float4 color2 = shaderTexture[2].Sample(SampleType, pin.uv);
-  float4 color = 2 * color1 * color2;
+  float4 color;
+  if (color2.x == 0 && color2.y == 0 && color2.z == 0 && color2.w == 0) {
+    color = color1;
+  } else {
+    color = 2 * color1 * color2;
+  }
   float dist = length(CameraPos - pin.pos_world);
   float4 view = normalize(CameraPos - pin.pos_world);
   float4 normal = normalize(pin.normal);
@@ -63,7 +68,8 @@ float4 main(PixelIn pin) : SV_TARGET {
   float4 binormal = normalize(pin.binormal);
 
   float4 bump = shaderTexture[1].Sample(SampleType, pin.uv) * 2.0 - 1.0;
-  normal = normalize(bump.x * tangent + bump.y * binormal + bump.z * normal);
+  if (bump.x != -1 || bump.y != -1 || bump.z != -1)
+    normal = normalize(bump.x * tangent + bump.y * binormal + bump.z * normal);
   color = color * (Ka + Kd * saturate(dot(normal, -light_dir))) +
           Ks * pow(saturate(dot(normalize(view - light_dir), normal)), Ns);
   float fog = pow(INV_E, max(0, dist - fog_start) * fog_intensity * 0.1);
