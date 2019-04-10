@@ -168,17 +168,17 @@ void Mirror::Render(ID3D11DeviceContext* context,
   context->Map(vertex_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
     auto rawdata = (VBType*)mapped.pData;
-    rawdata[0].pos = {-20, 0, 40};
+    rawdata[0].pos = {-80, -5, 80};
     rawdata[0].uv = {0.0f, 0.0f};
-    rawdata[1].pos = {20, 0, -10};
+    rawdata[1].pos = {80, -5, -80};
     rawdata[1].uv = {1.0f, 1.0f};
-    rawdata[2].pos = {-20, 0, -10};
+    rawdata[2].pos = {-80, -5, -80};
     rawdata[2].uv = {0.0f, 1.0f};
-    rawdata[3].pos = {-20, 0, 40};
+    rawdata[3].pos = {-80, -5, 80};
     rawdata[3].uv = {0.0f, 0.0f};
-    rawdata[4].pos = {20, 0, 40};
+    rawdata[4].pos = {80, -5, 80};
     rawdata[4].uv = {1.0f, 0.0f};
-    rawdata[5].pos = {20, 0, -10};
+    rawdata[5].pos = {80, -5, -80};
     rawdata[5].uv = {1.0f, 1.0f};
   }
   context->Unmap(vertex_buffer_, 0);

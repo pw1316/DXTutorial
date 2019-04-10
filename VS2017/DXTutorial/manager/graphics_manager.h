@@ -114,9 +114,9 @@ class GraphicsManagerClass : public core::IView {
  private:
   GraphicsManagerClass()
       : rng_(0),
-        distribution_x_(-40, 40),
+        distribution_x_(-80, 80),
         distribution_y_(0, 40),
-        distribution_z_(-5, 40) {}
+        distribution_z_(-10, 80) {}
 
   /* D3D Basic */
   void InitializeDevice(HWND hwnd, UINT width, UINT height);
@@ -137,7 +137,7 @@ class GraphicsManagerClass : public core::IView {
     device_context_->ClearRenderTargetView(rtv, color);
     device_context_->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
   }
-  void EndScene() { swap_chain_->Present(0, 0); }
+  void EndScene() { swap_chain_->Present(1, 0); }
 
   /* D3D Basic */
   ID3D11Device* device_ = nullptr;

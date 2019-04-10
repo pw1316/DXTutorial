@@ -54,11 +54,11 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
                                                     (float)width, (float)height,
                                                     kNearPlane, kFarPlane));
 
-  camera_.SetPos(0.0f, 5.0f, -10.0f);
+  camera_.SetPos(0.0f, 30.0f, -150.0f);
 
   model_ = new naiive::entity::Model3D("res/sphere");
   model_->Initialize(device_);
-  model_dup_.resize(1000);
+  model_dup_.resize(500);
   for (auto&& pos : model_dup_) {
     pos.x = distribution_x_(rng_);
     pos.y = distribution_y_(rng_);
