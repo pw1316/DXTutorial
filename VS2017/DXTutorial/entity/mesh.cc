@@ -26,7 +26,7 @@ SOFTWARE.
 #include <filesystem>
 
 namespace naiive::entity {
-Mesh::Mesh(const std::string& raw_path) : path_(raw_path) {
+Mesh::Mesh(const std::string& raw_path) {
   std::filesystem::path path(".");
   path /= raw_path;
   path += ".obj";

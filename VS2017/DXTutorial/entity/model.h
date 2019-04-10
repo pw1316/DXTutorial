@@ -26,8 +26,8 @@ SOFTWARE.
 #include <string>
 #include <vector>
 
+#include <3rdparty/include/tiny_obj_loader.h>
 #include <entity/bounding_box.h>
-#include <entity/mesh.h>
 
 namespace naiive::entity {
 class Model3D {
@@ -56,10 +56,15 @@ class Model3D {
     float ns;
     DirectX::XMFLOAT3 padding;
   };
+  struct TinyObj {
+    tinyobj::attrib_t attr;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+  };
 
  public:
   explicit Model3D(const std::string path)
-      : mesh_(new Mesh(path)),
+      : name_(path),
         translate_(0.0f, 0.0f, 0.0f),
         rotation_pyr_(0.0f, 0.0f, 0.0f) {}
   ~Model3D() = default;
@@ -81,12 +86,13 @@ class Model3D {
   void InitializeShader(ID3D11Device* device);
   void ShutdownShader();
 
-  std::shared_ptr<Mesh> mesh_;
+  std::string name_;
   /* Transform */
   DirectX::XMFLOAT3 translate_;
   DirectX::XMFLOAT3 rotation_pyr_;
 
   /* Resources */
+  UINT vertex_number_ = 0;
   ID3D11Buffer* vertex_buffer_ = nullptr;
   ID3D11Buffer* index_buffer_ = nullptr;
   ID3D11Buffer* const_buffer_transform_ = nullptr;
