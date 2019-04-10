@@ -164,7 +164,7 @@ class GraphicsManagerClass : public core::IView {
 
   Camera camera_;
   Light light_;
-  std::shared_ptr<entity::Model3D> model_;
+  naiive::entity::Model3D* model_ = nullptr;
   std::vector<DirectX::XMFLOAT3> model_dup_;
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;

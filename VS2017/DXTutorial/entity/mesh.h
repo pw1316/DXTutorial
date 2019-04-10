@@ -35,21 +35,21 @@ namespace naiive::entity {
 class Mesh {
  public:
   explicit Mesh(const std::string& raw_path);
-  const std::string& get_path() const { return path_; }
-  DirectX::XMFLOAT4 vertex(UINT triangle, UINT index) const {
+  const std::string& get_path() { return path_; }
+  DirectX::XMFLOAT4 vertex(UINT triangle, UINT index) {
     auto vi = shapes_[0].mesh.indices[3 * triangle + 2 - index].vertex_index;
     auto x = attribute_.vertices[3 * vi];
     auto y = attribute_.vertices[3 * vi + 1];
     auto z = -attribute_.vertices[3 * vi + 2];
     return {x, y, z, 1.0f};
   }
-  DirectX::XMFLOAT2 texcoord(UINT triangle, UINT index) const {
+  DirectX::XMFLOAT2 texcoord(UINT triangle, UINT index) {
     auto ti = shapes_[0].mesh.indices[3 * triangle + 2 - index].texcoord_index;
     auto x = attribute_.texcoords[2 * ti];
     auto y = attribute_.texcoords[2 * ti + 1];
     return {x, 1.0f - y};
   }
-  DirectX::XMFLOAT4 normal(UINT triangle, UINT index) const {
+  DirectX::XMFLOAT4 normal(UINT triangle, UINT index) {
     auto ni = shapes_[0].mesh.indices[3 * triangle + 2 - index].normal_index;
     auto x = attribute_.normals[3 * ni];
     auto y = attribute_.normals[3 * ni + 1];

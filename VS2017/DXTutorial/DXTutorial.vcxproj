@@ -105,7 +105,6 @@
     <ClInclude Include="entity\mesh.h" />
     <ClInclude Include="entity\model.h" />
     <ClInclude Include="entity\mirror.h" />
-    <ClInclude Include="entity\shader.h" />
     <ClInclude Include="Manager\graphics_manager.h" />
     <ClInclude Include="Manager\input_manager.h" />
     <ClInclude Include="Manager\sound_manager.h" />
@@ -124,7 +123,6 @@
     <ClCompile Include="entity\mesh.cc" />
     <ClCompile Include="entity\model.cc" />
     <ClCompile Include="entity\mirror.cc" />
-    <ClCompile Include="entity\shader.cc" />
     <ClCompile Include="main.cc" />
     <ClCompile Include="Manager\graphics_manager.cc" />
     <ClCompile Include="Manager\input_manager.cc" />

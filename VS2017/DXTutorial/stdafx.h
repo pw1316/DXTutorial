@@ -147,8 +147,6 @@ class DebugClass {
   LOG_IF(LOG_ERROR, !(expression))("Assertion failed " #expression)
 #define ASSERT_MESSAGE(expression) LOG_IF(LOG_ERROR, !(expression))
 
-#define STD_HEX(hr) std::hex, std::uppercase, hr
-
 inline HINSTANCE HinstanceFromHwnd(HWND hwnd) {
   return reinterpret_cast<HINSTANCE>(GetWindowLongPtr(hwnd, GWLP_HINSTANCE));
 }

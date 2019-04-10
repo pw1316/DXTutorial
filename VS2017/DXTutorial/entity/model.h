@@ -28,10 +28,16 @@ SOFTWARE.
 
 #include <entity/bounding_box.h>
 #include <entity/mesh.h>
-#include <entity/shader.h>
 
 namespace naiive::entity {
 class Model3D {
+  struct VBType {
+    DirectX::XMFLOAT4 pos;
+    DirectX::XMFLOAT2 uv;
+    DirectX::XMFLOAT4 normal;
+    DirectX::XMFLOAT4 tangent;
+    DirectX::XMFLOAT4 binormal;
+  };
   struct CBTransformType {
     DirectX::XMFLOAT4X4 world;
     DirectX::XMFLOAT4X4 view;
@@ -52,9 +58,8 @@ class Model3D {
   };
 
  public:
-  explicit Model3D(const std::string& mesh_path, const std::string& shader_path)
-      : mesh_(new Mesh(mesh_path)),
-        shader_(new Shader(shader_path)),
+  explicit Model3D(const std::string path)
+      : mesh_(new Mesh(path)),
         translate_(0.0f, 0.0f, 0.0f),
         rotation_pyr_(0.0f, 0.0f, 0.0f) {}
   ~Model3D() = default;
@@ -77,16 +82,13 @@ class Model3D {
   void ShutdownShader();
 
   std::shared_ptr<Mesh> mesh_;
-  std::shared_ptr<Shader> shader_;
   /* Transform */
   DirectX::XMFLOAT3 translate_;
   DirectX::XMFLOAT3 rotation_pyr_;
 
   /* Resources */
-  UINT stride_ = 0U;
   ID3D11Buffer* vertex_buffer_ = nullptr;
   ID3D11Buffer* index_buffer_ = nullptr;
-
   ID3D11Buffer* const_buffer_transform_ = nullptr;
   ID3D11Buffer* const_buffer_camera_light_ = nullptr;
   ID3D11Buffer* const_buffer_material_ = nullptr;
