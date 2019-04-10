@@ -87,9 +87,6 @@
     <ClInclude Include="entity\shader.h">
       <Filter>entity</Filter>
     </ClInclude>
-    <ClInclude Include="manager\shader_manager.h">
-      <Filter>manager</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
@@ -129,9 +126,6 @@
     </ClCompile>
     <ClCompile Include="entity\shader.cc">
       <Filter>entity</Filter>
-    </ClCompile>
-    <ClCompile Include="manager\shader_manager.cc">
-      <Filter>manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

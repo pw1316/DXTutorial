@@ -108,7 +108,6 @@
     <ClInclude Include="entity\shader.h" />
     <ClInclude Include="Manager\graphics_manager.h" />
     <ClInclude Include="Manager\input_manager.h" />
-    <ClInclude Include="manager\shader_manager.h" />
     <ClInclude Include="Manager\sound_manager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -129,7 +128,6 @@
     <ClCompile Include="main.cc" />
     <ClCompile Include="Manager\graphics_manager.cc" />
     <ClCompile Include="Manager\input_manager.cc" />
-    <ClCompile Include="manager\shader_manager.cc" />
     <ClCompile Include="Manager\sound_manager.cc" />
     <ClCompile Include="stdafx.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
