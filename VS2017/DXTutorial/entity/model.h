@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <entity/bounding_box.h>
 #include <entity/mesh.h>
-#include <entity/shader/shader.h>
+#include <entity/shader.h>
 
 namespace naiive::entity {
 class Model3D {
