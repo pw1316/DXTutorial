@@ -26,6 +26,8 @@ SOFTWARE.
 #include <locale>
 #include <vector>
 
+#include <DirectX/DDSTextureLoader.h>
+
 #include <entity/frustum.h>
 #include <utils/range.h>
 
@@ -35,27 +37,13 @@ SOFTWARE.
 
 namespace naiive::entity {
 void Model3D::Initialize(ID3D11Device* device) {
-  HRESULT hr = S_OK;
-  mesh_->Initialize(device);
+  InitializeBuffer(device);
   shader_->Initialize(device);
-  hr = shader_->CreateVertexBufferAndIndexBuffer(
-      device, *mesh_, &vertex_buffer_, &index_buffer_, &stride_);
-  ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 vertex/index buffer failed", STD_HEX(hr));
-  auto index_number = mesh_->index_number();
-  for (UINT tri_id = 0; tri_id < index_number / 3; ++tri_id) {
-    for (UINT v_id = 0; v_id < 3; ++v_id) {
-      auto vertex = mesh_->vertex(tri_id, v_id);
-      aabb_.Add(vertex.x, vertex.y, vertex.z);
-    }
-  }
 }
 
 void Model3D::Shutdown() {
   shader_->Shutdown();
-  mesh_->Shutdown();
-  SafeRelease(&index_buffer_);
-  SafeRelease(&vertex_buffer_);
+  ShutdownBuffer();
 }
 
 BOOL Model3D::Render(ID3D11DeviceContext* context,
@@ -65,13 +53,11 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
                      const DirectX::XMFLOAT4& dir) {
   HRESULT hr = S_OK;
 
-  DirectX::XMFLOAT4X4 world;
   auto xmworld = DirectX::XMMatrixRotationRollPitchYaw(
       rotation_pyr_.x, rotation_pyr_.y, rotation_pyr_.z);
   xmworld = DirectX::XMMatrixMultiply(
       xmworld,
       DirectX::XMMatrixTranslation(translate_.x, translate_.y, translate_.z));
-  DirectX::XMStoreFloat4x4(&world, xmworld);
   auto xmview = DirectX::XMLoadFloat4x4(&view);
   auto xmproj = DirectX::XMLoadFloat4x4(&proj);
   DirectX::XMFLOAT4X4 matrix_view_proj;
@@ -95,17 +81,168 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
   }
 #endif
 
+  D3D11_MAPPED_SUBRESOURCE mapped;
+  hr = context->Map(const_buffer_transform_, 0, D3D11_MAP_WRITE_DISCARD, 0,
+                    &mapped);
+  ASSERT(SUCCEEDED(hr));
+  {
+    auto rawdata = (CBTransformType*)mapped.pData;
+    DirectX::XMStoreFloat4x4(&rawdata->world,
+                             DirectX::XMMatrixTranspose(xmworld));
+    DirectX::XMStoreFloat4x4(&rawdata->view,
+                             DirectX::XMMatrixTranspose(xmview));
+    DirectX::XMStoreFloat4x4(&rawdata->proj,
+                             DirectX::XMMatrixTranspose(xmproj));
+  }
+  context->Unmap(const_buffer_transform_, 0);
+
+  hr = context->Map(const_buffer_camera_light_, 0, D3D11_MAP_WRITE_DISCARD, 0,
+                    &mapped);
+  ASSERT(SUCCEEDED(hr));
+  {
+    auto rawdata = (CBCameraLightType*)mapped.pData;
+    rawdata->camera_pos = camera_pos;
+    rawdata->light_dir = dir;
+    rawdata->fog = {0, 50, 0.5f, 0.0f};
+    rawdata->clip_plane = {-1, 0, 0, 0};
+  }
+  context->Unmap(const_buffer_camera_light_, 0);
+
   UINT offset = 0U;
   context->IASetVertexBuffers(0, 1, &vertex_buffer_, &stride_, &offset);
   context->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
   context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-  shader_->PreRender(context, world, view, proj, camera_pos, dir,
-                     mesh_->material(), mesh_->diffuse_map(),
-                     mesh_->normal_map());
+  context->VSSetConstantBuffers(0, 1, &const_buffer_transform_);
+  context->VSSetConstantBuffers(1, 1, &const_buffer_camera_light_);
+
+  context->PSSetConstantBuffers(0, 1, &const_buffer_material_);
+  context->PSSetConstantBuffers(1, 1, &const_buffer_camera_light_);
+  context->PSSetShaderResources(0, 3, shader_resource_texture_);
+  context->PSSetSamplers(0, 1, &sampler_state_);
+
   shader_->Render(context);
+
   context->DrawIndexed(mesh_->index_number(), 0, 0);
   return TRUE;
 }
 
+void Model3D::InitializeBuffer(ID3D11Device* device) {
+  BOOL bool_res = FALSE;
+  HRESULT hr = S_OK;
+
+  D3D11_BUFFER_DESC buffer_desc;
+  D3D11_SUBRESOURCE_DATA sub_data;
+  D3D11_SAMPLER_DESC sampler_desc;
+
+  /* =====VB & IB===== */
+  hr = shader_->CreateVertexBufferAndIndexBuffer(
+      device, *mesh_, &vertex_buffer_, &index_buffer_, &stride_);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DirectX 11 vertex/index buffer failed", STD_HEX(hr));
+  auto index_number = mesh_->index_number();
+  for (UINT tri_id = 0; tri_id < index_number / 3; ++tri_id) {
+    for (UINT v_id = 0; v_id < 3; ++v_id) {
+      auto vertex = mesh_->vertex(tri_id, v_id);
+      aabb_.Add(vertex.x, vertex.y, vertex.z);
+    }
+  }
+
+  /* =====CB===== */
+  ZeroMemory(&buffer_desc, sizeof(buffer_desc));
+  buffer_desc.ByteWidth = sizeof(CBTransformType);
+  buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+  buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+  buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+  buffer_desc.MiscFlags = 0;
+  buffer_desc.StructureByteStride = 0;
+  hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_transform_);
+  ASSERT(SUCCEEDED(hr));
+
+  ZeroMemory(&buffer_desc, sizeof(buffer_desc));
+  buffer_desc.ByteWidth = sizeof(CBCameraLightType);
+  buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+  buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+  buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+  buffer_desc.MiscFlags = 0;
+  buffer_desc.StructureByteStride = 0;
+  hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_camera_light_);
+  ASSERT(SUCCEEDED(hr));
+
+  ZeroMemory(&buffer_desc, sizeof(buffer_desc));
+  buffer_desc.ByteWidth = sizeof(CBMaterialType);
+  buffer_desc.Usage = D3D11_USAGE_IMMUTABLE;
+  buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+  buffer_desc.CPUAccessFlags = 0;
+  buffer_desc.MiscFlags = 0;
+  buffer_desc.StructureByteStride = 0;
+  CBMaterialType material;
+  material.ka = DirectX::XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
+  material.kd = DirectX::XMFLOAT4(mesh_->material().diffuse);
+  material.kd.w = 1.0f;
+  material.ks = DirectX::XMFLOAT4(mesh_->material().specular);
+  material.ks.w = 1.0f;
+  material.ns = mesh_->material().shininess;
+  ZeroMemory(&sub_data, sizeof(sub_data));
+  sub_data.pSysMem = &material;
+  sub_data.SysMemPitch = 0;
+  sub_data.SysMemSlicePitch = 0;
+  hr = device->CreateBuffer(&buffer_desc, &sub_data, &const_buffer_material_);
+  ASSERT(SUCCEEDED(hr));
+
+  /* =====Texture=====*/
+  auto texture_name = mesh_->get_path() + "_stone.dds";
+  WCHAR texture_name_l[128] = {0};
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  hr = DirectX::CreateDDSTextureFromFileEx(
+      device, nullptr, texture_name_l, 0, D3D11_USAGE_DEFAULT,
+      D3D11_BIND_SHADER_RESOURCE, 0, 0, TRUE, nullptr,
+      &shader_resource_texture_[0]);
+  CHECK(SUCCEEDED(hr))("Texture [stone] missing");
+
+  texture_name = mesh_->get_path() + "_stone_bump.dds";
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
+                                         &shader_resource_texture_[1]);
+  CHECK(SUCCEEDED(hr))("Texture [stone_bump] missing");
+
+  texture_name = mesh_->get_path() + "_dirt.dds";
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  hr = DirectX::CreateDDSTextureFromFileEx(
+      device, nullptr, texture_name_l, 0, D3D11_USAGE_DEFAULT,
+      D3D11_BIND_SHADER_RESOURCE, 0, 0, TRUE, nullptr,
+      &shader_resource_texture_[2]);
+  CHECK(SUCCEEDED(hr))("Texture [dirt] missing");
+
+  /* =====SamplerState===== */
+  sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+  sampler_desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler_desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler_desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+  sampler_desc.MipLODBias = 0.0f;
+  sampler_desc.MaxAnisotropy = 1;
+  sampler_desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+  sampler_desc.BorderColor[0] = 0;
+  sampler_desc.BorderColor[1] = 0;
+  sampler_desc.BorderColor[2] = 0;
+  sampler_desc.BorderColor[3] = 0;
+  sampler_desc.MinLOD = 0;
+  sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
+  hr = device->CreateSamplerState(&sampler_desc, &sampler_state_);
+  ASSERT(SUCCEEDED(hr));
+}
+void Model3D::ShutdownBuffer() {
+  SafeRelease(&sampler_state_);
+  SafeRelease(&shader_resource_texture_[2]);
+  SafeRelease(&shader_resource_texture_[1]);
+  SafeRelease(&shader_resource_texture_[0]);
+  SafeRelease(&const_buffer_material_);
+  SafeRelease(&const_buffer_camera_light_);
+  SafeRelease(&const_buffer_transform_);
+  SafeRelease(&index_buffer_);
+  SafeRelease(&vertex_buffer_);
+}
 }  // namespace naiive::entity

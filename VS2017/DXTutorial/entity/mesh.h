@@ -35,9 +35,6 @@ namespace naiive::entity {
 class Mesh {
  public:
   explicit Mesh(const std::string& raw_path);
-  void Initialize(ID3D11Device* device);
-  void Shutdown();
-
   const std::string& get_path() const { return path_; }
   DirectX::XMFLOAT4 vertex(UINT triangle, UINT index) const {
     auto vi = shapes_[0].mesh.indices[3 * triangle + 2 - index].vertex_index;
@@ -67,17 +64,12 @@ class Mesh {
     return static_cast<UINT>(shapes_[0].mesh.indices.size());
   }
   const tinyobj::material_t& material() const { return materials_[0]; }
-  ID3D11ShaderResourceView* diffuse_map() const { return diffuse_map_; }
-  ID3D11ShaderResourceView* normal_map() const { return normal_map_; }
 
  private:
   std::string path_;
   tinyobj::attrib_t attribute_;
   std::vector<tinyobj::shape_t> shapes_;
   std::vector<tinyobj::material_t> materials_;
-
-  ID3D11ShaderResourceView* diffuse_map_ = nullptr;
-  ID3D11ShaderResourceView* normal_map_ = nullptr;
 };
 }  // namespace naiive::entity
 #endif
