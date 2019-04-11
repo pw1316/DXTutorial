@@ -32,6 +32,7 @@ SOFTWARE.
 #include <entity/font.h>
 #include <entity/mirror.h>
 #include <entity/model.h>
+#include <entity/shader_default.h>
 #include <manager/input_manager.h>
 
 namespace naiive::manager {
@@ -70,6 +71,9 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   pool_model_.reset(new entity::Model3D("res/pool"));
   pool_model_->Initialize(device_);
 
+  shader_default.reset(new entity::ShaderDefault);
+  shader_default->Initialize(device_);
+
   gui_ = new naiive::entity::Font;
   gui_->Initialize(device_);
 
@@ -89,6 +93,7 @@ void GraphicsManagerClass::Shutdown() {
     delete gui_;
     gui_ = nullptr;
   }
+  shader_default->Shutdown();
   pool_model_->Shutdown();
   if (model_) {
     model_->Shutdown();
@@ -116,10 +121,10 @@ BOOL GraphicsManagerClass::OnUpdate() {
   ULONG total_models = static_cast<ULONG>(model_dup_.size());
   for (auto&& pos : model_dup_) {
     model_->MoveTo(pos);
-    model_->Render(device_context_, reflect_view, matrix_perspective_,
-                   camera_.GetPos(), light_.dir,
-                   {kNearPlane, kFarPlane, fog_intensity, 0.0f},
-                   {0, 0, -1, kFarPlane});
+    shader_default->Render(device_context_, *model_, reflect_view,
+                           matrix_perspective_, camera_.GetPos(), light_.dir,
+                           {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                           {0, 0, -1, kFarPlane});
   }
 
   // Refract texture
@@ -129,9 +134,10 @@ BOOL GraphicsManagerClass::OnUpdate() {
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
-  pool_model_->Render(
-      device_context_, view, matrix_perspective_, camera_.GetPos(), light_.dir,
-      {kNearPlane, kFarPlane, fog_intensity, 0.0f}, {0, 0, -1, kFarPlane});
+  shader_default->Render(device_context_, *pool_model_, view,
+                         matrix_perspective_, camera_.GetPos(), light_.dir,
+                         {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                         {0, 0, -1, kFarPlane});
 
   // To scene
   BeginScene(render_target_view_, depth_stencil_view_);
@@ -143,16 +149,18 @@ BOOL GraphicsManagerClass::OnUpdate() {
   ULONG frustum_visible_models = 0UL;
   for (auto&& pos : model_dup_) {
     model_->MoveTo(pos);
-    if (model_->Render(device_context_, view, matrix_perspective_,
-                       camera_.GetPos(), light_.dir,
-                       {kNearPlane, kFarPlane, fog_intensity, 0.0f},
-                       {0, 0, -1, kFarPlane})) {
+    if (shader_default->Render(device_context_, *model_, view,
+                               matrix_perspective_, camera_.GetPos(),
+                               light_.dir,
+                               {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                               {0, 0, -1, kFarPlane})) {
       ++frustum_visible_models;
     }
   }
-  pool_model_->Render(
-      device_context_, view, matrix_perspective_, camera_.GetPos(), light_.dir,
-      {kNearPlane, kFarPlane, fog_intensity, 0.0f}, {0, 0, -1, kFarPlane});
+  shader_default->Render(device_context_, *pool_model_, view,
+                         matrix_perspective_, camera_.GetPos(), light_.dir,
+                         {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                         {0, 0, -1, kFarPlane});
 
   // Mirror
   mirror_->Render(device_context_, view, matrix_perspective_, reflect_view);

@@ -84,6 +84,9 @@
     <ClInclude Include="entity\vertex_type.h">
       <Filter>entity</Filter>
     </ClInclude>
+    <ClInclude Include="entity\shader_default.h">
+      <Filter>entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
@@ -116,6 +119,9 @@
     <ClCompile Include="main.cc" />
     <ClCompile Include="stdafx.cc" />
     <ClCompile Include="entity\mirror.cc">
+      <Filter>entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\shader_default.cc">
       <Filter>entity</Filter>
     </ClCompile>
   </ItemGroup>

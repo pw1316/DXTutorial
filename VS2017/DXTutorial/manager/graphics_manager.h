@@ -32,6 +32,7 @@ namespace naiive::entity {
 class Model3D;
 class Font;
 class Mirror;
+class ShaderDefault;
 }  // namespace naiive::entity
 
 namespace naiive::manager {
@@ -176,6 +177,7 @@ class GraphicsManagerClass : public core::IView {
   naiive::entity::Model3D* model_ = nullptr;
   std::vector<DirectX::XMFLOAT3> model_dup_;
   std::shared_ptr<entity::Model3D> pool_model_;
+  std::shared_ptr<entity::ShaderDefault> shader_default;
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;
   FLOAT fog_intensity = 0.0f;

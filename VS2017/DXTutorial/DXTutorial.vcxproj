@@ -100,6 +100,7 @@
     <ClInclude Include="core\system.h" />
     <ClInclude Include="directx\DDSTextureLoader.h" />
     <ClInclude Include="entity\bounding_box.h" />
+    <ClInclude Include="entity\shader_default.h" />
     <ClInclude Include="entity\font.h" />
     <ClInclude Include="entity\frustum.h" />
     <ClInclude Include="entity\model.h" />
@@ -122,6 +123,7 @@
     <ClCompile Include="entity\font.cc" />
     <ClCompile Include="entity\model.cc" />
     <ClCompile Include="entity\mirror.cc" />
+    <ClCompile Include="entity\shader_default.cc" />
     <ClCompile Include="main.cc" />
     <ClCompile Include="Manager\graphics_manager.cc" />
     <ClCompile Include="Manager\input_manager.cc" />

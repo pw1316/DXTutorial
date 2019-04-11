@@ -31,24 +31,6 @@ SOFTWARE.
 
 namespace naiive::entity {
 class Model3D {
-  struct CBTransformType {
-    DirectX::XMFLOAT4X4 world;
-    DirectX::XMFLOAT4X4 view;
-    DirectX::XMFLOAT4X4 proj;
-  };
-  struct CBCameraLightType {
-    DirectX::XMFLOAT4 camera_pos;
-    DirectX::XMFLOAT4 light_dir;
-    DirectX::XMFLOAT4 fog;         // start, end, intensity, pad
-    DirectX::XMFLOAT4 clip_plane;  // nx, ny, nz, -dot(n,p0)
-  };
-  struct CBMaterialType {
-    DirectX::XMFLOAT4 ka;
-    DirectX::XMFLOAT4 kd;
-    DirectX::XMFLOAT4 ks;
-    float ns;
-    DirectX::XMFLOAT3 padding;
-  };
   struct TinyObj {
     tinyobj::attrib_t attr;
     std::vector<tinyobj::shape_t> shapes;
@@ -60,15 +42,24 @@ class Model3D {
       : name_(path),
         translate_(0.0f, 0.0f, 0.0f),
         rotation_pyr_(0.0f, 0.0f, 0.0f) {}
-  ~Model3D() = default;
 
   void Initialize(ID3D11Device* device);
   void Shutdown();
-  BOOL Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view,
-              const DirectX::XMFLOAT4X4& proj,
-              const DirectX::XMFLOAT4& camera_pos,
-              const DirectX::XMFLOAT4& light_dir, const DirectX::XMFLOAT4& fog,
-              const DirectX::XMFLOAT4& clip_plane);
+
+  DirectX::XMMATRIX Transform() const {
+    return DirectX::XMMatrixMultiply(
+        DirectX::XMMatrixRotationRollPitchYaw(rotation_pyr_.x, rotation_pyr_.y,
+                                              rotation_pyr_.z),
+        DirectX::XMMatrixTranslation(translate_.x, translate_.y, translate_.z));
+  }
+  DirectX::XMFLOAT3 Corner(int i) const { return aabb_.Corner(i); }
+  ID3D11Buffer* VertexBuffer() const { return vertex_buffer_; }
+  ID3D11Buffer* IndexBuffer() const { return index_buffer_; }
+  ID3D11ShaderResourceView* const* ShaderResource() const {
+    return &shader_resource_texture_[0];
+  }
+  UINT vertex_number() const { return vertex_number_; }
+  const tinyobj::material_t& Material() const { return obj.materials[0]; }
   void MoveTo(const DirectX::XMFLOAT3& translate) { translate_ = translate; }
 
  private:
@@ -76,31 +67,19 @@ class Model3D {
   void InitializeBuffer(ID3D11Device* device);
   void ShutdownBuffer();
 
-  /* Shader */
-  void InitializeShader(ID3D11Device* device);
-  void ShutdownShader();
-
   std::string name_;
   /* Transform */
   DirectX::XMFLOAT3 translate_;
   DirectX::XMFLOAT3 rotation_pyr_;
 
   /* Resources */
+  TinyObj obj;
   UINT vertex_number_ = 0;
   ID3D11Buffer* vertex_buffer_ = nullptr;
   ID3D11Buffer* index_buffer_ = nullptr;
-  ID3D11Buffer* const_buffer_transform_ = nullptr;
-  ID3D11Buffer* const_buffer_camera_light_ = nullptr;
-  ID3D11Buffer* const_buffer_material_ = nullptr;
+  BoundingBox3D aabb_;
   ID3D11ShaderResourceView* shader_resource_texture_[3] = {nullptr, nullptr,
                                                            nullptr};
-  ID3D11SamplerState* sampler_state_ = nullptr;
-  BoundingBox3D aabb_;
-
-  /* Shader */
-  ID3D11VertexShader* vertex_shader_ = nullptr;
-  ID3D11PixelShader* pixel_shader_ = nullptr;
-  ID3D11InputLayout* input_layout_ = nullptr;
 };
 }  // namespace naiive::entity
 #endif
