@@ -1,7 +1,30 @@
+/* MIT License
+
+Copyright (c) 2018 Joker Yough
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+==============================================================================*/
+
 #include "shader_default.h"
 
 #include <entity/frustum.h>
-#include <entity/model.h>
+#include <entity/model_default.h>
 #include <entity/vertex_type.h>
 #include <utils/range.h>
 
@@ -21,7 +44,7 @@ void naiive::entity::ShaderDefault::Shutdown() {
 }
 
 BOOL naiive::entity::ShaderDefault::Render(
-    ID3D11DeviceContext* context, const Model3D& model,
+    ID3D11DeviceContext* context, const ModelDefault& model,
     const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj,
     const DirectX::XMFLOAT4& camera_pos, const DirectX::XMFLOAT4& light_dir,
     const DirectX::XMFLOAT4& fog, const DirectX::XMFLOAT4& clip_plane) {
@@ -105,13 +128,16 @@ BOOL naiive::entity::ShaderDefault::Render(
   context->VSSetConstantBuffers(1, 1, &const_buffer_camera_light_);
   context->VSSetShader(vertex_shader_, nullptr, 0);
 
+  auto srv_diffuse_map = model.DiffuseMap();
+  auto srv_bump_map = model.BumpMap();
   context->PSSetConstantBuffers(0, 1, &const_buffer_material_);
   context->PSSetConstantBuffers(1, 1, &const_buffer_camera_light_);
-  context->PSSetShaderResources(0, 3, model.ShaderResource());
+  context->PSSetShaderResources(0, 1, &srv_diffuse_map);
+  context->PSSetShaderResources(1, 1, &srv_bump_map);
   context->PSSetSamplers(0, 1, &sampler_state_);
   context->PSSetShader(pixel_shader_, nullptr, 0);
 
-  context->DrawIndexed(model.vertex_number(), 0, 0);
+  context->DrawIndexed(model.NumIndices(), 0, 0);
   return TRUE;
 }
 

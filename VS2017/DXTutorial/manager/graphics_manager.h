@@ -29,7 +29,7 @@ SOFTWARE.
 #include <core/iview.h>
 
 namespace naiive::entity {
-class Model3D;
+class ModelDefault;
 class Font;
 class Mirror;
 class ShaderDefault;
@@ -174,9 +174,9 @@ class GraphicsManagerClass : public core::IView {
 
   Camera camera_;
   Light light_;
-  naiive::entity::Model3D* model_ = nullptr;
+  std::shared_ptr<entity::ModelDefault> model_;
   std::vector<DirectX::XMFLOAT3> model_dup_;
-  std::shared_ptr<entity::Model3D> pool_model_;
+  std::shared_ptr<entity::ModelDefault> pool_model_;
   std::shared_ptr<entity::ShaderDefault> shader_default;
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;

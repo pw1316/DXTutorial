@@ -60,9 +60,6 @@
     <ClInclude Include="entity\font.h">
       <Filter>entity</Filter>
     </ClInclude>
-    <ClInclude Include="entity\model.h">
-      <Filter>entity</Filter>
-    </ClInclude>
     <ClInclude Include="directx\DDSTextureLoader.h">
       <Filter>directx</Filter>
     </ClInclude>
@@ -87,6 +84,9 @@
     <ClInclude Include="entity\shader_default.h">
       <Filter>entity</Filter>
     </ClInclude>
+    <ClInclude Include="entity\model_default.h">
+      <Filter>entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
@@ -99,9 +99,6 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="entity\font.cc">
-      <Filter>entity</Filter>
-    </ClCompile>
-    <ClCompile Include="entity\model.cc">
       <Filter>entity</Filter>
     </ClCompile>
     <ClCompile Include="directx\DDSTextureLoader.cpp">
@@ -122,6 +119,9 @@
       <Filter>entity</Filter>
     </ClCompile>
     <ClCompile Include="entity\shader_default.cc">
+      <Filter>entity</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\model_default.cc">
       <Filter>entity</Filter>
     </ClCompile>
   </ItemGroup>

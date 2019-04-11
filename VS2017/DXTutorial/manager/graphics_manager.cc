@@ -31,7 +31,7 @@ SOFTWARE.
 #include <core/system.h>
 #include <entity/font.h>
 #include <entity/mirror.h>
-#include <entity/model.h>
+#include <entity/model_default.h>
 #include <entity/shader_default.h>
 #include <manager/input_manager.h>
 
@@ -57,8 +57,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
 
   camera_.SetPos(0.0f, 30.0f, -150.0f);
 
-  model_ = new naiive::entity::Model3D("res/sphere");
-  model_->Initialize(device_);
+  model_.reset(new entity::ModelDefault(device_, "res/sphere"));
   model_dup_.resize(500);
   for (auto&& pos : model_dup_) {
     pos.x = distribution_x_(rng_);
@@ -68,8 +67,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   std::sort(model_dup_.begin(), model_dup_.end(),
             [](auto&& lhs, auto&& rhs) { return lhs.z > rhs.z; });
 
-  pool_model_.reset(new entity::Model3D("res/pool"));
-  pool_model_->Initialize(device_);
+  pool_model_.reset(new entity::ModelDefault(device_, "res/pool"));
 
   shader_default.reset(new entity::ShaderDefault);
   shader_default->Initialize(device_);
@@ -93,13 +91,9 @@ void GraphicsManagerClass::Shutdown() {
     delete gui_;
     gui_ = nullptr;
   }
+  pool_model_.reset();
+  model_.reset();
   shader_default->Shutdown();
-  pool_model_->Shutdown();
-  if (model_) {
-    model_->Shutdown();
-    delete model_;
-    model_ = nullptr;
-  }
   ShutdownRasterizer();
   ShutdownOM();
   ShutdownDevice();

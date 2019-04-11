@@ -24,7 +24,7 @@ SOFTWARE.
 #ifndef __ENTITY_SHADER_DEFAULT__
 #define __ENTITY_SHADER_DEFAULT__
 namespace naiive::entity {
-class Model3D;
+class ModelDefault;
 
 class ShaderDefault {
   struct CBTransformType {
@@ -49,7 +49,7 @@ class ShaderDefault {
  public:
   void Initialize(ID3D11Device* device);
   void Shutdown();
-  BOOL Render(ID3D11DeviceContext* context, const Model3D& model,
+  BOOL Render(ID3D11DeviceContext* context, const ModelDefault& model,
               const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj,
               const DirectX::XMFLOAT4& camera_pos,
               const DirectX::XMFLOAT4& light_dir, const DirectX::XMFLOAT4& fog,

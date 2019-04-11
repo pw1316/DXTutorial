@@ -23,7 +23,7 @@ SOFTWARE.
 
 #define INV_E 0.36787944117144232159552377016146f
 
-Texture2D shaderTexture[3] : register(t0);
+Texture2D shaderTexture[2] : register(t0);
 SamplerState SampleType;
 
 cbuffer consts0 : register(b0) {
@@ -53,14 +53,7 @@ struct PixelIn {
 };
 
 float4 main(PixelIn pin) : SV_TARGET {
-  float4 color1 = shaderTexture[0].Sample(SampleType, pin.uv);
-  float4 color2 = shaderTexture[2].Sample(SampleType, pin.uv);
-  float4 color;
-  if (color2.x == 0 && color2.y == 0 && color2.z == 0 && color2.w == 0) {
-    color = color1;
-  } else {
-    color = 2 * color1 * color2;
-  }
+  float4 color = shaderTexture[0].Sample(SampleType, pin.uv);
   float dist = length(CameraPos - pin.pos_world);
   float4 view = normalize(CameraPos - pin.pos_world);
   float4 normal = normalize(pin.normal);
@@ -68,6 +61,7 @@ float4 main(PixelIn pin) : SV_TARGET {
   float4 binormal = normalize(pin.binormal);
 
   float4 bump = shaderTexture[1].Sample(SampleType, pin.uv) * 2.0 - 1.0;
+  // TODO remove if
   if (bump.x != -1 || bump.y != -1 || bump.z != -1)
     normal = normalize(bump.x * tangent + bump.y * binormal + bump.z * normal);
   color = color * (Ka + Kd * saturate(dot(normal, -light_dir))) +
