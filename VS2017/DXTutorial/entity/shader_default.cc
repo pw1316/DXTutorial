@@ -91,7 +91,7 @@ BOOL naiive::entity::ShaderDefault::Render(
     rawdata->ks.w = 1.0f;
     rawdata->ns = material.shininess;
   }
-  context->Unmap(const_buffer_camera_light_, 0);
+  context->Unmap(const_buffer_material_, 0);
 
   UINT stride = sizeof(VertexType);
   UINT offset = 0U;
