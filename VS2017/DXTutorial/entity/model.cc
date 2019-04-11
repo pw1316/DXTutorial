@@ -29,6 +29,7 @@ SOFTWARE.
 #include <DirectX/DDSTextureLoader.h>
 
 #include <entity/frustum.h>
+#include <entity/vertex_type.h>
 #include <utils/range.h>
 
 // TODO fix
@@ -111,7 +112,7 @@ BOOL Model3D::Render(ID3D11DeviceContext* context,
   }
   context->Unmap(const_buffer_camera_light_, 0);
 
-  UINT stride = sizeof(VBType);
+  UINT stride = sizeof(VertexType);
   UINT offset = 0U;
   context->IASetVertexBuffers(0, 1, &vertex_buffer_, &stride, &offset);
   context->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
@@ -147,7 +148,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
 
   /* =====VB & IB===== */
   vertex_number_ = static_cast<UINT>(obj.shapes[0].mesh.indices.size());
-  std::vector<VBType> vertices(vertex_number_);
+  std::vector<VertexType> vertices(vertex_number_);
   std::vector<ULONG> indices(vertex_number_);
   for (UINT triId = 0; triId < vertex_number_ / 3; ++triId) {
     for (UINT j = 0; j < 3; ++j) {
@@ -212,7 +213,7 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
   // indices[2] = 2;
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
-  buffer_desc.ByteWidth = sizeof(VBType) * vertex_number_;
+  buffer_desc.ByteWidth = sizeof(VertexType) * vertex_number_;
   buffer_desc.Usage = D3D11_USAGE_DEFAULT;
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
   buffer_desc.CPUAccessFlags = 0;

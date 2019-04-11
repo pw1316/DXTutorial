@@ -31,13 +31,6 @@ SOFTWARE.
 
 namespace naiive::entity {
 class Model3D {
-  struct VBType {
-    DirectX::XMFLOAT4 pos;
-    DirectX::XMFLOAT2 uv;
-    DirectX::XMFLOAT4 normal;
-    DirectX::XMFLOAT4 tangent;
-    DirectX::XMFLOAT4 binormal;
-  };
   struct CBTransformType {
     DirectX::XMFLOAT4X4 world;
     DirectX::XMFLOAT4X4 view;

@@ -104,6 +104,7 @@
     <ClInclude Include="entity\frustum.h" />
     <ClInclude Include="entity\model.h" />
     <ClInclude Include="entity\mirror.h" />
+    <ClInclude Include="entity\vertex_type.h" />
     <ClInclude Include="Manager\graphics_manager.h" />
     <ClInclude Include="Manager\input_manager.h" />
     <ClInclude Include="Manager\sound_manager.h" />
