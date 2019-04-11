@@ -27,9 +27,8 @@ SamplerState texture_sampler;
 
 struct PixelIn {
   float4 pos : SV_POSITION;
-  float2 uv : TEXCOORD0;
-  float4 pos_reflect : TEXCOORD1;
-  float4 pos_refract : TEXCOORD2;
+  float4 pos_reflect : TEXCOORD0;
+  float4 pos_refract : TEXCOORD1;
 };
 
 float4 main(PixelIn pin) : SV_TARGET {

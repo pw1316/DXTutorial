@@ -23,6 +23,8 @@ SOFTWARE.
 
 #include "mirror.h"
 
+#include <entity/vertex_type.h>
+
 namespace naiive::entity {
 void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   HRESULT hr = S_OK;
@@ -79,7 +81,7 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-  buffer_desc.ByteWidth = sizeof(VBType) * 6;
+  buffer_desc.ByteWidth = sizeof(VertexType) * 6;
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
   buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
   buffer_desc.MiscFlags = 0;
@@ -167,23 +169,23 @@ void Mirror::Render(ID3D11DeviceContext* context,
 
   context->Map(vertex_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
-    auto rawdata = (VBType*)mapped.pData;
-    rawdata[0].pos = {-80, -5, 80};
+    auto rawdata = (VertexType*)mapped.pData;
+    rawdata[0].pos = {-80, -5, 80, 1};
     rawdata[0].uv = {0.0f, 0.0f};
-    rawdata[1].pos = {80, -5, -80};
+    rawdata[1].pos = {80, -5, -80, 1};
     rawdata[1].uv = {1.0f, 1.0f};
-    rawdata[2].pos = {-80, -5, -80};
+    rawdata[2].pos = {-80, -5, -80, 1};
     rawdata[2].uv = {0.0f, 1.0f};
-    rawdata[3].pos = {-80, -5, 80};
+    rawdata[3].pos = {-80, -5, 80, 1};
     rawdata[3].uv = {0.0f, 0.0f};
-    rawdata[4].pos = {80, -5, 80};
+    rawdata[4].pos = {80, -5, 80, 1};
     rawdata[4].uv = {1.0f, 0.0f};
-    rawdata[5].pos = {80, -5, -80};
+    rawdata[5].pos = {80, -5, -80, 1};
     rawdata[5].uv = {1.0f, 1.0f};
   }
   context->Unmap(vertex_buffer_, 0);
 
-  UINT stride = sizeof(VBType);
+  UINT stride = sizeof(VertexType);
   UINT offset = 0;
   context->IASetVertexBuffers(0, 1, &vertex_buffer_, &stride, &offset);
   context->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
@@ -219,24 +221,16 @@ void Mirror::InitializeShader(ID3D11Device* device) {
                                   &vertex_shader_);
   ASSERT(SUCCEEDED(hr));
 
-  const UINT kNumLayout = 2;
+  const UINT kNumLayout = 1;
   D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
   layout[0].SemanticIndex = 0;
-  layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
   layout[0].InputSlot = 0;
-  layout[0].AlignedByteOffset = 0;
+  layout[0].AlignedByteOffset = offsetof(VertexType, pos);
   layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[0].InstanceDataStepRate = 0;
-
-  layout[1].SemanticName = "TEXCOORD";
-  layout[1].SemanticIndex = 0;
-  layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-  layout[1].InputSlot = 0;
-  layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-  layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-  layout[1].InstanceDataStepRate = 0;
   hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
                                  blob->GetBufferSize(), &input_layout_);
   ASSERT(SUCCEEDED(hr));

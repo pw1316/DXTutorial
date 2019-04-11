@@ -26,10 +26,6 @@ SOFTWARE.
 
 namespace naiive::entity {
 class Mirror {
-  struct VBType {
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT2 uv;
-  };
   struct CB0Type {
     DirectX::XMFLOAT4X4 matrix_world;
     DirectX::XMFLOAT4X4 matrix_view;

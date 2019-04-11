@@ -196,21 +196,6 @@ void Model3D::InitializeBuffer(ID3D11Device* device) {
     vertices[3 * triId + 2].tangent = vertices[3 * triId].tangent;
     vertices[3 * triId + 2].binormal = vertices[3 * triId].binormal;
   }
-  // vertex_number_ = 3;
-  // std::vector<VBType> vertices(vertex_number_);
-  // std::vector<ULONG> indices(vertex_number_);
-  // vertices[0].pos = DirectX::XMFLOAT3(-1.0f, 1.0f, 0.0f);
-  // vertices[0].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
-  // vertices[0].uv = DirectX::XMFLOAT2(0.0f, 0.0f);
-  // indices[0] = 0;
-  // vertices[1].pos = DirectX::XMFLOAT3(1.0f, 1.0f, 0.0f);
-  // vertices[1].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
-  // vertices[1].uv = DirectX::XMFLOAT2(1.0f, 0.0f);
-  // indices[1] = 1;
-  // vertices[2].pos = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);
-  // vertices[2].normal = DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f);
-  // vertices[2].uv = DirectX::XMFLOAT2(1.0f, 1.0f);
-  // indices[2] = 2;
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.ByteWidth = sizeof(VertexType) * vertex_number_;

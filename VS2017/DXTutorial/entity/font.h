@@ -31,10 +31,6 @@ class Font {
     FLOAT uv_left, uv_right;
     UINT size;
   };
-  struct VBType {
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT2 uv;
-  };
   struct CB0Type {
     DirectX::XMFLOAT4X4 matrix_proj;
     DirectX::XMFLOAT4 font_color;

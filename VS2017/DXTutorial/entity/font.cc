@@ -27,6 +27,7 @@ SOFTWARE.
 #include <vector>
 
 #include <DirectX/DDSTextureLoader.h>
+#include <entity/vertex_type.h>
 
 namespace naiive::entity {
 void Font::Initialize(ID3D11Device* device) {
@@ -60,7 +61,7 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
 
   UINT num_character = static_cast<UINT>(text.size());
   UINT num_vertex = 0U;
-  std::vector<VBType> vertices(num_character * 6);
+  std::vector<VertexType> vertices(num_character * 6);
   std::vector<ULONG> indices(num_character * 6);
   FLOAT x = -1.0f / proj._11 + pos.x;
   FLOAT y = 1.0f / proj._22 - pos.y;
@@ -73,27 +74,29 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
       y -= 16.0f;
     } else if (letter > kStartChar && letter != 127) {
       UINT index = letter - kStartChar;
-      vertices[num_vertex + 0].pos = {x, y, 1.0f};
+      vertices[num_vertex + 0].pos = {x, y, 1.0f, 1.0f};
       vertices[num_vertex + 0].uv = {font_[index].uv_left, 0.0f};
       indices[num_vertex + 0] = num_vertex + 0U;
 
-      vertices[num_vertex + 1].pos = {x + font_[index].size, y - 16, 1.0f};
+      vertices[num_vertex + 1].pos = {x + font_[index].size, y - 16, 1.0f,
+                                      1.0f};
       vertices[num_vertex + 1].uv = {font_[index].uv_right, 1.0f};
       indices[num_vertex + 1] = num_vertex + 1;
 
-      vertices[num_vertex + 2].pos = {x, y - 16, 1.0f};
+      vertices[num_vertex + 2].pos = {x, y - 16, 1.0f, 1.0f};
       vertices[num_vertex + 2].uv = {font_[index].uv_left, 1.0f};
       indices[num_vertex + 2] = num_vertex + 2;
 
-      vertices[num_vertex + 3].pos = {x, y, 1.0f};
+      vertices[num_vertex + 3].pos = {x, y, 1.0f, 1.0f};
       vertices[num_vertex + 3].uv = {font_[index].uv_left, 0.0f};
       indices[num_vertex + 3] = num_vertex + 3;
 
-      vertices[num_vertex + 4].pos = {x + font_[index].size, y, 1.0f};
+      vertices[num_vertex + 4].pos = {x + font_[index].size, y, 1.0f, 1.0f};
       vertices[num_vertex + 4].uv = {font_[index].uv_right, 0.0f};
       indices[num_vertex + 4] = num_vertex + 4;
 
-      vertices[num_vertex + 5].pos = {x + font_[index].size, y - 16, 1.0f};
+      vertices[num_vertex + 5].pos = {x + font_[index].size, y - 16, 1.0f,
+                                      1.0f};
       vertices[num_vertex + 5].uv = {font_[index].uv_right, 1.0f};
       indices[num_vertex + 5] = num_vertex + 5;
       x += font_[index].size + 1.0f;
@@ -106,7 +109,7 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
   SafeRelease(&vertex_buffer_);
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_IMMUTABLE;
-  buffer_desc.ByteWidth = sizeof(VBType) * num_vertex;
+  buffer_desc.ByteWidth = sizeof(VertexType) * num_vertex;
   buffer_desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
   buffer_desc.CPUAccessFlags = 0;
   buffer_desc.MiscFlags = 0;
@@ -143,7 +146,7 @@ void Font::Render(ID3D11Device* device, ID3D11DeviceContext* context,
   }
   context->Unmap(const_buffer_0_, 0);
 
-  UINT stride = sizeof(VBType);
+  UINT stride = sizeof(VertexType);
   UINT offset = 0;
   context->IASetVertexBuffers(0, 1, &vertex_buffer_, &stride, &offset);
   context->IASetIndexBuffer(index_buffer_, DXGI_FORMAT_R32_UINT, 0);
@@ -235,16 +238,17 @@ void Font::InitializeShader(ID3D11Device* device) {
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
   layout[0].SemanticIndex = 0;
-  layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+  layout[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
   layout[0].InputSlot = 0;
-  layout[0].AlignedByteOffset = 0;
+  layout[0].AlignedByteOffset = offsetof(VertexType, pos);
   layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[0].InstanceDataStepRate = 0;
+
   layout[1].SemanticName = "TEXCOORD";
   layout[1].SemanticIndex = 0;
   layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
   layout[1].InputSlot = 0;
-  layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+  layout[1].AlignedByteOffset = offsetof(VertexType, uv);
   layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[1].InstanceDataStepRate = 0;
   hr =
