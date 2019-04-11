@@ -48,9 +48,11 @@ ModelDefault::ModelDefault(ID3D11Device* device, const std::string raw_path)
   tinyobj::LoadObj(&attribute_, &shapes_, &materials_, &obj_warning, &obj_error,
                    path.string().c_str(), path.parent_path().string().c_str());
   if (!obj_warning.empty()) {
-    LOG(LOG_WARN)(obj_warning);
+    LOG(LOG_WARN)
+    (raw_path_, "Load model with warning", obj_warning);
   }
-  ASSERT_MESSAGE(obj_error.empty())(obj_error);
+  ASSERT_MESSAGE(obj_error.empty())
+  (raw_path_, "Load model with error", obj_error);
 
   Initialize(device);
 }
@@ -112,7 +114,7 @@ void ModelDefault::Initialize(ID3D11Device* device) {
   sub_data.SysMemPitch = 0;
   sub_data.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &sub_data, &vertex_buffer_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get VertexBuffer failed.");
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.ByteWidth = sizeof(ULONG) * num_indices_;
@@ -126,7 +128,7 @@ void ModelDefault::Initialize(ID3D11Device* device) {
   sub_data.SysMemPitch = 0;
   sub_data.SysMemSlicePitch = 0;
   hr = device->CreateBuffer(&buffer_desc, &sub_data, &index_buffer_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get IndexBuffer failed.");
 
   // Texture
   auto texture_name = raw_path_ + "_diffuse.dds";
@@ -136,14 +138,14 @@ void ModelDefault::Initialize(ID3D11Device* device) {
   hr = DirectX::CreateDDSTextureFromFileEx(
       device, nullptr, texture_name_l, 0, D3D11_USAGE_DEFAULT,
       D3D11_BIND_SHADER_RESOURCE, 0, 0, TRUE, nullptr, &srv_diffuse_map_);
-  CHECK(SUCCEEDED(hr))("Texture [diffuse] missing");
+  CHECK(SUCCEEDED(hr))(raw_path_, "Texture [diffuse] missing");
 
   texture_name = raw_path_ + "_bump.dds";
   MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
                       (int)(texture_name.size() + 1), texture_name_l, 128);
   hr = DirectX::CreateDDSTextureFromFile(device, texture_name_l, nullptr,
                                          &srv_bump_map_);
-  CHECK(SUCCEEDED(hr))("Texture [bump] missing");
+  CHECK(SUCCEEDED(hr))(raw_path_, "Texture [bump] missing");
 }
 void ModelDefault::Shutdown() {
   SafeRelease(&srv_bump_map_);
