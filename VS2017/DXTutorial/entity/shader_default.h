@@ -42,13 +42,18 @@ class ShaderDefault {
     DirectX::XMFLOAT4 ka;
     DirectX::XMFLOAT4 kd;
     DirectX::XMFLOAT4 ks;
-    float ns;
-    DirectX::XMFLOAT3 padding;
+    DirectX::XMFLOAT4 ns;
   };
 
  public:
-  void Initialize(ID3D11Device* device);
-  void Shutdown();
+  ShaderDefault(ID3D11Device* device) {
+    InitializeResource(device);
+    InitializeShader(device);
+  }
+  ~ShaderDefault() {
+    ShutdownShader();
+    ShutdownResource();
+  }
   BOOL Render(ID3D11DeviceContext* context, const ModelDefault& model,
               const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj,
               const DirectX::XMFLOAT4& camera_pos,

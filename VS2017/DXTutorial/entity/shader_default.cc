@@ -33,16 +33,6 @@ SOFTWARE.
 #define NAIIVE_FRUSTUM_CULL 0
 #endif
 
-void naiive::entity::ShaderDefault::Initialize(ID3D11Device* device) {
-  InitializeResource(device);
-  InitializeShader(device);
-}
-
-void naiive::entity::ShaderDefault::Shutdown() {
-  ShutdownShader();
-  ShutdownResource();
-}
-
 BOOL naiive::entity::ShaderDefault::Render(
     ID3D11DeviceContext* context, const ModelDefault& model,
     const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj,
@@ -112,7 +102,7 @@ BOOL naiive::entity::ShaderDefault::Render(
     rawdata->kd.w = 1.0f;
     rawdata->ks = DirectX::XMFLOAT4(material.specular);
     rawdata->ks.w = 1.0f;
-    rawdata->ns = material.shininess;
+    rawdata->ns.x = material.shininess;
   }
   context->Unmap(const_buffer_material_, 0);
 
