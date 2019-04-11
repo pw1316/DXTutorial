@@ -46,7 +46,8 @@ class ShaderDefault {
   };
 
  public:
-  ShaderDefault(ID3D11Device* device) {
+  ShaderDefault(ID3D11Device* device, const std::string raw_path)
+      : raw_path_(raw_path) {
     InitializeResource(device);
     InitializeShader(device);
   }
@@ -67,6 +68,7 @@ class ShaderDefault {
   void ShutdownResource();
 
   // Shader
+  std::string raw_path_;
   ID3D11VertexShader* vertex_shader_ = nullptr;
   ID3D11PixelShader* pixel_shader_ = nullptr;
   ID3D11InputLayout* input_layout_ = nullptr;

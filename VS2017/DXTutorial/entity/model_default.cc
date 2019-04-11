@@ -33,6 +33,11 @@ SOFTWARE.
 #include <entity/vertex_type.h>
 #include <utils/range.h>
 
+// TODO fix
+#ifndef NAIIVE_FRUSTUM_CULL
+#define NAIIVE_FRUSTUM_CULL 1
+#endif
+
 namespace naiive::entity {
 ModelDefault::ModelDefault(ID3D11Device* device, const std::string raw_path)
     : raw_path_(raw_path),
@@ -55,6 +60,24 @@ ModelDefault::ModelDefault(ID3D11Device* device, const std::string raw_path)
   (raw_path_, "Load model with error", obj_error);
 
   Initialize(device);
+}
+
+BOOL ModelDefault::Visible(const DirectX::XMFLOAT4X4& matrix_vp) const {
+#if NAIIVE_FRUSTUM_CULL
+  FrustumWorld frustum(matrix_vp);
+  for (auto&& i : utils::Range(8)) {
+    auto&& cnr = aabb_.Corner(i);
+    auto xmcnr =
+        DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&cnr), Transform());
+    DirectX::XMStoreFloat3(&cnr, xmcnr);
+    if (frustum.Check(cnr)) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+#else
+  return TRUE;
+#endif
 }
 
 void ModelDefault::Initialize(ID3D11Device* device) {

@@ -28,12 +28,8 @@ SOFTWARE.
 #include <entity/vertex_type.h>
 #include <utils/range.h>
 
-// TODO fix
-#ifndef NAIIVE_FRUSTUM_CULL
-#define NAIIVE_FRUSTUM_CULL 0
-#endif
-
-BOOL naiive::entity::ShaderDefault::Render(
+namespace naiive::entity {
+BOOL ShaderDefault::Render(
     ID3D11DeviceContext* context, const ModelDefault& model,
     const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj,
     const DirectX::XMFLOAT4& camera_pos, const DirectX::XMFLOAT4& light_dir,
@@ -46,28 +42,14 @@ BOOL naiive::entity::ShaderDefault::Render(
   DirectX::XMFLOAT4X4 matrix_view_proj;
   DirectX::XMStoreFloat4x4(&matrix_view_proj,
                            DirectX::XMMatrixMultiply(xmview, xmproj));
-#if NAIIVE_FRUSTUM_CULL
-  FrustumWorld frustum(matrix_view_proj);
-  BOOL visible = FALSE;
-  for (auto&& i : utils::Range(8)) {
-    auto&& cnr = model.Corner(i);
-    auto xmcnr =
-        DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&cnr), xmworld);
-    DirectX::XMStoreFloat3(&cnr, xmcnr);
-    if (frustum.Check(cnr)) {
-      visible = TRUE;
-      break;
-    }
-  }
-  if (!visible) {
+  if (!model.Visible(matrix_view_proj)) {
     return FALSE;
   }
-#endif
 
   D3D11_MAPPED_SUBRESOURCE mapped;
   hr = context->Map(const_buffer_transform_, 0, D3D11_MAP_WRITE_DISCARD, 0,
                     &mapped);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Map CB0 failed");
   {
     auto rawdata = (CBTransformType*)mapped.pData;
     DirectX::XMStoreFloat4x4(&rawdata->world,
@@ -81,7 +63,7 @@ BOOL naiive::entity::ShaderDefault::Render(
 
   hr = context->Map(const_buffer_camera_light_, 0, D3D11_MAP_WRITE_DISCARD, 0,
                     &mapped);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Map CB1 failed");
   {
     auto rawdata = (CBCameraLightType*)mapped.pData;
     rawdata->camera_pos = camera_pos;
@@ -93,11 +75,12 @@ BOOL naiive::entity::ShaderDefault::Render(
 
   hr = context->Map(const_buffer_material_, 0, D3D11_MAP_WRITE_DISCARD, 0,
                     &mapped);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Map CB2 failed");
   {
     auto rawdata = (CBMaterialType*)mapped.pData;
     auto&& material = model.Material();
-    rawdata->ka = {0.05f, 0.05f, 0.05f, 1.0f};
+    rawdata->ka = DirectX::XMFLOAT4(material.ambient);
+    rawdata->ka.w = 1.0f;
     rawdata->kd = DirectX::XMFLOAT4(material.diffuse);
     rawdata->kd.w = 1.0f;
     rawdata->ks = DirectX::XMFLOAT4(material.specular);
@@ -131,25 +114,27 @@ BOOL naiive::entity::ShaderDefault::Render(
   return TRUE;
 }
 
-void naiive::entity::ShaderDefault::InitializeShader(ID3D11Device* device) {
+void ShaderDefault::InitializeShader(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   ID3D10Blob* blob = nullptr;
-  const UINT kNumLayout = 5;
-  D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
-
   UINT shader_flag = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG |
                      D3DCOMPILE_SKIP_OPTIMIZATION;
 
-  SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"res/sphere_vs.hlsl", nullptr, nullptr, "main",
-                          "vs_5_0", shader_flag, 0, &blob, nullptr);
-  ASSERT(SUCCEEDED(hr));
+  auto shader_name = raw_path_ + "_vs.hlsl";
+  WCHAR shader_name_l[128] = {0};
+  MultiByteToWideChar(CP_UTF8, 0, shader_name.c_str(),
+                      (int)(shader_name.size() + 1), shader_name_l, 128);
+  hr = D3DCompileFromFile(shader_name_l, nullptr, nullptr, "main", "vs_5_0",
+                          shader_flag, 0, &blob, nullptr);
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Compile VS failed");
   hr = device->CreateVertexShader(blob->GetBufferPointer(),
                                   blob->GetBufferSize(), nullptr,
                                   &vertex_shader_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get VS failed");
 
+  const UINT kNumLayout = 5;
+  D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
   layout[0].SemanticIndex = 0;
@@ -192,25 +177,28 @@ void naiive::entity::ShaderDefault::InitializeShader(ID3D11Device* device) {
   layout[4].InstanceDataStepRate = 0;
   hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
                                  blob->GetBufferSize(), &input_layout_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get Layout failed");
 
   SafeRelease(&blob);
-  hr = D3DCompileFromFile(L"res/sphere_ps.hlsl", nullptr, nullptr, "main",
-                          "ps_5_0", shader_flag, 0, &blob, nullptr);
-  ASSERT(SUCCEEDED(hr));
+  shader_name = raw_path_ + "_ps.hlsl";
+  MultiByteToWideChar(CP_UTF8, 0, shader_name.c_str(),
+                      (int)(shader_name.size() + 1), shader_name_l, 128);
+  hr = D3DCompileFromFile(shader_name_l, nullptr, nullptr, "main", "ps_5_0",
+                          shader_flag, 0, &blob, nullptr);
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Compile PS failed");
   hr = device->CreatePixelShader(
       blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixel_shader_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get PS failed");
   SafeRelease(&blob);
 }
 
-void naiive::entity::ShaderDefault::ShutdownShader() {
+void ShaderDefault::ShutdownShader() {
   SafeRelease(&pixel_shader_);
   SafeRelease(&input_layout_);
   SafeRelease(&vertex_shader_);
 }
 
-void naiive::entity::ShaderDefault::InitializeResource(ID3D11Device* device) {
+void ShaderDefault::InitializeResource(ID3D11Device* device) {
   HRESULT hr = S_OK;
 
   D3D11_BUFFER_DESC buffer_desc;
@@ -222,7 +210,7 @@ void naiive::entity::ShaderDefault::InitializeResource(ID3D11Device* device) {
   buffer_desc.MiscFlags = 0;
   buffer_desc.StructureByteStride = 0;
   hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_transform_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get CB0 failed");
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.ByteWidth = sizeof(CBCameraLightType);
@@ -232,7 +220,7 @@ void naiive::entity::ShaderDefault::InitializeResource(ID3D11Device* device) {
   buffer_desc.MiscFlags = 0;
   buffer_desc.StructureByteStride = 0;
   hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_camera_light_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get CB1 failed");
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.ByteWidth = sizeof(CBMaterialType);
@@ -241,21 +229,8 @@ void naiive::entity::ShaderDefault::InitializeResource(ID3D11Device* device) {
   buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
   buffer_desc.MiscFlags = 0;
   buffer_desc.StructureByteStride = 0;
-  // CBMaterialType material;
-  // material.ka = DirectX::XMFLOAT4(0.05f, 0.05f, 0.05f, 1.0f);
-  // material.kd = DirectX::XMFLOAT4(obj.materials[0].diffuse);
-  // material.kd.w = 1.0f;
-  // material.ks = DirectX::XMFLOAT4(obj.materials[0].specular);
-  // material.ks.w = 1.0f;
-  // material.ns = obj.materials[0].shininess;
-  // ZeroMemory(&sub_data, sizeof(sub_data));
-  // sub_data.pSysMem = &material;
-  // sub_data.SysMemPitch = 0;
-  // sub_data.SysMemSlicePitch = 0;
-  // hr = device->CreateBuffer(&buffer_desc, &sub_data,
-  // &const_buffer_material_);
   hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_material_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get CB2 failed");
 
   D3D11_SAMPLER_DESC sampler_desc;
   sampler_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -272,12 +247,13 @@ void naiive::entity::ShaderDefault::InitializeResource(ID3D11Device* device) {
   sampler_desc.MinLOD = 0;
   sampler_desc.MaxLOD = D3D11_FLOAT32_MAX;
   hr = device->CreateSamplerState(&sampler_desc, &sampler_state_);
-  ASSERT(SUCCEEDED(hr));
+  ASSERT_MESSAGE(SUCCEEDED(hr))(raw_path_, "Get SamplerState failed");
 }
 
-void naiive::entity::ShaderDefault::ShutdownResource() {
+void ShaderDefault::ShutdownResource() {
   SafeRelease(&sampler_state_);
   SafeRelease(&const_buffer_material_);
   SafeRelease(&const_buffer_camera_light_);
   SafeRelease(&const_buffer_transform_);
 }
+}  // namespace naiive::entity

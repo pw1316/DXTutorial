@@ -69,7 +69,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
 
   pool_model_.reset(new entity::ModelDefault(device_, "res/pool"));
 
-  shader_default.reset(new entity::ShaderDefault(device_));
+  shader_default.reset(new entity::ShaderDefault(device_, "res/sphere"));
 
   gui_ = new naiive::entity::Font;
   gui_->Initialize(device_);
