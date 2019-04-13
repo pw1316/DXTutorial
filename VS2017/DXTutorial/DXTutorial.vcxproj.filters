@@ -87,6 +87,9 @@
     <ClInclude Include="entity\model_default.h">
       <Filter>entity</Filter>
     </ClInclude>
+    <ClInclude Include="entity\shader_refract.h">
+      <Filter>entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\application.cc">
@@ -124,6 +127,9 @@
     <ClCompile Include="entity\model_default.cc">
       <Filter>entity</Filter>
     </ClCompile>
+    <ClCompile Include="entity\shader_refract.cc">
+      <Filter>entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DXTutorial.rc">
@@ -155,6 +161,12 @@
       <Filter>shader</Filter>
     </FxCompile>
     <FxCompile Include="res\water_ps.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="res\refract_ps.hlsl">
+      <Filter>shader</Filter>
+    </FxCompile>
+    <FxCompile Include="res\refract_vs.hlsl">
       <Filter>shader</Filter>
     </FxCompile>
   </ItemGroup>

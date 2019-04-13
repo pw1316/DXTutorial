@@ -33,6 +33,7 @@ class ModelDefault;
 class Font;
 class Mirror;
 class ShaderDefault;
+class ShaderRefract;
 }  // namespace naiive::entity
 
 namespace naiive::manager {
@@ -178,6 +179,7 @@ class GraphicsManagerClass : public core::IView {
   std::vector<DirectX::XMFLOAT3> model_dup_;
   std::shared_ptr<entity::ModelDefault> pool_model_;
   std::shared_ptr<entity::ShaderDefault> shader_default;
+  std::shared_ptr<entity::ShaderRefract> shader_refract;
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;
   FLOAT fog_intensity = 0.0f;

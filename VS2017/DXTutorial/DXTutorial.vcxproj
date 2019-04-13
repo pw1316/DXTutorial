@@ -105,6 +105,7 @@
     <ClInclude Include="entity\frustum.h" />
     <ClInclude Include="entity\model_default.h" />
     <ClInclude Include="entity\mirror.h" />
+    <ClInclude Include="entity\shader_refract.h" />
     <ClInclude Include="entity\vertex_type.h" />
     <ClInclude Include="Manager\graphics_manager.h" />
     <ClInclude Include="Manager\input_manager.h" />
@@ -124,6 +125,7 @@
     <ClCompile Include="entity\model_default.cc" />
     <ClCompile Include="entity\mirror.cc" />
     <ClCompile Include="entity\shader_default.cc" />
+    <ClCompile Include="entity\shader_refract.cc" />
     <ClCompile Include="main.cc" />
     <ClCompile Include="Manager\graphics_manager.cc" />
     <ClCompile Include="Manager\input_manager.cc" />
@@ -146,6 +148,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="res\font_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="res\refract_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="res\refract_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

@@ -33,6 +33,7 @@ SOFTWARE.
 #include <entity/mirror.h>
 #include <entity/model_default.h>
 #include <entity/shader_default.h>
+#include <entity/shader_refract.h>
 #include <manager/input_manager.h>
 
 namespace naiive::manager {
@@ -70,6 +71,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   pool_model_.reset(new entity::ModelDefault(device_, "res/pool"));
 
   shader_default.reset(new entity::ShaderDefault(device_, "res/sphere"));
+  shader_refract.reset(new entity::ShaderRefract(device_, "res/refract"));
 
   gui_ = new naiive::entity::Font;
   gui_->Initialize(device_);
@@ -92,6 +94,7 @@ void GraphicsManagerClass::Shutdown() {
   }
   pool_model_.reset();
   model_.reset();
+  shader_refract.reset();
   shader_default.reset();
   ShutdownRasterizer();
   ShutdownOM();
@@ -127,10 +130,10 @@ BOOL GraphicsManagerClass::OnUpdate() {
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_on_, 1);
   device_context_->OMSetBlendState(blend_state_alpha_off_, blend_factor,
                                    0xFFFFFFFF);
-  shader_default->Render(device_context_, *pool_model_, view,
+  shader_refract->Render(device_context_, *pool_model_, view,
                          matrix_perspective_, camera_.GetPos(), light_.dir,
                          {kNearPlane, kFarPlane, fog_intensity, 0.0f},
-                         {0, 0, -1, kFarPlane});
+                         {0, 1, 0, 5});
 
   // To scene
   BeginScene(render_target_view_, depth_stencil_view_);
