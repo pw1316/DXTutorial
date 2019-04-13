@@ -135,7 +135,7 @@ class GraphicsManagerClass : public core::IView {
 
   void BeginScene(ID3D11RenderTargetView* rtv, ID3D11DepthStencilView* dsv) {
     // RTV is sRGB, so we can use linear value here
-    float color[] = {fog_intensity, fog_intensity, fog_intensity, 1.0f};
+    float color[] = {fog_intensity_, fog_intensity_, fog_intensity_, 1.0f};
     device_context_->ClearRenderTargetView(rtv, color);
     device_context_->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
   }
@@ -182,7 +182,9 @@ class GraphicsManagerClass : public core::IView {
   std::shared_ptr<entity::ShaderRefract> shader_refract;
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;
-  FLOAT fog_intensity = 0.0f;
+  FLOAT fog_intensity_ = 0.0f;
+  DirectX::XMFLOAT4 water_params_ = {0.5, 0.02f, 5, 0};  // t, scale, height, 0
+  FLOAT last_frame_time_ = 0;
 };
 
 GraphicsManagerClass& GraphicsManager();

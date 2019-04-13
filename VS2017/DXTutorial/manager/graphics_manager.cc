@@ -83,6 +83,7 @@ void GraphicsManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   DirectX::XMVECTOR xmfloat4 = DirectX::XMLoadFloat4(&float4);
   xmfloat4 = DirectX::XMVector4Normalize(xmfloat4);
   DirectX::XMStoreFloat4(&light_.dir, xmfloat4);
+  last_frame_time_ = core::System().GameTime();
 }
 void GraphicsManagerClass::Shutdown() {
   mirror_->Shutdown();
@@ -101,6 +102,13 @@ void GraphicsManagerClass::Shutdown() {
   ShutdownDevice();
 }
 BOOL GraphicsManagerClass::OnUpdate() {
+  FLOAT cur_time = core::System().GameTime();
+  water_params_.x -= 0.05f * (cur_time - last_frame_time_);
+  if (water_params_.x < -1)
+  {
+    water_params_.x += 1;
+  }
+  last_frame_time_ = cur_time;
   DirectX::XMFLOAT4X4 view;
   camera_.GetMatrix(view);
   DirectX::XMFLOAT4X4 reflect_view;
@@ -119,7 +127,7 @@ BOOL GraphicsManagerClass::OnUpdate() {
     model_->MoveTo(pos);
     shader_default->Render(device_context_, *model_, reflect_view,
                            matrix_perspective_, camera_.GetPos(), light_.dir,
-                           {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                           {kNearPlane, kFarPlane, fog_intensity_, 0.0f},
                            {0, 0, -1, kFarPlane});
   }
 
@@ -132,8 +140,8 @@ BOOL GraphicsManagerClass::OnUpdate() {
                                    0xFFFFFFFF);
   shader_refract->Render(device_context_, *pool_model_, view,
                          matrix_perspective_, camera_.GetPos(), light_.dir,
-                         {kNearPlane, kFarPlane, fog_intensity, 0.0f},
-                         {0, 1, 0, 5});
+                         {kNearPlane, kFarPlane, fog_intensity_, 0.0f},
+                         {0, 1, 0, water_params_.z});
 
   // To scene
   BeginScene(render_target_view_, depth_stencil_view_);
@@ -148,18 +156,19 @@ BOOL GraphicsManagerClass::OnUpdate() {
     if (shader_default->Render(device_context_, *model_, view,
                                matrix_perspective_, camera_.GetPos(),
                                light_.dir,
-                               {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                               {kNearPlane, kFarPlane, fog_intensity_, 0.0f},
                                {0, 0, -1, kFarPlane})) {
       ++frustum_visible_models;
     }
   }
   shader_default->Render(device_context_, *pool_model_, view,
                          matrix_perspective_, camera_.GetPos(), light_.dir,
-                         {kNearPlane, kFarPlane, fog_intensity, 0.0f},
+                         {kNearPlane, kFarPlane, fog_intensity_, 0.0f},
                          {0, 0, -1, kFarPlane});
 
   // Mirror
-  mirror_->Render(device_context_, view, matrix_perspective_, reflect_view);
+  mirror_->Render(device_context_, view, matrix_perspective_, reflect_view,
+                  water_params_);
 
   // GUI
   device_context_->OMSetDepthStencilState(depth_stencil_state_z_off_, 1);

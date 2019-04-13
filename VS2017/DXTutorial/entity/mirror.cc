@@ -23,6 +23,8 @@ SOFTWARE.
 
 #include "mirror.h"
 
+#include <DirectX/DDSTextureLoader.h>
+
 #include <entity/vertex_type.h>
 
 namespace naiive::entity {
@@ -67,6 +69,15 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   ASSERT_MESSAGE(SUCCEEDED(hr))
   ("Get DirectX 11 SRV failed", STD_HEX(hr));
 
+  auto texture_name = std::string("res/water_bump.dds");
+  WCHAR texture_name_l[128] = {0};
+  MultiByteToWideChar(CP_UTF8, 0, texture_name.c_str(),
+                      (int)(texture_name.size() + 1), texture_name_l, 128);
+  hr = DirectX::CreateDDSTextureFromFileEx(
+      device, nullptr, texture_name_l, 0, D3D11_USAGE_DEFAULT,
+      D3D11_BIND_SHADER_RESOURCE, 0, 0, TRUE, nullptr, &srv_bump_);
+  CHECK(SUCCEEDED(hr))("water Texture [bump] missing");
+
   D3D11_BUFFER_DESC buffer_desc;
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -75,9 +86,20 @@ void Mirror::Initialize(ID3D11Device* device, UINT width, UINT height) {
   buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
   buffer_desc.MiscFlags = 0;
   buffer_desc.StructureByteStride = 0;
-  hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_);
+  hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_transform_);
   ASSERT_MESSAGE(SUCCEEDED(hr))
-  ("Get DirectX 11 CB failed", STD_HEX(hr));
+  ("Get DirectX 11 CB0 failed", STD_HEX(hr));
+
+  ZeroMemory(&buffer_desc, sizeof(buffer_desc));
+  buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+  buffer_desc.ByteWidth = sizeof(CB1Type);
+  buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+  buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+  buffer_desc.MiscFlags = 0;
+  buffer_desc.StructureByteStride = 0;
+  hr = device->CreateBuffer(&buffer_desc, nullptr, &const_buffer_water_);
+  ASSERT_MESSAGE(SUCCEEDED(hr))
+  ("Get DirectX 11 CB1 failed", STD_HEX(hr));
 
   ZeroMemory(&buffer_desc, sizeof(buffer_desc));
   buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -133,8 +155,10 @@ void Mirror::Shutdown() {
   SafeRelease(&sampler_state_);
   SafeRelease(&index_buffer_);
   SafeRelease(&vertex_buffer_);
-  SafeRelease(&const_buffer_);
+  SafeRelease(&const_buffer_water_);
+  SafeRelease(&const_buffer_transform_);
 
+  SafeRelease(&srv_bump_);
   SafeRelease(&srv_refract_);
   SafeRelease(&rtv_refract_);
   SafeRelease(&texture_refract_);
@@ -146,11 +170,12 @@ void Mirror::Shutdown() {
 void Mirror::Render(ID3D11DeviceContext* context,
                     const DirectX::XMFLOAT4X4& view,
                     const DirectX::XMFLOAT4X4& proj,
-                    const DirectX::XMFLOAT4X4& view_reflect) {
+                    const DirectX::XMFLOAT4X4& view_reflect,
+                    const DirectX::XMFLOAT4& water_params) {
   HRESULT hr = S_OK;
 
   D3D11_MAPPED_SUBRESOURCE mapped;
-  context->Map(const_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+  context->Map(const_buffer_transform_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
     auto rawdata = (CB0Type*)mapped.pData;
     auto temp = DirectX::XMMatrixIdentity();
@@ -165,22 +190,29 @@ void Mirror::Render(ID3D11DeviceContext* context,
     temp = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&view_reflect));
     DirectX::XMStoreFloat4x4(&rawdata->matrix_reflect_view, temp);
   }
-  context->Unmap(const_buffer_, 0);
+  context->Unmap(const_buffer_transform_, 0);
+
+  context->Map(const_buffer_water_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+  {
+    auto rawdata = (CB1Type*)mapped.pData;
+    rawdata->water = water_params;
+  }
+  context->Unmap(const_buffer_water_, 0);
 
   context->Map(vertex_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
   {
     auto rawdata = (VertexType*)mapped.pData;
-    rawdata[0].pos = {-80, -5, 80, 1};
+    rawdata[0].pos = {-80, -water_params.z, 80, 1};
     rawdata[0].uv = {0.0f, 0.0f};
-    rawdata[1].pos = {80, -5, -80, 1};
+    rawdata[1].pos = {80, -water_params.z, -80, 1};
     rawdata[1].uv = {1.0f, 1.0f};
-    rawdata[2].pos = {-80, -5, -80, 1};
+    rawdata[2].pos = {-80, -water_params.z, -80, 1};
     rawdata[2].uv = {0.0f, 1.0f};
-    rawdata[3].pos = {-80, -5, 80, 1};
+    rawdata[3].pos = {-80, -water_params.z, 80, 1};
     rawdata[3].uv = {0.0f, 0.0f};
-    rawdata[4].pos = {80, -5, 80, 1};
+    rawdata[4].pos = {80, -water_params.z, 80, 1};
     rawdata[4].uv = {1.0f, 0.0f};
-    rawdata[5].pos = {80, -5, -80, 1};
+    rawdata[5].pos = {80, -water_params.z, -80, 1};
     rawdata[5].uv = {1.0f, 1.0f};
   }
   context->Unmap(vertex_buffer_, 0);
@@ -192,11 +224,13 @@ void Mirror::Render(ID3D11DeviceContext* context,
   context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
   context->IASetInputLayout(input_layout_);
 
-  context->VSSetConstantBuffers(0, 1, &const_buffer_);
+  context->VSSetConstantBuffers(0, 1, &const_buffer_transform_);
   context->VSSetShader(vertex_shader_, nullptr, 0);
 
+  context->PSSetConstantBuffers(0, 1, &const_buffer_water_);
   context->PSSetShaderResources(0, 1, &srv_reflect_);
   context->PSSetShaderResources(1, 1, &srv_refract_);
+  context->PSSetShaderResources(2, 1, &srv_bump_);
   context->PSSetSamplers(0, 1, &sampler_state_);
   context->PSSetShader(pixel_shader_, nullptr, 0);
 
@@ -221,7 +255,7 @@ void Mirror::InitializeShader(ID3D11Device* device) {
                                   &vertex_shader_);
   ASSERT(SUCCEEDED(hr));
 
-  const UINT kNumLayout = 1;
+  const UINT kNumLayout = 2;
   D3D11_INPUT_ELEMENT_DESC layout[kNumLayout];
   ZeroMemory(layout, sizeof(layout));
   layout[0].SemanticName = "POSITION";
@@ -231,6 +265,14 @@ void Mirror::InitializeShader(ID3D11Device* device) {
   layout[0].AlignedByteOffset = offsetof(VertexType, pos);
   layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
   layout[0].InstanceDataStepRate = 0;
+
+  layout[1].SemanticName = "TEXCOORD";
+  layout[1].SemanticIndex = 0;
+  layout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+  layout[1].InputSlot = 0;
+  layout[1].AlignedByteOffset = offsetof(VertexType, uv);
+  layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+  layout[1].InstanceDataStepRate = 0;
   hr = device->CreateInputLayout(layout, kNumLayout, blob->GetBufferPointer(),
                                  blob->GetBufferSize(), &input_layout_);
   ASSERT(SUCCEEDED(hr));

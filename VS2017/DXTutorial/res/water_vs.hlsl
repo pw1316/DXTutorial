@@ -30,12 +30,14 @@ cbuffer consts0 : register(b0) {
 
 struct VertexIn {
   float4 pos : POSITION;
+  float2 uv : TEXCOORD0;
 };
 
 struct VertexOut {
   float4 pos : SV_POSITION;
-  float4 pos_reflect : TEXCOORD0;
-  float4 pos_refract : TEXCOORD1;
+  float2 uv : TEXCOORD0;
+  float4 pos_reflect : TEXCOORD1;
+  float4 pos_refract : TEXCOORD2;
 };
 
 VertexOut main(VertexIn vin) {
@@ -43,6 +45,7 @@ VertexOut main(VertexIn vin) {
   VertexOut vout;
   vout.pos = mul(pos_world, matrix_view);
   vout.pos = mul(vout.pos, matrix_proj);
+  vout.uv = vin.uv;
   vout.pos_reflect = mul(pos_world, matrix_reflect_view);
   vout.pos_reflect = mul(vout.pos_reflect, matrix_proj);
   vout.pos_refract = vout.pos;  // Ni=1 for now

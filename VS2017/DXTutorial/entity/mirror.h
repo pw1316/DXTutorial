@@ -32,6 +32,9 @@ class Mirror {
     DirectX::XMFLOAT4X4 matrix_proj;
     DirectX::XMFLOAT4X4 matrix_reflect_view;
   };
+  struct CB1Type {
+    DirectX::XMFLOAT4 water;  // translate, scale, height, 0
+  };
   static constexpr ID3D11ShaderResourceView* kDummyShaderResourceView = nullptr;
   static constexpr UINT kWidth = 256;
   static constexpr UINT kHeight = 192;
@@ -41,7 +44,8 @@ class Mirror {
   void Shutdown();
   void Render(ID3D11DeviceContext* context, const DirectX::XMFLOAT4X4& view,
               const DirectX::XMFLOAT4X4& proj,
-              const DirectX::XMFLOAT4X4& view_reflect);
+              const DirectX::XMFLOAT4X4& view_reflect,
+              const DirectX::XMFLOAT4& water_params);
 
   ID3D11RenderTargetView* rtv_reflect() { return rtv_reflect_; }
   ID3D11RenderTargetView* rtv_refract() { return rtv_refract_; }
@@ -58,7 +62,10 @@ class Mirror {
   ID3D11ShaderResourceView* srv_refract_ = nullptr;
   ID3D11Texture2D* texture_refract_ = nullptr;
 
-  ID3D11Buffer* const_buffer_ = nullptr;
+  ID3D11ShaderResourceView* srv_bump_ = nullptr;
+
+  ID3D11Buffer* const_buffer_transform_ = nullptr;
+  ID3D11Buffer* const_buffer_water_ = nullptr;
   ID3D11Buffer* vertex_buffer_ = nullptr;
   ID3D11Buffer* index_buffer_ = nullptr;
   ID3D11SamplerState* sampler_state_ = nullptr;
