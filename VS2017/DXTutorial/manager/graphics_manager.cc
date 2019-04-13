@@ -103,12 +103,20 @@ void GraphicsManagerClass::Shutdown() {
 }
 BOOL GraphicsManagerClass::OnUpdate() {
   FLOAT cur_time = core::System().GameTime();
-  water_params_.x -= 0.05f * (cur_time - last_frame_time_);
+  FLOAT dt = cur_time - last_frame_time_;
+  last_frame_time_ = cur_time;
+
+  water_params_.x -= 0.05f * dt;
   if (water_params_.x < -1)
   {
     water_params_.x += 1;
   }
-  last_frame_time_ = cur_time;
+  if (InputManager().IsKeyDown(DIK_Z))
+  {
+    water_params_.z += 2.0f * dt;
+  } else if (InputManager().IsKeyDown(DIK_X)) {
+    water_params_.z -= 2.0f * dt;
+  }
   DirectX::XMFLOAT4X4 view;
   camera_.GetMatrix(view);
   DirectX::XMFLOAT4X4 reflect_view;

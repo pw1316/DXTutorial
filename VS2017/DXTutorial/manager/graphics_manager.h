@@ -183,7 +183,7 @@ class GraphicsManagerClass : public core::IView {
   naiive::entity::Font* gui_ = nullptr;
   std::shared_ptr<entity::Mirror> mirror_;
   FLOAT fog_intensity_ = 0.0f;
-  DirectX::XMFLOAT4 water_params_ = {0.5, 0.02f, 5, 0};  // t, scale, height, 0
+  DirectX::XMFLOAT4 water_params_ = {0.5, 0.01f, 5, 0};  // t, scale, height, 0
   FLOAT last_frame_time_ = 0;
 };
 
