@@ -73,14 +73,18 @@ void SoundManagerClass::Shutdown() {
 BOOL SoundManagerClass::OnUpdate() {
   HRESULT hr = S_OK;
 
-  hr = secondary_buffer_->SetCurrentPosition(0);
-  ASSERT(SUCCEEDED(hr));
+  DWORD status;
+  secondary_buffer_->GetStatus(&status);
+  if (status == 0) {
+    hr = secondary_buffer_->SetCurrentPosition(0);
+    ASSERT(SUCCEEDED(hr));
 
-  hr = secondary_buffer_->SetVolume(DSBVOLUME_MAX);
-  ASSERT(SUCCEEDED(hr));
+    hr = secondary_buffer_->SetVolume(DSBVOLUME_MAX);
+    ASSERT(SUCCEEDED(hr));
 
-  hr = secondary_buffer_->Play(0, 0, 0);
-  ASSERT(SUCCEEDED(hr));
+    hr = secondary_buffer_->Play(0, 0, 0);
+    ASSERT(SUCCEEDED(hr));
+  }
   return TRUE;
 }
 
