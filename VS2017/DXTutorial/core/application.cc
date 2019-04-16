@@ -52,18 +52,22 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
         is_quit = TRUE;
       }
     }
-    /* Input */
+    // Input
     if (!manager::InputManager().OnUpdate()) {
       break;
     }
-    if (manager::InputManager().IsKeyDown(DIK_ESCAPE)) {
-      break;
+    // Sound
+    if (manager::InputManager().IsKeyDown(DIK_S)) {
+      manager::SoundManager().OnUpdate();
     }
-    /* Graphics */
+    // Graphics
     if (!manager::GraphicsManager().OnUpdate()) {
       break;
     }
     System().CountFrame();
+    if (manager::InputManager().IsKeyDown(DIK_ESCAPE)) {
+      break;
+    }
   }
 
   manager::GraphicsManager().Shutdown();

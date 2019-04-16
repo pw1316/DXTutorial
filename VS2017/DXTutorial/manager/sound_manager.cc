@@ -41,7 +41,7 @@ void SoundManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   buffer_desc.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRLVOLUME;
   buffer_desc.dwBufferBytes = 0;
   buffer_desc.dwReserved = 0;
-  buffer_desc.lpwfxFormat = NULL;
+  buffer_desc.lpwfxFormat = nullptr;
   buffer_desc.guid3DAlgorithm = GUID_NULL;
   hr = dsound_->CreateSoundBuffer(&buffer_desc, &primary_buffer_, nullptr);
   ASSERT(SUCCEEDED(hr));
@@ -58,12 +58,12 @@ void SoundManagerClass::Initialize(HWND hwnd, UINT width, UINT height) {
   wave_format_ex.cbSize = 0;
   hr = primary_buffer_->SetFormat(&wave_format_ex);
 
-  // LoadWave();
+  LoadWave();
   OnUpdate();
 }
 
 void SoundManagerClass::Shutdown() {
-  // UnloadWave();
+  UnloadWave();
 
   SafeRelease(&primary_buffer_);
   SafeRelease(&dsound_);
@@ -71,23 +71,23 @@ void SoundManagerClass::Shutdown() {
 }
 
 BOOL SoundManagerClass::OnUpdate() {
-  // HRESULT hr = S_OK;
+  HRESULT hr = S_OK;
 
-  // hr = secondary_buffer_->SetCurrentPosition(0);
-  // ASSERT(SUCCEEDED(hr));
+  hr = secondary_buffer_->SetCurrentPosition(0);
+  ASSERT(SUCCEEDED(hr));
 
-  // hr = secondary_buffer_->SetVolume(DSBVOLUME_MAX);
-  // ASSERT(SUCCEEDED(hr));
+  hr = secondary_buffer_->SetVolume(DSBVOLUME_MAX);
+  ASSERT(SUCCEEDED(hr));
 
-  // hr = secondary_buffer_->Play(0, 0, 0);
-  // ASSERT(SUCCEEDED(hr));
+  hr = secondary_buffer_->Play(0, 0, 0);
+  ASSERT(SUCCEEDED(hr));
   return TRUE;
 }
 
 void SoundManagerClass::LoadWave() {
   HRESULT hr = S_OK;
 
-  std::ifstream ifs("foo.wav", std::ios::binary);
+  std::ifstream ifs("res/foo.wav", std::ios::binary);
   assert(ifs.is_open());  // TODO
 
   WaveHeaderType wave_header;
@@ -142,7 +142,7 @@ void SoundManagerClass::LoadWave() {
   IDirectSoundBuffer* temp_buffer;
   hr = dsound_->CreateSoundBuffer(&buffer_desc, &temp_buffer, nullptr);
   ASSERT(SUCCEEDED(hr));
-  hr = temp_buffer->QueryInterface(IID_IDirectSound3DBuffer8,
+  hr = temp_buffer->QueryInterface(IID_IDirectSoundBuffer8,
                                    (void**)&secondary_buffer_);
   SafeRelease(&temp_buffer);
   ASSERT(SUCCEEDED(hr));
