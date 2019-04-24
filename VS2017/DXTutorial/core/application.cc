@@ -27,6 +27,7 @@ SOFTWARE.
 #include <manager/graphics_manager.h>
 #include <manager/input_manager.h>
 #include <manager/sound_manager.h>
+#include <utils/range.h>
 
 namespace naiive::core {
 void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
@@ -56,11 +57,48 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
     if (!manager::InputManager().OnUpdate()) {
       break;
     }
+    // Sound position
+    {
+      FLOAT t = System().GameTime();
+      FLOAT e = std::sqrt(1.0f + 2 * sound_energy_ * sound_angular_momentum_ *
+                                     sound_angular_momentum_ / sound_mass_ /
+                                     sound_k_ / sound_k_);
+      LOG(LOG_INFO)("e", e);
+      FLOAT mt =
+          t * std::sqrt(-8 * sound_energy_ * sound_energy_ * sound_energy_ /
+                        sound_mass_ / sound_k_ / sound_k_);
+      INT circle = static_cast<INT>(mt / DirectX::XM_2PI);
+      mt -= circle * DirectX::XM_2PI;
+      FLOAT etl = 0, etr = DirectX::XM_2PI;
+      for (auto i : utils::Range(50)) {
+        FLOAT et = (etl + etr) * 0.5f;
+        if (et - e * std::sin(et) > mt) {
+          etr = et;
+        } else {
+          etl = et;
+        }
+      }
+      FLOAT et = (etl + etr) * 0.5f;
+      FLOAT thetat = std::tan(et * 0.5f);
+      thetat *= std::sqrt((1 + e) / (1 - e));
+      thetat = 2 * std::atan(thetat);
+      if (thetat < 0.0f) {
+        thetat += DirectX::XM_2PI;
+      }
+      FLOAT r = sound_angular_momentum_ * sound_angular_momentum_ /
+                sound_mass_ / sound_k_ / (1 + e * std::cos(thetat));
+      sound_position_.x = r * std::sin(thetat);
+      sound_position_.y = 0;
+      sound_position_.z = -r * std::cos(thetat);
+      manager::SoundManager().MoveTo(sound_position_.x, sound_position_.y,
+                                     sound_position_.z);
+    }
     // Sound
     if (manager::InputManager().IsKeyDown(DIK_S)) {
       manager::SoundManager().OnUpdate();
     }
     // Graphics
+    manager::GraphicsManager().SoundMoveTo(sound_position_);
     if (!manager::GraphicsManager().OnUpdate()) {
       break;
     }

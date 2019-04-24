@@ -138,6 +138,11 @@ BOOL GraphicsManagerClass::OnUpdate() {
                            {kNearPlane, kFarPlane, fog_intensity_, 0.0f},
                            {0, 0, -1, kFarPlane});
   }
+  model_->MoveTo(model_sound_);
+  shader_default->Render(device_context_, *model_, reflect_view,
+                         matrix_perspective_, camera_.GetPos(), light_.dir,
+                         {kNearPlane, kFarPlane, fog_intensity_, 0.0f},
+                         {0, 0, -1, kFarPlane});
 
   // Refract texture
   rtv = mirror_->rtv_refract();
@@ -169,6 +174,11 @@ BOOL GraphicsManagerClass::OnUpdate() {
       ++frustum_visible_models;
     }
   }
+  model_->MoveTo(model_sound_);
+  shader_default->Render(device_context_, *model_, view,
+                         matrix_perspective_, camera_.GetPos(), light_.dir,
+                         {kNearPlane, kFarPlane, fog_intensity_, 0.0f},
+                         {0, 0, -1, kFarPlane});
   shader_default->Render(device_context_, *pool_model_, view,
                          matrix_perspective_, camera_.GetPos(), light_.dir,
                          {kNearPlane, kFarPlane, fog_intensity_, 0.0f},

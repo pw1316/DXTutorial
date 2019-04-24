@@ -25,6 +25,8 @@ SOFTWARE.
 #define __MANAGER_SOUND_MANAGER__
 #include <dsound.h>
 
+#include <fstream>
+
 #include <core/iview.h>
 
 namespace naiive::manager {
@@ -53,13 +55,24 @@ class SoundManagerClass : public core::IView {
   virtual void Initialize(HWND hwnd, UINT width, UINT height) override;
   virtual void Shutdown() override;
   virtual BOOL OnUpdate() override;
+  void MoveTo(FLOAT x, FLOAT y, FLOAT z) {
+    position_.x = x;
+    position_.y = y;
+    position_.z = z;
+  }
 
  private:
   void LoadWave();
   void UnloadWave();
+  void ReadAndCheckWaveHeader(std::ifstream& ifs, WaveHeaderType& header);
+
   IDirectSound8* dsound_ = nullptr;
   IDirectSoundBuffer* primary_buffer_ = nullptr;
-  IDirectSoundBuffer8* secondary_buffer_ = nullptr;
+  IDirectSound3DListener8* listener_ = nullptr;
+  IDirectSoundBuffer8* secondary_buffer_1_ = nullptr;
+  IDirectSoundBuffer8* secondary_buffer_2_ = nullptr;
+  IDirectSound3DBuffer8* secondary_buffer_2_3d_ = nullptr;
+  DirectX::XMFLOAT4 position_;
 };
 
 SoundManagerClass& SoundManager();

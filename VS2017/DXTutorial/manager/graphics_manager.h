@@ -112,6 +112,7 @@ class GraphicsManagerClass : public core::IView {
   virtual void Initialize(HWND hwnd, UINT width, UINT height) override;
   virtual void Shutdown() override;
   virtual BOOL OnUpdate() override;
+  void SoundMoveTo(const DirectX::XMFLOAT4& pos) { model_sound_ = pos; }
 
  private:
   GraphicsManagerClass()
@@ -177,6 +178,7 @@ class GraphicsManagerClass : public core::IView {
   Light light_;
   std::shared_ptr<entity::ModelDefault> model_;
   std::vector<DirectX::XMFLOAT3> model_dup_;
+  DirectX::XMFLOAT4 model_sound_;
   std::shared_ptr<entity::ModelDefault> pool_model_;
   std::shared_ptr<entity::ShaderDefault> shader_default;
   std::shared_ptr<entity::ShaderRefract> shader_refract;

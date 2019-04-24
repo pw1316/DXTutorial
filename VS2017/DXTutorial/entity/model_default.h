@@ -75,6 +75,11 @@ class ModelDefault {
   ID3D11ShaderResourceView* BumpMap() const { return srv_bump_map_; }
 
   void MoveTo(const DirectX::XMFLOAT3& translate) { translate_ = translate; }
+  void MoveTo(const DirectX::XMFLOAT4& translate) {
+    translate_.x = translate.x;
+    translate_.y = translate.y;
+    translate_.z = translate.z;
+  }
   BOOL Visible(const DirectX::XMFLOAT4X4& matrix_vp) const;
 
  private:
