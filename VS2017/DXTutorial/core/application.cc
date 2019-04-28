@@ -60,19 +60,12 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
     // Sound position
     {
       FLOAT t = System().GameTime();
-      FLOAT e = std::sqrt(1.0f + 2 * sound_energy_ * sound_angular_momentum_ *
-                                     sound_angular_momentum_ / sound_mass_ /
-                                     sound_k_ / sound_k_);
-      LOG(LOG_INFO)("e", e);
-      FLOAT mt =
-          t * std::sqrt(-8 * sound_energy_ * sound_energy_ * sound_energy_ /
-                        sound_mass_ / sound_k_ / sound_k_);
-      INT circle = static_cast<INT>(mt / DirectX::XM_2PI);
-      mt -= circle * DirectX::XM_2PI;
+      FLOAT mt = t / sound_oval_T_;
+      mt = (mt - std::floor(mt)) * DirectX::XM_2PI;
       FLOAT etl = 0, etr = DirectX::XM_2PI;
       for (auto i : utils::Range(50)) {
         FLOAT et = (etl + etr) * 0.5f;
-        if (et - e * std::sin(et) > mt) {
+        if (et - sound_oval_e_ * std::sin(et) > mt) {
           etr = et;
         } else {
           etl = et;
@@ -80,13 +73,13 @@ void ApplicationClass::Run(HINSTANCE hinstance, INT command_show) {
       }
       FLOAT et = (etl + etr) * 0.5f;
       FLOAT thetat = std::tan(et * 0.5f);
-      thetat *= std::sqrt((1 + e) / (1 - e));
+      thetat *= std::sqrt((1 + sound_oval_e_) / (1 - sound_oval_e_));
       thetat = 2 * std::atan(thetat);
       if (thetat < 0.0f) {
         thetat += DirectX::XM_2PI;
       }
-      FLOAT r = sound_angular_momentum_ * sound_angular_momentum_ /
-                sound_mass_ / sound_k_ / (1 + e * std::cos(thetat));
+      FLOAT r = sound_oval_a_ * (1 - sound_oval_e_ * sound_oval_e_) /
+                (1 + sound_oval_e_ * std::cos(thetat));
       sound_position_.x = r * std::sin(thetat);
       sound_position_.y = 0;
       sound_position_.z = -r * std::cos(thetat);

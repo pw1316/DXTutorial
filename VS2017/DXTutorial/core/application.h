@@ -54,10 +54,9 @@ class ApplicationClass {
   UINT width_ = 1024U;
   UINT height_ = 768U;
   DirectX::XMFLOAT4 sound_position_;
-  FLOAT sound_energy_ = -1;
-  FLOAT sound_angular_momentum_ = 8.5f;
-  FLOAT sound_mass_ = 0.02f;
-  FLOAT sound_k_ = 100;
+  FLOAT sound_oval_a_ = 50;
+  FLOAT sound_oval_e_ = 0.5f;
+  FLOAT sound_oval_T_ = 10;
 };
 
 ApplicationClass& Application(UINT width = 1024U, UINT height = 768U);
